@@ -1,0 +1,100 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%\pagestyle{plain}
+%
+\usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\usepackage{amssymb}
+\usepackage[super]{nth}
+\newcommand{\ith}{i\textsuperscript{th} }
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{extarrows}
+\usepackage{pgf}
+\usepackage{tikz}
+%\usetikzlibrary{arrows,shapes,snakes,automata,backgrounds,petri}
+
+\newcommand{\Prob}{\text{Prob}}
+
+\newcommand{\Cor}{\text{Cor}}
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{center}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+       {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{center}
+  }
+\makeatother
+
+\begin{document}
+%
+\title{An Automatic Search Tool for Iterative Trails and its Application to KNOT, PRESENT, GIFT-64 and RECTANGLE 
+%\thanks{Supported by organization x.}
+}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+%\author{First Author\inst{1}\orcidID{0000-1111-2222-3333} \and
+%Second Author\inst{2,3}\orcidID{1111-2222-3333-4444} \and
+%Third Author\inst{3}\orcidID{2222--3333-4444-5555}}
+%
+%\authorrunning{F. Author et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+%\institute{Princeton University, Princeton NJ 08544, USA \and
+%Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
+%\email{lncs@springer.com}\\
+%\url{http://www.springer.com/gp/computer-science/lncs} \and
+%ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
+%\email{\{abc,lncs\}@uni-heidelberg.de}}
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+To conduct a successful differential (linear) cryptanalysis to a symmetric-key primitive, a differential (linear) distinguisher with significant differential probability (correlation contribution) is needed. We observe that, for some lightweight symmetric-key primitives, their significant trails usually contain iterative trails. We propose an automatic tool for searching iterative trails and determinating the weight of the best trail constructed by iterative trails and the weight of the best differential or linear propagation composed of significant trails constructed by iterative trails. Respectively applying our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, iterative trails are found and visualized. An upper bound of the weight of the best trail with arbitrary rounds is obtained in several seconds. When the number of rounds is large, it's illustrated that the upper bound coincide with the best weight or is very tight. An upper bound of the weight of the best differential or linear propagation is also obtained by considering the clustering effect. For 14-round 256-bit KNOT permutation, 13-round GIFT-64 and 15-round RECTANGLE, better differential distinguishers than the best differential trails are obtained. For 10-round 256-bit KNOT permutation and 13-round RECTANGLE, better linear distinguishers than the best linear trails are obtained. Additionally, by constraining the input and output differences and masks, results for KNOT-AEAD fitting certain differential and linear attack scenarios in Duplex mode of operations are obtained. 
+
+\keywords{Differential Cryptanalysis \and Linear Cryptanalysis \and Automatic Search Tools \and Iterative Trails \and Lightweight Cryptography}
+\end{abstract}
+
+%\input{introduction.tex}
+\input{preliminary.tex}
+%\input{paragraph1.tex}
+%\input{paragraph2.tex}
+%\input{paragraph3.tex}
+%\input{experiment.tex}
+%\input{paragraph4.tex}
+%\input{conclusion.tex}
+
+\input{bib.tex}
+%\input{appendix.tex}
+
+
+\end{document}

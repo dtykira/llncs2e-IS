@@ -1,0 +1,108 @@
+\section{Preliminary\label{sec:pre}}
+
+%\subsection{Some Basic Definitions in Graph Theory \cite{J75}}
+%A $directed$ $graph$ $G(V, E)$ consists of a nonempty and finite set of vertices $V$ and a set $E$ of ordered pairs of distinct vertices called $edges$. There are $n$ vertices and $e$ edges in $G$. A $path$ in $G$ is a sequence of vertices $p_{vu}(v=v_1, v_2, \cdots, v_k=u)$, such that $(v_i, v_{i+1})\in E $ $for$ $ 1 \leq i < k$. A $circuit$ is a path in which the first and last vertices are identical. A path is $elementary$ if no vertex appears twice. A circuit is elementary if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
+%$F$ is a $subgraph$ $of$ $G$ $induced$ $by$ $W$ if $W \subseteq V$ and $F= (W, \{(u, v)|u, v\in W $ and $(u,v)\in E\})$. An induced subgraph $F$ is a (maximal) $strong$ $component$ of $G$ if for all $u, v\in W$there exist paths $p_{uv}$ and $p_{vu}$ and this property holds for no subgraph of $G$ induced by a vertex set $\overline{W}$ such that $W \subset W \subseteq V$.
+
+\subsection{Differential Trail, Differential Propagation and Truncated Differential Propagation}
+
+Let $\beta$ be an iterative Boolean transformation from $\mathbb{F}_2^n$ to $\mathbb{F}_2^n$: 
+\[
+    \beta=\rho^{(r)}\circ\rho^{(r-1)}\circ\cdots\circ\rho^{(2)}\circ\rho^{(1)}.
+\]
+A diffrential trail $Q$ over $\beta$ consists of a sequence of $r+1$ differences:
+\[
+    Q=(q^{(0)},q^{(1)},q^{(2)},\cdots,q^{(r-1)},q^{(r)}).
+\]
+The probability of a differential step $(q^{(i-1)},q^{(i)})$ is defined as:
+\[
+    \Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)})=2^{-n}\times\#\{x\in \mathbb{F}_2^n|\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}\}
+\]
+Assuming the independence of differenti differential steps, the probability of $Q$ is:
+\[
+    \Prob^{\beta}(Q)=\prod\limits_i\Prob(q^{(i-1)},q^{(i)}).
+\]
+A difference propagation of $\beta$ is composed of $r$-round differential trails with the same initial and final differences. The probability of a difference propagation $(a,b)$ is the sum of the probabilities of all these differential trails:
+\[
+    \Prob^{\beta}(a,b)=\sum\limits_{q^{(0)}=a,q^{(r)}=b}\Prob(Q).
+\]
+Let $\lambda$ be a linear function corresponding to an $n\times l$ binary matrix $M$. The difference propagation probabilities of $\lambda\circ\beta$ are given by:
+\[
+    \Prob^{\lambda\circ\beta}(a,b)=\sum\limits_{\omega|b=M\omega}\Prob^{\lambda\circ\beta}(a,\omega).
+\]
+
+\subsection{Linear Trail and Linear Propagation}
+
+A linear trail $U$ over $\beta$ consists of a sequence of $r+1$ masks:
+\[
+    U=(u^{(0)},u^{(1)},u^{(2)},\cdots,u^{(r-1)},u^{(r)}).
+\]
+The correlation of a linear step $(u^{(i-1)},u^{(i)})$ is defined as:
+\[
+    \Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})=2^{-n+1}\times\#\{x|u^{(i-1)}\cdot x=u^{(i)}\cdot \rho^{(i)}(x)\}-1.
+\]
+The correlation of $U$ is:
+\[
+    \Cor^{\beta}(U)=\prod\limits_i\Cor(u^{(i-1)},u^{(i)}).
+\]
+A linear propagation of $\beta$ is composed of $r$-round linear trails with the same initial and final masks. The correlation of a linear propagation $(a,b)$ is the sum of the correlations of all these linear trails:
+\[
+    \Cor^{\beta}(a,b)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}\Cor(U).
+\]
+A key-alternating cipher $\beta'$ consists of key-independent round transformations $\rho^{(i)}$ and simple key addition by means of XOR denoted as $\sigma[k]$:
+\[
+    \beta'=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}].
+\]
+For a key-alternating cipher, The amplitude of the correlation of a linear trail is independent of the round keys:
+\begin{align*}
+    \Cor^{\beta'}(U)&=(-1)^{u^{(0)}\cdot k^{(0)}}\prod\limits_i(-1)^{u^{(i)}\cdot k^{(i)}}\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)}).\\
+    &=(-1)^{d_U\oplus U\cdot K}\bigg\lvert\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})\bigg\rvert
+\end{align*}
+where $K=(k^{(0)},k^{(1)},k^{(2)},\cdots,k^{(r-1)},k^{(r)})$, $d_U=1$ if $\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})<0$ and $d_U=0$ otherwise. Thus the correlation of a linear propagation (a,b) for a key-alternating cipher is:
+\[
+    \Cor^{\beta'}(a,b)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(-1)^{d_U\oplus U\cdot K}\lvert\Cor^{\beta'}(U)\rvert.
+\]
+We denote the square of a correlation by correlation potential. The average correlation potential between an input and an output mask is the sum of the correlation potentials of all linear trails between the input and output masks:
+\[
+    \text{Exp}_{K}((\Cor^{\beta'}(a,b))^2)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(\Cor^{\beta'}(U))^2
+\]
+
+
+\subsection{Notations of a Differential or Linear Trail \cite{DR01}}
+
+Given an iterative round function, an $r$-round differential or linear trail $X$ is denoted as
+\[
+    X=(X_0, X_1,\cdots, X_{r-1}, X_r),
+\]
+where $X_i$ denotes the difference or mask before the S-box layer of the $i^{\text{th}}$ round. $X_i$ is denoted as
+\[
+    X_i=(x_{i,0},x_{i,1},\cdots,x_{i,n-1}),
+\]
+where $x_{i,j}$ is the input difference or mask of the $j^{\text{th}}$ sbox of the $i^{\text{th}}$ round. $p_X$ denotes the differential probability of $X$ and $c_X$ denotes the correlation contribution of $X$. Note that the sign of $c_X$ is key-dependent
+\[
+    c_X=(-1)^{s_X\oplus \bigoplus_i X_i\cdot k_i}|c_X|,
+\]
+where $s_X$ is the sign of the correlation contribution of $X$ without key xor in the round function, $k_i$ is the round key of the $i^{\text{th}}$ round. The correlation contribution amplitude $|c_X|$ is independent of the round keys. 
+
+The differential probability $p_{u,v}$ of the $r$-round differential propagation composed of differential trails with input difference $u$ and output difference $v$ is
+\[
+    p_{u,v}=\sum\limits_{X,X_0=u,X_r=v}p_X.
+\]
+
+Fixing the key $K=(k_0,k_1,\cdots,k_r)$, the correlation contribution $c_{u,v}$ of the $r$-round linear propagation composed of linear trails with input mask $u$ and output mask $v$ is
+\[
+    c_{u,v}=\sum\limits_{X,X_0=u,X_r=v}(-1)^{s_X\oplus X\cdot K}|c_X|. 
+\]
+The expected value of the correlation potential $c_{u,v}^2$ is
+\[
+    \text{E}(c_{u,v}^2)=2^{-n_K}\sum\limits_K c_{u,v}^2.
+\]
+And there is the theorem: 
+\begin{theorem}[\cite{DR01}]
+    The average correlation potential between an input and an output mask is the sum of the correlation potentials of all linear trails between the input and output masks:
+    \[
+        \text{E}(c_{u,v}^2)=\sum\limits_{X,X_0=u,X_r=v} c_X^2
+    \]
+\end{theorem}
+
+The weight of a differential probability or a correlation contribution amplitude is its negative binary logarithm. 
