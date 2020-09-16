@@ -1,51 +1,50 @@
 \section{Preliminary\label{sec:pre}}
 
-%\subsection{Some Basic Definitions in Graph Theory \cite{J75}}
-%A $directed$ $graph$ $G(V, E)$ consists of a nonempty and finite set of vertices $V$ and a set $E$ of ordered pairs of distinct vertices called $edges$. There are $n$ vertices and $e$ edges in $G$. A $path$ in $G$ is a sequence of vertices $p_{vu}(v=v_1, v_2, \cdots, v_k=u)$, such that $(v_i, v_{i+1})\in E $ $for$ $ 1 \leq i < k$. A $circuit$ is a path in which the first and last vertices are identical. A path is $elementary$ if no vertex appears twice. A circuit is elementary if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
-%$F$ is a $subgraph$ $of$ $G$ $induced$ $by$ $W$ if $W \subseteq V$ and $F= (W, \{(u, v)|u, v\in W $ and $(u,v)\in E\})$. An induced subgraph $F$ is a (maximal) $strong$ $component$ of $G$ if for all $u, v\in W$there exist paths $p_{uv}$ and $p_{vu}$ and this property holds for no subgraph of $G$ induced by a vertex set $\overline{W}$ such that $W \subset W \subseteq V$.
-
-\subsection{Differential Trail, Differential Propagation and Truncated Differential Propagation}
+\subsection{Differential Trails, Differentials and Truncated Differentials}
 
 Let $\beta$ be an iterative Boolean transformation from $\mathbb{F}_2^n$ to $\mathbb{F}_2^n$: 
 \[
     \beta=\rho^{(r)}\circ\rho^{(r-1)}\circ\cdots\circ\rho^{(2)}\circ\rho^{(1)}.
 \]
-A diffrential trail $Q$ over $\beta$ consists of a sequence of $r+1$ differences:
+A \textit{diffrential trail} $Q$ over $\beta$ consists of a sequence of $r+1$ differences:
 \[
     Q=(q^{(0)},q^{(1)},q^{(2)},\cdots,q^{(r-1)},q^{(r)}).
 \]
 The probability of a differential step $(q^{(i-1)},q^{(i)})$ is defined as:
-\[
-    \Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)})=2^{-n}\times\#\{x\in \mathbb{F}_2^n|\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}\}
-\]
+\begin{align*}
+    \Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)})&=\Prob_x[\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}]\\
+    &=2^{-n}\times\#\{x\in \mathbb{F}_2^n|\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}\}
+\end{align*}
+    
 Assuming the independence of differenti differential steps, the probability of $Q$ is:
 \[
-    \Prob^{\beta}(Q)=\prod\limits_i\Prob(q^{(i-1)},q^{(i)}).
+    \Prob^{\beta}(Q)=\prod\limits_i\Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)}).
 \]
-A difference propagation of $\beta$ is composed of $r$-round differential trails with the same initial and final differences. The probability of a difference propagation $(a,b)$ is the sum of the probabilities of all these differential trails:
+A \textit{differential} of $\beta$ is composed of $r$-round differential trails with the same initial and final differences. The probability of a differential $(a,b)$ is the sum of the probabilities of all these differential trails:
 \[
-    \Prob^{\beta}(a,b)=\sum\limits_{q^{(0)}=a,q^{(r)}=b}\Prob(Q).
+    \Prob^{\beta}(a,b)=\sum\limits_{q^{(0)}=a,q^{(r)}=b}\Prob^{\beta}(Q).
 \]
-Let $\lambda$ be a linear function corresponding to an $n\times l$ binary matrix $M$. The difference propagation probabilities of $\lambda\circ\beta$ are given by:
+Let $\lambda$ be a linear function corresponding to an $n\times l$ binary matrix $M$. The probabilities of \textit{truncated} differentials of $\lambda\circ\beta$ are given by:
 \[
     \Prob^{\lambda\circ\beta}(a,b)=\sum\limits_{\omega|b=M\omega}\Prob^{\lambda\circ\beta}(a,\omega).
 \]
 
-\subsection{Linear Trail and Linear Propagation}
+\subsection{Linear Trails and Linear Hulls}
 
-A linear trail $U$ over $\beta$ consists of a sequence of $r+1$ masks:
+A \textit{linear trail} $U$ over $\beta$ consists of a sequence of $r+1$ masks:
 \[
     U=(u^{(0)},u^{(1)},u^{(2)},\cdots,u^{(r-1)},u^{(r)}).
 \]
 The correlation of a linear step $(u^{(i-1)},u^{(i)})$ is defined as:
-\[
-    \Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})=2^{-n+1}\times\#\{x|u^{(i-1)}\cdot x=u^{(i)}\cdot \rho^{(i)}(x)\}-1.
-\]
+\begin{align*}
+    \Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})&=2\times(\Prob_x[u^{(i-1)}\cdot x=u^{(i)}\cdot \rho^{(i)}(x)]-\frac{1}{2})\\
+    &=2^{-n+1}\times\#\{x\in \mathbb{F}_2^n|u^{(i-1)}\cdot x=u^{(i)}\cdot \rho^{(i)}(x)\}-1.
+\end{align*}
 The correlation of $U$ is:
 \[
     \Cor^{\beta}(U)=\prod\limits_i\Cor(u^{(i-1)},u^{(i)}).
 \]
-A linear propagation of $\beta$ is composed of $r$-round linear trails with the same initial and final masks. The correlation of a linear propagation $(a,b)$ is the sum of the correlations of all these linear trails:
+A \textit{linear hull} of $\beta$ is composed of $r$-round linear trails with the same initial and final masks. The correlation of a linear hull $(a,b)$ is the sum of the correlations of all these linear trails:
 \[
     \Cor^{\beta}(a,b)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}\Cor(U).
 \]
@@ -56,53 +55,66 @@ A key-alternating cipher $\beta'$ consists of key-independent round transformati
 For a key-alternating cipher, The amplitude of the correlation of a linear trail is independent of the round keys:
 \begin{align*}
     \Cor^{\beta'}(U)&=(-1)^{u^{(0)}\cdot k^{(0)}}\prod\limits_i(-1)^{u^{(i)}\cdot k^{(i)}}\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)}).\\
-    &=(-1)^{d_U\oplus U\cdot K}\bigg\lvert\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})\bigg\rvert
+    &=(-1)^{U\cdot K}\cdot(-1)^{d_U}\bigg\lvert\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})\bigg\rvert\\
+    &=(-1)^{d_U\oplus U\cdot K}\Big\lvert\Cor^{\beta'}(U)\Big\rvert,
 \end{align*}
-where $K=(k^{(0)},k^{(1)},k^{(2)},\cdots,k^{(r-1)},k^{(r)})$, $d_U=1$ if $\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})<0$ and $d_U=0$ otherwise. Thus the correlation of a linear propagation (a,b) for a key-alternating cipher is:
+where $K=(k^{(0)},k^{(1)},k^{(2)},\cdots,k^{(r-1)},k^{(r)})$, $d_U=1$ if $\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})<0$ and $d_U=0$ otherwise. The correlation of a linear hull $(a,b)$ for a key-alternating cipher is:
 \[
     \Cor^{\beta'}(a,b)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(-1)^{d_U\oplus U\cdot K}\lvert\Cor^{\beta'}(U)\rvert.
 \]
 We denote the square of a correlation by correlation potential. The average correlation potential between an input and an output mask is the sum of the correlation potentials of all linear trails between the input and output masks:
 \[
-    \text{Exp}_{K}((\Cor^{\beta'}(a,b))^2)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(\Cor^{\beta'}(U))^2
+    \text{Exp}_{K}[(\Cor^{\beta'}(a,b))^2]=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(\Cor^{\beta'}(U))^2.
 \]
 
-
-\subsection{Notations of a Differential or Linear Trail \cite{DR01}}
-
-Given an iterative round function, an $r$-round differential or linear trail $X$ is denoted as
+\subsection{EDP and ELP}
+The differential probabilities and linear correlations of a cipher $\calE_K$ both depend on the specific key used $K$. In the case of differential cryptanalysis, EDP (expected differential probability) is defined as:
 \[
-    X=(X_0, X_1,\cdots, X_{r-1}, X_r),
+    \EDP(a,b)=\Exp_{K}[\Prob^{\calE_K}(a,b)].
 \]
-where $X_i$ denotes the difference or mask before the S-box layer of the $i^{\text{th}}$ round. $X_i$ is denoted as
+It is often assumed that
 \[
-    X_i=(x_{i,0},x_{i,1},\cdots,x_{i,n-1}),
+    \Prob^{\calE_K}(a,b)\approx\EDP(a,b)
 \]
-where $x_{i,j}$ is the input difference or mask of the $j^{\text{th}}$ sbox of the $i^{\text{th}}$ round. $p_X$ denotes the differential probability of $X$ and $c_X$ denotes the correlation contribution of $X$. Note that the sign of $c_X$ is key-dependent
+for most keys. In the case of linear cryptanalysis, ELP (expected linear potential) is defined as:
 \[
-    c_X=(-1)^{s_X\oplus \bigoplus_i X_i\cdot k_i}|c_X|,
+    \ELP(a,b)=\Exp_{K}[(\Cor^{\calE_K}(a,b))^2].
 \]
-where $s_X$ is the sign of the correlation contribution of $X$ without key xor in the round function, $k_i$ is the round key of the $i^{\text{th}}$ round. The correlation contribution amplitude $|c_X|$ is independent of the round keys. 
-
-The differential probability $p_{u,v}$ of the $r$-round differential propagation composed of differential trails with input difference $u$ and output difference $v$ is
+If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}].$. Let $\calE$ be $\rho^{(r)}\circ\cdots\circ\rho^{(1)}$, then:
 \[
-    p_{u,v}=\sum\limits_{X,X_0=u,X_r=v}p_X.
+    \ELP(a,b)=(\Cor^{\calE}(a,b))^2.
 \]
 
-Fixing the key $K=(k_0,k_1,\cdots,k_r)$, the correlation contribution $c_{u,v}$ of the $r$-round linear propagation composed of linear trails with input mask $u$ and output mask $v$ is
-\[
-    c_{u,v}=\sum\limits_{X,X_0=u,X_r=v}(-1)^{s_X\oplus X\cdot K}|c_X|. 
-\]
-The expected value of the correlation potential $c_{u,v}^2$ is
-\[
-    \text{E}(c_{u,v}^2)=2^{-n_K}\sum\limits_K c_{u,v}^2.
-\]
-And there is the theorem: 
-\begin{theorem}[\cite{DR01}]
-    The average correlation potential between an input and an output mask is the sum of the correlation potentials of all linear trails between the input and output masks:
-    \[
-        \text{E}(c_{u,v}^2)=\sum\limits_{X,X_0=u,X_r=v} c_X^2
-    \]
-\end{theorem}
+%For the sponge construction and its variant, no key is involved in the inner permutations. Thus the correlation of a linear hull is directly the signed sum of the correlations of the linear trails.
 
-The weight of a differential probability or a correlation contribution amplitude is its negative binary logarithm. 
+\subsection{Concepts in Graph Theory}
+
+A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. For a weighted graph, each edge $u\rightarrow v$ has a \textit{length}, denoted as $l(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_1,v_2,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E$. The length of the path is
+\[
+    l(p_{u,v})=\prod\limits_{i=1}^{k-1}l(v_i\rightarrow v_{i+1}).
+\]
+The set of all paths $p_{u,v}$ is called the \textit{hull} of $(u,v)$. The hull is denoted as $h_{u,v}$ and is associated by a $weight$ defined as:
+\[
+    w(h_{u,v})=\sum l(p_{u,v}),
+\]
+i.e. the sum of the lengths of all the path contained in the hull. A \textit{circuit} is a path in which the first and last vertices are identical. A circuit is $elementary$ if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
+
+Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $i\in[0,l-1)$. We call the graph a \textit{multistage graph}.
+
+Each vertex can be associated with a difference or mask value. Given the round transformation $F$ of an iterative block cipher or permutation $\calE$, a weighted graph $G_{F}=(V_{F},E_{F})$ can be generated to describe the 1-round differentials or linear hulls of $F$. $G_{F}$ has $2^n$ vertices representing the elements of $\mathbb{F}_2^n$. $G_{F}$ contains all edges $u\rightarrow v$ for $u,v\in \mathbb{F}_2^n$ of which length is not zero. In the case of differential cryptanalysis, the length of an edge is defined as:
+\[
+    l(u\rightarrow v)=\Prob^{F}(u,v).
+\]
+In the case of linear cryptanalysis, if $\calE$ is a block cipher, the length of an edge is defined as:
+\[
+    l(u\rightarrow v)=(\Cor^{F}(u,v))^2;
+\]
+else if $\calE$ is a permutation, the length is defined as:
+\[
+    l(u\rightarrow v)=\Cor^{F}(u,v).
+\]
+
+In another way, a weighted 2-stage graph $G^1_F=(V^1_F,E^1_F)$ can also be generated to describe the 1-round differentials or linear hulls. $G^1_F$ has 2 stages $S_0$ and $S_1$ each being $\mathbb{F}_2^n$. For $u\in S_0$ and $v\in S_1$, the length of an edge $l^1(u\rightarrow v)$ is defined the same way as $l(u\rightarrow v)$ in $G_F$ is.
+
+If $S_0=S_1$, then $G^1_F$ can be iteratively concatenated to itself. 
+%$F$ is a $subgraph$ $of$ $G$ $induced$ $by$ $W$ if $W \subseteq V$ and $F= (W, \{(u, v)|u, v\in W $ and $(u,v)\in E\})$. An induced subgraph $F$ is a (maximal) $strong$ $component$ of $G$ if for all $u, v\in W$there exist paths $p_{uv}$ and $p_{vu}$ and this property holds for no subgraph of $G$ induced by a vertex set $\overline{W}$ such that $W \subset W \subseteq V$.
