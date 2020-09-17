@@ -89,32 +89,19 @@ If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\
 
 \subsection{Concepts in Graph Theory}
 
-A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. For a weighted graph, each edge $u\rightarrow v$ has a \textit{length}, denoted as $l(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_1,v_2,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E$. The length of the path is
+A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. For a weighted graph, each edge $u\rightarrow v$ has a \textit{length}, denoted as $l(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_1,v_2,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E$. The \textit{length} of the path is
 \[
-    l(p_{u,v})=\prod\limits_{i=1}^{k-1}l(v_i\rightarrow v_{i+1}).
+    l(p_{u,v})=k-1,
 \]
-The set of all paths $p_{u,v}$ is called the \textit{hull} of $(u,v)$. The hull is denoted as $h_{u,v}$ and is associated by a $weight$ defined as:
+the \textit{weight} of the path is
 \[
-    w(h_{u,v})=\sum l(p_{u,v}),
+    w(p_{u,v})=\prod\limits_{i=1}^{k-1}l(v_i\rightarrow v_{i+1}).
+\]
+The set of all paths $p_{u,v}$ is called the \textit{hull} of $(u,v)$. The hull is denoted as $h_{u,v}$ and its weight is defined as:
+\[
+    w(h_{u,v})=\sum w(p_{u,v}),
 \]
 i.e. the sum of the lengths of all the path contained in the hull. A \textit{circuit} is a path in which the first and last vertices are identical. A circuit is $elementary$ if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
 
 Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $i\in[0,l-1)$. We call the graph a \textit{multistage graph}.
 
-Each vertex can be associated with a difference or mask value. Given the round transformation $F$ of an iterative block cipher or permutation $\calE$, a weighted graph $G_{F}=(V_{F},E_{F})$ can be generated to describe the 1-round differentials or linear hulls of $F$. $G_{F}$ has $2^n$ vertices representing the elements of $\mathbb{F}_2^n$. $G_{F}$ contains all edges $u\rightarrow v$ for $u,v\in \mathbb{F}_2^n$ of which length is not zero. In the case of differential cryptanalysis, the length of an edge is defined as:
-\[
-    l(u\rightarrow v)=\Prob^{F}(u,v).
-\]
-In the case of linear cryptanalysis, if $\calE$ is a block cipher, the length of an edge is defined as:
-\[
-    l(u\rightarrow v)=(\Cor^{F}(u,v))^2;
-\]
-else if $\calE$ is a permutation, the length is defined as:
-\[
-    l(u\rightarrow v)=\Cor^{F}(u,v).
-\]
-
-In another way, a weighted 2-stage graph $G^1_F=(V^1_F,E^1_F)$ can also be generated to describe the 1-round differentials or linear hulls. $G^1_F$ has 2 stages $S_0$ and $S_1$ each being $\mathbb{F}_2^n$. For $u\in S_0$ and $v\in S_1$, the length of an edge $l^1(u\rightarrow v)$ is defined the same way as $l(u\rightarrow v)$ in $G_F$ is.
-
-If $S_0=S_1$, then $G^1_F$ can be iteratively concatenated to itself. 
-%$F$ is a $subgraph$ $of$ $G$ $induced$ $by$ $W$ if $W \subseteq V$ and $F= (W, \{(u, v)|u, v\in W $ and $(u,v)\in E\})$. An induced subgraph $F$ is a (maximal) $strong$ $component$ of $G$ if for all $u, v\in W$there exist paths $p_{uv}$ and $p_{vu}$ and this property holds for no subgraph of $G$ induced by a vertex set $\overline{W}$ such that $W \subset W \subseteq V$.

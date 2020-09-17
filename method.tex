@@ -1,1 +1,84 @@
-\section{Method}
+\section{Searching for Iterative Trails}
+
+\subsection{Definition of Iterative Trails}
+
+\begin{definition}[Iterative Trails]
+	A differential or linear trail $(v^{(0)},\cdots,v^{(r)})$ is iterative if $v^{(0)}=v^{(r)}$.
+\end{definition}
+
+\begin{definition}[Elementry Iterative Trails]
+    An iterative differential or linear trail $(v^{(0)},\cdots,v^{(r)}=v^{(0)})$ is elementry if $v^{(i)}\neq v^{(j)},\forall i,j\in [0,r-1]$.
+\end{definition}
+
+\subsection{Modelling 1-round Differentials and Linear Hulls Using Graph}
+
+In a directed graph, each vertex can be associated with a difference or mask value. Given the round transformation $F$ of an iterative block cipher or permutation $\calE$, a weighted directed graph $G_{F}=(V_{F},E_{F})$ can be generated to describe the 1-round differentials or linear hulls of $F$. $G_{F}$ has $2^n$ vertices representing the elements of $\mathbb{F}_2^n$. $G_{F}$ contains all edges $u\rightarrow v$ for $u,v\in \mathbb{F}_2^n$ of which length is not zero. In the case of differential cryptanalysis, the length of an edge is defined as:
+\[
+    l(u\rightarrow v)=\Prob^{F}(u,v).
+\]
+In the case of linear cryptanalysis, if $\calE$ is a block cipher, the length of an edge is defined as:
+\[
+    l(u\rightarrow v)=(\Cor^{F}(u,v))^2;
+\]
+else if $\calE$ is a permutation, the length is defined as:
+\[
+    l(u\rightarrow v)=\Cor^{F}(u,v).
+\]
+
+\subsection{Searching for Iterative Trails}
+
+The elementry circuits in $G_F$ are equivelent to the elementry iterative trails of $\calE$. Applying Johnson's algorithm in \cite{J75}, we can list all the elementry circuits in $G_F$. However, if $V_F=\mathbb{F}_2^n$, the size of $V_F$ is $2^n$ which is too large. In order to limit the size of $V_F$, we set a parameter $max\_asn$ which is defined as the maximum active S-boxes that a vertex can has. That is, given SPN round transformation $F$ and parameter $max\_asn$, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is a subgraph of $G_F$. The set of vertices is given by
+\[
+    V_{F,max\_asn}=\{u|\text{Asn}(u)\leq max\_asn \text{ and } u\in V_F\}
+\]
+where $\text{Asn}(\cdot)$ is a function returns the number of active S-boxes of its input. The set $E_{F,max\_asn}$ of weighted edges between any two vertices in $V_{F,max\_asn}$ is given according to the method in the last subsection. 
+
+Applying Johnson's algorithm to $G_{F,max\_asn}$, we can obtain a set of elementry circuits
+\[
+    EIT=\{p_{uv}|u=v \text{ and } v^{(i)}\neq v^{(j)},\forall i,j\in[0,r-1]\},
+\]
+in which each element represent an elementry iterative trails for $F$. 
+
+We extract every vertex that lies in at least one elementry circuit and denote the set of vertices as $V^{IT}_{F,max\_asn}$. $V^{IT}_{F,max\_asn}$ is a subset of $V_{F,max\_asn}$ and it forms a subgraph $G^{IT}_{F,max\_asn}=(V^{IT}_{F,max\_asn},E^{IT}_{F,max\_asn})$ of $G_{F,max\_asn}$. 
+
+\subsection{Finding Differential and Linear Trails}
+
+Let $B^f_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail starting from $u$ has. Let $B^b_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail ending with $u$ has. Given parameters $r^f$ and $r^b$ which represent the number of rounds to be extended forward and backward, we can obtain $B^f_{u,i},i\in [0,r^f]$ and $B^b_{u,j},j\in [0,r^b]$ for each $u\in G^{IT}_{F,max\_asn}$ using Matsui's branch-and-bound depth-first search algorithm. Then based on iterative trails, the largest probability (correlation) that a single $r$-round trail has is
+\[
+    \max\limits_{r_1+l(p_{u,v})+r_2=r} B^b_{u,r_1}\times w(p_{u,v})\times B^f_{v,r_2}
+\]
+
+
+\begin{algorithm}
+	\caption{Finding Differential (Linear) Trails}
+	\label{algo1}
+	\begin{algorithmic}[1] %每行显示行号
+		\Require $r_f$, $r_b$ and $G^{IT}_{F,max\_asn}$
+		\Ensure the set of hinge trails $Hinges\leftarrow\emptyset$
+		\Procedure {searchHinges}{}
+		\For{each characteristic $c[0]$ which has no more than $n_{tip}$ active sboxes}
+		\State \Call{searchRound}{1}
+		\EndFor
+		\EndProcedure
+		
+		\Procedure{searchRound}{$i$}
+		\If{$i<r_{max}$}
+		\Return{}
+		\EndIf
+		\For{$w[i-1]\leftarrow w_{min}:w_{max}$}
+		\For{each $c[i]$ compatible with $c[i-1]$ under $w[i-1]$ according to $RF$}
+		\If{$c[i]$ has no more than $n_{tip}$ active sboxes}
+		\State $Hinges$.append($c[0]:c[i],w[0]:w[i-1]$) 
+		\ElsIf{$c[i]$ has no more than $n_{belly}$ active sboxes}
+		\State \Call{searchRound}{i+1}
+		\EndIf
+		\EndFor
+		\EndFor
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+
+%In another way, a weighted 2-stage graph $G^1_F=(V^1_F,E^1_F)$ can also be generated to describe the 1-round differentials or linear hulls. $G^1_F$ has 2 stages $S_0$ and $S_1$ each being $\mathbb{F}_2^n$. For $u\in S_0$ and $v\in S_1$, the length of an edge $l^1(u\rightarrow v)$ is defined the same way as $l(u\rightarrow v)$ in $G_F$ is.
+
+%If $S_0=S_1$, then $G^1_F$ can be iteratively concatenated to itself. 
