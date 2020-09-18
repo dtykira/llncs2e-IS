@@ -43,10 +43,31 @@ We extract every vertex that lies in at least one elementry circuit and denote t
 
 \subsection{Finding Differential and Linear Trails}
 
-Let $B^f_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail starting from $u$ has. Let $B^b_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail ending with $u$ has. Given parameters $r^f$ and $r^b$ which represent the number of rounds to be extended forward and backward, we can obtain $B^f_{u,i},i\in [0,r^f]$ and $B^b_{u,j},j\in [0,r^b]$ for each $u\in G^{IT}_{F,max\_asn}$ using Matsui's branch-and-bound depth-first search algorithm. Then based on iterative trails, the largest probability (correlation) that a single $r$-round trail has is
+Let $B^f_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail starting from $u$ has. Let $B^b_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail ending with $u$ has. Given parameters $r^f$ and $r^b$ which represent the number of rounds to be extended forward and backward, we can obtain $B^f_{u,i},i\in [0,r^f]$ and $B^b_{u,j},j\in [0,r^b]$ for each $u\in V^{IT}_{F,max\_asn}$ using Matsui's branch-and-bound depth-first search algorithm. Then based on iterative trails, the largest probability (correlation) that a single $r$-round trail has $B_r$ is
 \[
-    \max\limits_{r_1+l(p_{u,v})+r_2=r} B^b_{u,r_1}\times w(p_{u,v})\times B^f_{v,r_2}
+    B_r=\max\limits_{\substack{p_{u,v}\in E^{IT}_{F,max\_asn}\\r_1+l(p_{u,v})+r_2=r\\0\leq r_1\leq r^b,0\leq r_2\leq r^f}} B^b_{u,r_1}\times w(p_{u,v})\times B^f_{v,r_2}.
 \]
+To obtain $B_r$, instead of traversing all $p_{u,v}$, we use dynamic programming. 
+
+\begin{algorithm}
+	\caption{Compute $B_r$}
+	\label{algo2}
+	\begin{algorithmic}[1] %每行显示行号
+		\Require $r$, parameters $r^f\leq r,r^b\leq r$, the round function $F$, $G^{IT}_{F,max\_asn}$
+		\Ensure $B^r$
+		\Procedure {ComputeB}{}
+		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\in [0,r^f]$}
+		\State $\overline{B^f_{u,i}}\leftarrow B^f_{u,i}$
+		\EndFor
+		\For{$i\leftarrow r^f+1:r$}
+		\State $\overline{B^f_{u,i}}\leftarrow\max\limits_{v\in V^{IT}_{F,max\_asn}} w(u\rightarrow v)\times\overline{B^f_{v,i-1}}$
+		\EndFor
+		\State $B_r\leftarrow\max\limits_{\substack{i+j=r\\u\in V^{IT}_{F,max\_asn}}} B^b_{u,i}\times \overline{B^f_{u,j}}$
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+
 
 
 \begin{algorithm}
@@ -54,29 +75,22 @@ Let $B^f_{u,i}$ be the largest probability (correlation) that an $i$-round diffe
 	\label{algo1}
 	\begin{algorithmic}[1] %每行显示行号
 		\Require $r_f$, $r_b$ and $G^{IT}_{F,max\_asn}$
-		\Ensure the set of hinge trails $Hinges\leftarrow\emptyset$
+		\Ensure 
 		\Procedure {searchHinges}{}
-		\For{each characteristic $c[0]$ which has no more than $n_{tip}$ active sboxes}
-		\State \Call{searchRound}{1}
+		\For{each $u\in V^{IT}_{F,max\_asn}$}
+		\State $B^b_{u,0}\leftarrow 0$, $B^f_{u,0}\leftarrow 0$
 		\EndFor
 		\EndProcedure
 		
 		\Procedure{searchRound}{$i$}
-		\If{$i<r_{max}$}
-		\Return{}
-		\EndIf
-		\For{$w[i-1]\leftarrow w_{min}:w_{max}$}
-		\For{each $c[i]$ compatible with $c[i-1]$ under $w[i-1]$ according to $RF$}
-		\If{$c[i]$ has no more than $n_{tip}$ active sboxes}
-		\State $Hinges$.append($c[0]:c[i],w[0]:w[i-1]$) 
-		\ElsIf{$c[i]$ has no more than $n_{belly}$ active sboxes}
-		\State \Call{searchRound}{i+1}
-		\EndIf
-		\EndFor
-		\EndFor
+
 		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
+
+\subsection{Finding Differentials and Linear Hulls}
+
+Let $w^f_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(u,v)$ where $u\in V^{IT}_{F,max\_asn}$. Let $w^b_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(v,u)$ where $u\in V^{IT}_{F,max\_asn}$. 
 
 
 %In another way, a weighted 2-stage graph $G^1_F=(V^1_F,E^1_F)$ can also be generated to describe the 1-round differentials or linear hulls. $G^1_F$ has 2 stages $S_0$ and $S_1$ each being $\mathbb{F}_2^n$. For $u\in S_0$ and $v\in S_1$, the length of an edge $l^1(u\rightarrow v)$ is defined the same way as $l(u\rightarrow v)$ in $G_F$ is.
