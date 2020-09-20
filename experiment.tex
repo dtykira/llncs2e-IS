@@ -1,0 +1,369 @@
+\section{Experiment Results\label{sec:experiment}}
+
+\subsection{Results on Iterative Trails}
+
+We apply our method in Subsection \ref{subsec:iterative-trails} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation and ASCON permutation. 
+
+
+
+The iterative structures are illustrated in Figures \ref{fig:graph_knot256_ddt}-\ref{fig:graph_gift_lat} in Appendix \ref{sec:is}. The differential and linear iterative structures of PRESENT are too big to be illustrated. The quantitive summary results are illustrated in Table \ref{tab:is}. For PRESENT, we constrain the elementary differential iterative trails within 10 rounds, for the genuine iterative structure is too complicated.
+
+\begin{table}
+	\caption{Results on iterative trails}\label{tab:iterative-trails}
+	\centering
+	\tiny
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		cryptanalysis & $F$ & rs. & $max\_asn$ &$|V_{F,max\_asn}|$&$\leq n$& $|V^{IT}_{F,max\_asn}|$ & \#ecs. & best w/l. &time\\
+		\hline
+		\multirow{5}{*}{differential}
+		&KNOT-perm-256 & yes & 2 & 8214 & - & 5 & 6 & 5.3 & 0.3s\\
+		\cline{2-10}
+		&PRESENT & no & 2 & 17256 & 10 & 225 & 463 & 4.5 & 2.1s\\
+		\cline{2-10}
+		&GIFT-64 & no & 2 & 19344 & - & 32 & 66 & 5 & 1.8s\\
+		\cline{2-10}
+		& RECTANGLE & yes & 2 & 1450 & - & 6 & 3 & 5 & 0.1s\\
+		\cline{2-10}
+		& ASCON-perm & yes & 3 & 3939 & - & 0 & 0 & - & 2.7h\\
+		\hline
+		\multirow{4}{*}{linear}
+		& KNOT-perm-256 & yes & 2 & 8229 & - & 8 & 10 & 3 & 0.4s\\
+		\cline{2-10}
+		& PRESENT & no & 1 & 208 & - & 27 & 114223 & 2 & 3.6s\\
+		\cline{2-10}
+		& GIFT-64 & no & 2 & 21696 & - & 16 & 4 & 3 & 2.3s\\
+		\cline{2-10}
+		& RECTANGLE & yes & 2 & 1465 & - & 10 & 16 & 3 & 0.1s\\
+		\cline{2-10}
+		& ASCON-perm & yes & 3 & 336 & - & 0 & 0 & - & 4.0h\\
+		\hline
+		\multicolumn{9}{l}{rs.: whether the cipher has the property of rotational symmetry}\\
+		\multicolumn{9}{l}{$\leq n$: the length of any elementary circuit is restricted to no more than $n$}\\
+		\multicolumn{9}{l}{\#ecs.: number of elementary circuits}\\
+		\multicolumn{9}{l}{best w/l.: the smallest weight/length that an elementary circuit can has}\\
+	\end{tabular}
+\end{table}
+
+We consider the smallest weight per round an elementary iterative trail can have (best w/r. in Table \ref{tab:is}) as an index describing the differential or linear propagation growth. We can see that PRESENT has both the weakest differential and linear propagation growth. The weakest differential iterative trail is exactly the one found by Wang et al.\cite{W08}. 256-bit KNOT permutation has a little advantage in differential propagation growth. 
+
+256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE share a common point that each of them uses a bit permutation as its linear layer which is hardware-friendly and an S-box also providing diffusion as its non-linear layer. However, due to the weakness of the linear layer, the best differential and linear weights of them all increase proportionally with the round number, because of the existence of iterative trails. Meanwhile ASCON permutation uses a low-latency S-box and a strong linear layer. From Table \ref{tab:is} we can see that the differential iterative structure of ASCON permutation is empty even when $k=3$.
+
+A question is raised that how far a cipher with a comparatively weak diffusion layer can go. As long as the iterative structure is not empty, the best weight increases proportionally with the round number. Through the visualization of iterative structure, we hope to inform symmetric-key primitive designers of the detailed structure of iterative trails. 
+
+%Thus if we wish that the weight of such a cipher increases exponentially, a must is to cancel out the iterative structure. 
+
+%Inspired by Ascon, 256-bit KNOT permutation and RECTANGLE can be strengthened by modifying The $ShiftRow$ operation to the sum of 3 $ShiftRow$ operations. Take 256-bit KNOT permutation as an example, given 2-hinge trails and through the visualization of iterative structure, the differential iterative structure can be cancelled out by strengthening the 4th row while the linear iterative structure can be cancelled out by strengthening the 1st row. Thus by increasing the implementation cost of the linear layer by 4 more XOR operations and 4 more left rotation operations, 256-bit KNOT permutation has an opportunity to be improved. 
+
+%Other information in the graph formed by $k$-hinge trails can also be useful, a long path in the graph for instance. However, our method doesn't take such trails into use. 
+
+
+\subsection{Results of the Best Weights}
+
+Results for 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE on the best weights obtained using our methods in section \ref{sec:para2} and \ref{sec:para3} are illustrated in Tables \ref{tab:knot256}-\ref{tab:rect}. They are compared with the weights of the best differential and linear trails. Using the method proposed in section \ref{sec:para2}, we need to determine the parameters $(r^f,r^b)$ first. Using the method proposed in section \ref{sec:para3}, we need to determine the parameters $(r^f,w^f,r^b,w^b,gap)$ first, where $gap=wub-bw[r]$ when searching $r$-round clusters. The larger each parameter is, the more time is consumed and the more accurate the result is. 
+
+The results obtained by our method coincide with the results of genuine best weight when the round number is large, except for results of linear weights for GIFT-64. The best 13-round linear trail of GIFT given in \cite{ZZDX19} has correlation $2^{-34}$ and has no iterative trail in it. Our method is unable to find such a trail. 
+
+%Our method finishes in minutes or even in seconds and is able to obtain an upper bound of the best weight for ciphers have iterative trails.
+\begin{table}
+	\caption{results for KNOT-permutation-256}\label{tab:knot256}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{3}{*}{round}&\multicolumn{3}{|c|}{differential}&\multicolumn{3}{|c|}{linear}\\
+        \cline{2-7}
+		&\multirow{2}{*}{\cite{ZDY19}}&Sec. \ref{sec:para2}&Sec. \ref{sec:para3}&\multirow{2}{*}{\cite{ZDY19}}&Sec. \ref{sec:para2}&Sec. \ref{sec:para3}\\
+		\cline{3-4}\cline{6-7}
+		&&(3,3)&(3,16,3,16,5)&&(3,3)&(3,9,3,9,5)\\
+        \hline
+		1&	2&	4&	& 			1&	2&	\\
+		2&	4&	8&	& 			2&	4&	\\
+		3&	7&	13&	& 			4&	5&	\\
+		4&	10&	18&	& 			6&	7&	\\
+		5&	14&	23&	& 			8&	9&	\\
+		6&	18&	28&	& 			10&	11&	\\
+		7&	25&	34&	&			13&	14&	\\
+		8&	32&	39&	&			17&	17&	16.8301 (863s)\\
+		9&	40&	44&	&			20&	20&	19 (2194s)\\
+		10&	49&	50&	&			23&	23&	21.8301 (7509s)\\
+		11&	55&	55&	50.5041 (75s)&	26&	26&	\\
+		12&	60&	60&	55.3065 (111s)&	29&	29&	\\
+		13&	66&	66&	60.3543 (219s)&	32&	32&	\\
+		14&	71&	71&	65.4493 (511s)&	35&	35&	\\
+		$\vdots$&&&&&&\\
+		44&	&	231&	&	&	125&	\\
+		45&	&	236&	&	&	128&	\\
+		46&	&	242&	&	&	131&	\\
+		47&	&	247&	&	&	&	\\
+		48&	&	252&	&	&	&	\\
+		49&	&	258&	&	&	&	\\
+		\hline
+		time& &0.1s&732s& &0.6s&10566s\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}
+	\caption{results for PRESENT}\label{tab:present}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		\multirow{3}{*}{round}&\multicolumn{2}{|c|}{differential}&\multicolumn{2}{|c|}{linear}\\
+        \cline{2-5}
+		&\multirow{2}{*}{\cite{ZZDX19}}&Sec. \ref{sec:para2}&\multirow{2}{*}{\cite{ZZDX19}}&Sec. \ref{sec:para2}\\
+		\cline{3-3}\cline{5-5}
+		&&(3,3)&&(3,3)\\
+        \hline
+		1&	2&	4&	 	1&	1	\\
+		2&	4&	8&		2&	2	\\
+		3&	8&	12&	 	4&	4	\\
+		4&	12&	16&	 	6&	6	\\
+		5&	20&	20&	 	8&	8	\\
+		6&	24&	24&	 	10&	10	\\
+		7&	28&	28&		12&	12	\\
+		8&	32&	32&		14&	14	\\
+		9&	36&	36&		16&	16	\\
+		10&	41&	42&		18&	18	\\
+		11&	46&	46& 	20&	20	\\
+		12&	52&	52&	 	22&	22	\\
+		13&	56&	56&		24&	24	\\
+		14&	62&	62&		26&	26	\\
+		15&	66&	66&		28&	28	\\
+		16&	&	&		30&	30	\\
+		17&	&	&		32&	32	\\
+		\hline
+		time&&0.6s&&0.1s\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}
+	\caption{results for GIFT-64}\label{tab:gift64}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{3}{*}{round}&\multicolumn{3}{|c|}{differential}&\multicolumn{3}{|c|}{linear}\\
+        \cline{2-7}
+		&\multirow{2}{*}{\cite{ZZDX19}}&Sec. \ref{sec:para2}&Sec. \ref{sec:para3}&\multirow{2}{*}{\cite{ZZDX19}}&Sec. \ref{sec:para2}&Sec. \ref{sec:para3}\\
+		\cline{3-4}\cline{6-7}
+		&&(3,3)&(3,16,3,16,4)&&(3,3)&(3,16,3,16,6)\\
+        \hline
+		1&	1.415&	4&	& 			1&	2&	\\
+		2&	3.415&	8&	& 			2&	4&	\\
+		3&	7&		12&	& 			3&	6&	\\
+		4&	11.415&	18&	& 			5&	8&	\\
+		5&	17&		22&	& 			7&	11&	\\
+		6&	22.415&	28&	& 			10&	14&	\\
+		7&	28.415&	32&	31.415 (53s)&		13&	17&	34 (15s)\\
+		8&	38&		38&	37.415 (82s)&		16&	20&	40 (32s)\\
+		9&	42&		42&	41.1926 (107s)&	20&	23&	46 (98s)\\
+		10&	48&		48&	46.9556 (158s)& 	25&	26&	52 (32s)\\
+		11&	52&		52&	50.6424 (210s)& 	29&	29&	58 (27s)\\
+		12&	58&		58&	56.5737 (307s)& 	31&	32&	64 (31s)\\
+		13&	62&		62&	60.415 (414s)&		34&	35&	70 (27s)\\
+		14&	68&		68&	66.0693 (603s)& 	&	&	\\
+		\hline
+		time&&0.3s&1935s&&0.2s&262s\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}
+	\caption{results for RECTANGLE}\label{tab:rect}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{3}{*}{round}&\multicolumn{3}{|c|}{differential}&\multicolumn{3}{|c|}{linear}\\
+        \cline{2-7}
+		&\multirow{2}{*}{\cite{ZBL15}}&Sec. \ref{sec:para2}&Sec. \ref{sec:para3}&\multirow{2}{*}{\cite{ZBL15}}&Sec. \ref{sec:para2}&Sec. \ref{sec:para3}\\
+		\cline{3-4}\cline{6-7}
+		&&(6,6)&(6,25,6,25,10)&&(5,5)&(5,20,5,20,6)\\
+        \hline
+		1&	2&	2&	& 			1&	2&	\\
+		2&	4&	5&	& 			2&	3&	\\
+		3&	7&	8&	& 			4&	4&	\\
+		4&	10&	12&	& 			6&	6&	\\
+		5&	14&	16&	& 			8&	8&	\\
+		6&	18&	22&	& 			10&	10&	\\
+		7&	25&	26&	25.2996 (313s)&	13&	13&	25.6781 (30s)\\
+		8&	31&	31&	29.5365 (394s)&	16&	16&	31.6781 (62s)\\
+		9&	36&	36&	34.0429 (417s)&	19&	19&	36.6781 (128s)\\
+		10&	41&	41&	38.7857 (511s)&	22&	22&	42 (268s)\\
+		11&	46&	46&	43.7848 (624s)&	25&	25&	48 (555s)\\
+		12&	51&	51&	48.7851 (729s)&	28&	28&	53.9776 (1225s)\\
+		13&	56&	56&	53.7857 (864s)&	31&	31&	59.3561 (2481s)\\
+		14&	61&	61&	58.7857 (1079s)&	34&	34&	64.6781 (6732s)\\
+		15&	66&	66&	63.7857 (1329s)&	&	&	\\
+		\hline
+		time& &1.2s&6262s& &0.2s&11480s\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}
+	\caption{results for KNOT AEAD v1}\label{tab:knot-aead-v1}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		Attack Mode & AM1 & AM2 & AM3 & AM4\\
+		\hline
+		Round & Weight & Weight & Weight & Weight\\
+		\hline
+		10 & 43.0469 & 25 & 27 & 47.061\\
+		11 & 47.8506 & 28 & \textcolor{blue}{30} & 51.8425\\
+		12 & 52.645 & \textcolor{blue}{30} & 32 & 56.615\\
+		13 & 57.4293 & 33 & 35 & \textcolor{blue}{61.4089}\\
+		14 & \textcolor{blue}{62.221} & 35 & 37 & 66.2028\\
+		15 & 67.0135 & 38 & 40 & 70.9899\\
+		16 & 71.8032 & 40 & 42 & 75.7781\\
+		17 & 76.5928 & 43 & 45 & 80.5682\\
+		18 & 81.3819 & 45 & 47 & 85.3577\\
+		19 & 86.1745 & 48 & 50 & 90.1467\\
+		20 & 90.963 & 50 & 52 & 94.9358\\
+		21 & 95.7523 & 53 & 55 & 99.7253\\
+		22 & 100.543 & 55 & 57 & 104.514\\
+		23 & 105.326 & 58 & 60 & 109.304\\
+		24 & 110.123 & \textcolor{red}{60} & \textcolor{red}{62} & 114.093\\
+		25 & 114.912 & 63 & 65 & 118.882\\
+		26 & 119.698 & 65 & 67 & \textcolor{red}{123.671}\\
+		27 & \textcolor{red}{124.487} & 68 & 70 & 128.461\\
+		28 & 129.296 & 70 & 72 & 133.25\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}
+	\caption{results for KNOT AEAD v2}\label{tab:knot-aead-v2}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		Attack Mode & AM1 & AM2 & AM3 & AM4\\
+		\hline
+		Round & Weight & Weight & Weight & Weight\\
+		\hline
+		10 & 46.4185 & 25 & 25.415 & 43.974\\
+		11 & 51.2287 & 28 & 28 & 48.6047\\
+		12 & 56.0227 & \textcolor{blue}{30} & \textcolor{blue}{30.415} & 53.2065\\
+		13 & \textcolor{blue}{60.8044} & 33 & 25.415 & 57.861\\
+		14 & 65.5931 & 35 & 28 & \textcolor{blue}{62.6253}\\
+		15 & 70.3848 & 38 & 30.415 & 67.4453\\
+		16 & 75.1743 & 40 & 33 & 72.3117\\
+		17 & 79.9625 & 43 & 35.415 & 77.1827\\
+		18 & 84.7521 & 45 & 38 & 82.0705\\
+		19 & 89.5416 & 48 & 40.415 & 86.9196\\
+		20 & 94.3308 & 50 & 43 & 91.7902\\
+		21 & 99.1199 & 53 & 45.415 & 96.6418\\
+		22 & 103.909 & 55 & 48 & 101.435\\
+		23 & 108.699 & 58 & 50.415 & 106.19\\
+		24 & 113.488 & 60 & 53 & 110.913\\
+		25 & 118.277 & \textcolor{red}{63} & 55.415 & 115.617\\
+		26 & 123.067 & 65 & 58 & 120.323\\
+		27 & \textcolor{red}{127.856} & 68 & 60.415 & \textcolor{red}{125.068}\\
+		28 & 132.646 & 70 & \textcolor{red}{63} & 129.865\\
+		29 & 137.434 & 73 & 65.415 & 134.695\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}
+	\caption{results for KNOT AEAD v3}\label{tab:knot-aead-v3}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		Attack Mode & AM1 & AM2 & AM3 & AM4\\
+		\hline
+		Round & Weight & Weight & Weight & Weight\\
+		\hline
+		10 & 43.0471 & 25 & 27 & 47.061\\
+		11 & 47.8508 & 28 & 30 & 51.8425\\
+		12 & 52.6451 & 30 & 32 & 56.615\\
+		13 & 57.4288 & 33 & 35 & 61.4089\\
+		14 & 62.2204 & 35 & 37 & 66.2028\\
+		15 & 67.0159 & 38 & 40 & 70.99\\
+		16 & 71.8043 & 40 & 42 & 75.7781\\
+		17 & 76.5933 & 43 & 45 & 80.5682\\
+		18 & 81.3808 & \textcolor{blue}{45} & \textcolor{blue}{47} & 85.3578\\
+		19 & 86.1747 & 48 & 50 & 90.1468\\
+		20 & 90.9607 & 50 & 52 & \textcolor{blue}{94.9359}\\
+		21 & \textcolor{blue}{95.7551} & 53 & 55 & 99.7253\\
+		22 & 100.545 & 55 & 57 & 104.514\\
+		23 & 105.328 & 58 & 60 & 109.304\\
+		24 & 110.127 & 60 & 62 & 114.093\\
+		25 & 114.915 & 63 & 65 & 118.882\\
+		26 & 119.702 & 65 & 67 & 123.671\\
+		27 & 124.493 & 68 & 70 & 128.461\\
+		28 & 129.301 & 70 & 72 & 133.25\\
+		29 & 134.093 & 73 & 75 & 138.04\\
+		30 & 138.889 & 75 & 77 & 142.829\\
+		31 & 143.672 & 78 & 80 & 147.618\\
+		32 & 148.469 & 80 & 82 & 152.407\\
+		33 & 153.26 & 83 & 85 & 157.197\\
+		34 & 158.049 & 85 & 87 & 161.986\\
+		35 & 162.841 & 88 & 90 & 166.776\\
+		36 & 167.628 & 90 & \textcolor{red}{92} & 171.564\\
+		37 & 172.423 & \textcolor{red}{93} & 95 & 176.353\\
+		38 & 177.22 & 95 & 97 & 181.143\\
+		39 & 182.009 & 98 & 100 & \textcolor{red}{185.932}\\
+		40 & \textcolor{red}{186.812} & - & - & 190.721\\
+		41 & 191.592 & - & - & 195.51\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}
+	\caption{results for KNOT AEAD v4}\label{tab:knot-aead-v4}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		Attack Mode & AM1 & AM2 & AM3 & AM4\\
+		\hline
+		Round & Weight & Weight & Weight & Weight\\
+		\hline
+		10 & 43.047 & 25 & 27 & 47.061\\
+		11 & 47.8506 & 28 & 30 & 51.8425\\
+		12 & 52.6451 & 30 & 32 & 56.615\\
+		13 & 57.4291 & 33 & 35 & 61.409\\
+		14 & 62.2209 & 35 & 37 & 66.2029\\
+		15 & 67.0135 & 38 & 40 & 70.99\\
+		16 & 71.8035 & 40 & 42 & 75.7781\\
+		17 & 76.5935 & 43 & 45 & 80.5682\\
+		18 & 81.3822 & 45 & 47 & 85.3577\\
+		19 & 86.1749 & 48 & 50 & 90.1467\\
+		20 & 90.9636 & 50 & 52 & 94.936\\
+		21 & 95.7556 & 53 & 55 & 99.7252\\
+		22 & 100.545 & 55 & 57 & 104.515\\
+		23 & 105.328 & 58 & 60 & 109.304\\
+		24 & 110.126 & 60 & \textcolor{blue}{62} & 114.093\\
+		25 & 114.916 & \textcolor{blue}{63} & 65 & 118.882\\
+		26 & 119.701 & 65 & 67 & \textcolor{blue}{123.671}\\
+		27 & \textcolor{blue}{124.493} & 68 & 70 & 128.461\\
+		28 & 129.303 & 70 & 72 & 133.25\\
+		29 & 134.092 & 73 & 75 & 138.039\\
+		30 & 138.886 & 75 & 77 & 142.829\\
+		31 & 143.671 & 78 & 80 & 147.618\\
+		32 & 148.469 & 80 & 82 & 152.407\\
+		33 & 153.263 & 83 & 85 & 157.197\\
+		34 & 158.052 & 85 & 87 & 161.986\\
+		35 & 162.844 & 88 & 90 & 166.775\\
+		36 & 167.627 & 90 & 92 & 171.565\\
+		37 & 172.425 & 93 & 95 & 176.353\\
+		38 & 177.214 & 95 & 97 & 181.143\\
+		39 & 182.014 & 98 & 100 & 185.933\\
+		40 & 186.81 & 100 & 102 & 190.722\\
+		41 & 191.587 & 103 & 105 & 195.511\\
+		42 & 196.389 & 105 & 107 & 200.3\\
+		43 & 201.177 & 108 & 110 & 205.089\\
+		44 & 205.971 & 110 & 112 & 209.878\\
+		45 & 210.759 & 113 & 115 & 214.668\\
+		46 & 215.544 & 115 & 117 & 219.457\\
+		47 & 220.336 & 118 & 120 & 224.246\\
+		48 & 225.129 & 120 & 122 & 229.035\\
+		49 & 229.922 & 123 & \textcolor{red}{125} & 233.825\\
+		50 & 234.715 & \textcolor{red}{125} & 127 & 238.614\\
+		51 & 239.503 & 128 & 130 & 243.403\\
+		52 & 244.297 & 130 & 132 & 248.192\\
+		53 & \textcolor{red}{249.09} & 133 & 135 & \textcolor{red}{252.981}\\
+		54 & 253.884 & 135 & 137 & 257.772\\
+		\hline
+	\end{tabular}
+\end{table}

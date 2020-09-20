@@ -25,7 +25,7 @@ else if $\calE$ is a permutation, the length is defined as:
     l(u\rightarrow v)=\Cor^{F}(u,v).
 \]
 
-\subsection{Searching for Iterative Trails}
+\subsection{Searching for Iterative Trails\label{subsec:iterative-trails}}
 
 The elementry circuits in $G_F$ are equivelent to the elementry iterative trails of $\calE$. Applying Johnson's algorithm in \cite{J75}, we can list all the elementry circuits in $G_F$. However, if $V_F=\mathbb{F}_2^n$, the size of $V_F$ is $2^n$ which is too large. In order to limit the size of $V_F$, we set a parameter $max\_asn$ which is defined as the maximum active S-boxes that a vertex can has. That is, given SPN round transformation $F$ and parameter $max\_asn$, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is a subgraph of $G_F$. The set of vertices is given by
 \[
@@ -43,7 +43,37 @@ We extract every vertex that lies in at least one elementry circuit and denote t
 
 \subsection{Finding Differential and Linear Trails}
 
-Let $B^f_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail starting from $u$ has. Let $B^b_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail ending with $u$ has. Given parameters $r^f$ and $r^b$ which represent the number of rounds to be extended forward and backward, we can obtain $B^f_{u,i},i\in [0,r^f]$ and $B^b_{u,j},j\in [0,r^b]$ for each $u\in V^{IT}_{F,max\_asn}$ using Matsui's branch-and-bound depth-first search algorithm. Then based on iterative trails, the largest probability (correlation) that a single $r$-round trail has $B_r$ is
+For any trail based on iterative trails, it can be treated as three parts: the extension backward, the iterative trail and the extension forward. The 14-round differential trail of PRESENT found in \cite{W08} is shown in Table \ref{tab:trail-present}. It is constructed by concatenating a 4-round iterative trail to itself two times and extending both forward and backward by 1 round. Thus the subtrail from round 0 to round 1 is the extension backward part, the one from round 1 to round 13 is the iterative trail part and the one from round 13 to round 14 is the extension forward part. In the following, we try to compute the largest probability a trail of such type can has based on $G^{IT}_{F,max\_asn}$. 
+
+\begin{table}
+	\caption{A 14-round differential trail of PRESENT}\label{tab:trail-present}
+	\centering
+	\begin{tabular}{|c|c|c|}
+		\hline
+		Round &  Diffference & Prob.\\
+		\hline
+		0 &  $x_2=7,x_{14}=7$ & \\
+		1 &  $x_0=4,x_3=4$ & $2^{-4}$\\
+		2 &  $x_0=9,x_8=9$ & $2^{-4}$\\
+		3 &  $x_8=1,x_{10}=1$ & $2^{-4}$\\
+		4 &  $x_2=5,x_{14}=5$ & $2^{-4}$\\
+		5 &  $x_0=4,x_3=4$ & $2^{-6}$\\
+		6 &  $x_0=9,x_8=9$ & $2^{-4}$\\
+		7 &  $x_8=1,x_{10}=1$ & $2^{-4}$\\
+		8 &  $x_2=5,x_{14}=5$ & $2^{-4}$\\
+		9 &  $x_0=4,x_3=4$ & $2^{-6}$\\
+		10 &  $x_0=9,x_8=9$ & $2^{-4}$\\
+		11 &  $x_8=1,x_{10}=1$ & $2^{-4}$\\
+		12 &  $x_2=5,x_{14}=5$ & $2^{-4}$\\
+		13 &  $x_0=4,x_3=4$ & $2^{-6}$\\
+		14 &  $x_0=9,x_8=9$ & $2^{-4}$\\
+		\hline
+	\end{tabular}
+\end{table}
+
+%example
+
+Let $B^f_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail starting from $u$ can has, $u\in V^{IT}_{F,max\_asn}$. Let $B^b_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail ending with $u$ can has, $u\in V^{IT}_{F,max\_asn}$. Given parameters $r^f$ and $r^b$ which represent the number of rounds to be extended forward and backward, we can obtain $B^f_{u,i},i\in [0,r^f]$ and $B^b_{u,j},j\in [0,r^b]$ for each $u\in V^{IT}_{F,max\_asn}$ using Matsui's branch-and-bound depth-first search algorithm.  Based on iterative trails, the largest probability (correlation) that a single $r$-round trail can has $B_r$ is
 \[
     B_r=\max\limits_{\substack{p_{u,v}\in E^{IT}_{F,max\_asn}\\r_1+l(p_{u,v})+r_2=r\\0\leq r_1\leq r^b,0\leq r_2\leq r^f}} B^b_{u,r_1}\times w(p_{u,v})\times B^f_{v,r_2}.
 \]
@@ -51,48 +81,122 @@ To obtain $B_r$, instead of traversing all $p_{u,v}$, we use dynamic programming
 
 \begin{algorithm}
 	\caption{Compute $B_r$}
-	\label{algo2}
-	\begin{algorithmic}[1] %每行显示行号
+	\label{algo1}
+	\begin{algorithmic}[1] %每�?�显示�?�号
 		\Require $r$, parameters $r^f\leq r,r^b\leq r$, the round function $F$, $G^{IT}_{F,max\_asn}$
-		\Ensure $B^r$
+		\Ensure $B_r$
 		\Procedure {ComputeB}{}
+		\For{each $u\in V^{IT}_{F,max\_asn}$}
+		\State $B^f_{u,0}\leftarrow 1,B^b_{u,0}\leftarrow 1$
+		\EndFor
+		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^f$}
+		\State $BW\leftarrow B^f_{u,i-1}\times\max\limits_{a,b} \Prob^F(a,b)$
+		\While{\Call{Search}{$u,i,0,F,BW$}}
+		\State $BW\leftarrow BW\times 2^{-1}$
+		\EndWhile
+		\State $B^f_{u,i}\leftarrow BW$
+		\EndFor
+		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^b$}
+		\State $BW\leftarrow B^b_{u,i-1}\times\max\limits_{a,b} \Prob^{F^{-1}}(a,b)$
+		\While{\Call{Search}{$u,i,0,F^{-1},BW$}}
+		\State $BW\leftarrow BW\times 2^{-1}$
+		\EndWhile
+		\State $B^b_{u,i}\leftarrow BW$
+		\EndFor
+		
 		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\in [0,r^f]$}
 		\State $\overline{B^f_{u,i}}\leftarrow B^f_{u,i}$
 		\EndFor
-		\For{$i\leftarrow r^f+1:r$}
+		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow (r^f+1):r$}
 		\State $\overline{B^f_{u,i}}\leftarrow\max\limits_{v\in V^{IT}_{F,max\_asn}} w(u\rightarrow v)\times\overline{B^f_{v,i-1}}$
 		\EndFor
 		\State $B_r\leftarrow\max\limits_{\substack{i+j=r\\u\in V^{IT}_{F,max\_asn}}} B^b_{u,i}\times \overline{B^f_{u,j}}$
 		\EndProcedure
-	\end{algorithmic}
-\end{algorithm}
-
-
-
-
-\begin{algorithm}
-	\caption{Finding Differential (Linear) Trails}
-	\label{algo1}
-	\begin{algorithmic}[1] %每行显示行号
-		\Require $r_f$, $r_b$ and $G^{IT}_{F,max\_asn}$
-		\Ensure 
-		\Procedure {searchHinges}{}
-		\For{each $u\in V^{IT}_{F,max\_asn}$}
-		\State $B^b_{u,0}\leftarrow 0$, $B^f_{u,0}\leftarrow 0$
-		\EndFor
-		\EndProcedure
 		
-		\Procedure{searchRound}{$i$}
-
-		\EndProcedure
+		\Function{Search}{$u,j,w,rf,BW$}
+		\State $found\leftarrow\false$
+		\For{each $v$ such that $\Prob^{rf}(u,v)\geq BW\div w\div j\times\max\limits_{a,b}\Prob^{rf}(a,b)$}
+		\State $w'\leftarrow w\times \Prob^{rf}(u,v)$
+		\If{$j=0$}
+		\If{$w'>=BW$}
+		\State$BW\leftarrow w'$, $found\leftarrow \true$
+		\EndIf
+		\Else
+		\State $found\leftarrow found$ or \Call{Search}{$v,j-1,w',rf,BW$}
+		\EndIf
+		\EndFor
+		\State \Return{$found$}
+		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
 
 \subsection{Finding Differentials and Linear Hulls}
 
-Let $w^f_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(u,v)$ where $u\in V^{IT}_{F,max\_asn}$. Let $w^b_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(v,u)$ where $u\in V^{IT}_{F,max\_asn}$. 
+Let $w^F_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(u,v)$ where $u\in V^{IT}_{F,max\_asn}$. Let $w^{F^{-1}}_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(v,u)$ where $u\in V^{IT}_{F,max\_asn}$. Given parameters $r^F,r^{F^{-1}}$ which represent the maximum number of rounds to be extended forward and backward and parameters $w^F,w^{F^{-1}}$ which heuristically bounds the probability (correlation) of the extension subtrails. To compute $w^F_{u,v,i}$ and $w^{F^{-1}}_{u,v,i}$, We collect as many extension subtrails as possible using Matsui's branch-and-bound depth-first algorithm. Note that during traversing extension subtrails, we abandon any subtrail that contains any value in $V^{IT}_{F,max\_asn}$ to avoid duplicate trails in the next step.
 
+In a graph, a hull $h_{u,v}$ is the set of all paths from $u$ to $v$. Here, we define a hull $h_{u,v,r}$ as the set of all paths $p_{u,v}$ with $l(p_{u,v})=r$. Then its weight is
+\[
+	w(h_{u,v,r})=\sum\limits_{l(p_{u,v})=r} w(p_{u,v}).
+\]
+$w(h_{u,v,r})$ can be computed by dynamic programming.
 
+Based on iterative trails, the largest probability (correlation) that a $r$-round differential (linear hull) can has $BC_r$ is
+\[
+	BC_r=\max\limits_{\substack{x,y\in \mathbb{F}_2^n\\u,v\in V^{IT}_{F,max\_asn}\\r_1+r_2+r_3=r\\0\leq r_1\leq r^b,0\leq r_3\leq r^f}} w^b_{x,u,r_1}\times w(h_{u,v,r_2})\times w^f_{v,y,r_3}
+\]
+
+\begin{algorithm}
+	\caption{Compute $BC_r$}
+	\label{algo2}
+	\begin{algorithmic}[1] %每�?�显示�?�号
+		\Require $r$, parameters $r^F\leq r,r^{F^{-1}}\leq r$, parameters $wb^F,wb^{F^{-1}}$, the round function $F$, $G^{IT}_{F,max\_asn}$
+		\Ensure $BC_r$
+		\Procedure {ComputeBC}{}
+		\For{each $u\in V^{IT}_{F,max\_asn}$}
+		\State $w^F_{u,u,0}\leftarrow 1,w^b_{u,u,0}\leftarrow 1$
+		\EndFor
+		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^F$}
+		\State \Call{Collect}{$u,u,r^F,1,F$}
+		\EndFor
+		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^{F^{-1}}$}
+		\State \Call{Collect}{$u,u,r^{F^{-1}},1,F^{-1}$}
+		\EndFor
+		
+		\For{each $u,v\in V^{IT}_{F,max\_asn}$}
+		\State $w(h_{u,v,i})\leftarrow 1$
+		\EndFor
+		\For{$i\leftarrow 1:r$}
+		\For{each $u,v\in V^{IT}_{F,max\_asn}$}
+		\State $w(h_{u,v,i})\leftarrow \sum\limits_x w(h_{u,x,i-1})\times w(x\rightarrow v)$
+		\EndFor
+		\EndFor
+
+		\For{each possible first subscript index $x$ of $w^{F^{-1}}$}
+		\For{each possible second subscript index $y$ of $w^F$}
+		\State $BC_{y,r}\leftarrow \sum\limits_{\substack{r_1+r_2+r_3=r\\u,v\in V^{IT}_{F,max\_asn}}}w^{F^{-1}}_{x,u,r_1}\times w(h_{u,v,r_2})\times w^F_{v,y,r_3}$
+		\If{$BC_{y,r}>BC_r$}
+		\State $BC_r\leftarrow BC_{y,r}$
+		\EndIf
+		\EndFor
+		\EndFor
+		\EndProcedure
+		
+		\Procedure{Collect}{$s,x,j,w,rf$}
+		\For{each $y$ such that $\Prob^{rf}(x,y)\geq wb^{rf}\div w\div (j\times\max\limits_{a,b}\Prob^{rf}(a,b))$}
+		\State $w'\leftarrow w+\Prob^{rf}(x,y)$
+		\If{$w^{rf}_{s,y,r_f-j}$ exists}
+		\State $w^{rf}_{s,y,r_{rf}-j}\leftarrow w^{rf}_{s,y,r^{r43}-j}\times w'$
+		\Else
+		\State $w^{rf}_{s,y,r_{rf}-j}\leftarrow w'$
+		\EndIf
+		\If{$j\neq 0$}
+		\State \Call{Collect}{$s,y,j-1,w',rf$}
+		\EndIf
+		\EndFor
+
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
 %In another way, a weighted 2-stage graph $G^1_F=(V^1_F,E^1_F)$ can also be generated to describe the 1-round differentials or linear hulls. $G^1_F$ has 2 stages $S_0$ and $S_1$ each being $\mathbb{F}_2^n$. For $u\in S_0$ and $v\in S_1$, the length of an edge $l^1(u\rightarrow v)$ is defined the same way as $l(u\rightarrow v)$ in $G_F$ is.
 
 %If $S_0=S_1$, then $G^1_F$ can be iteratively concatenated to itself. 

@@ -26,6 +26,9 @@
 \usepackage{tikz}
 %\usetikzlibrary{arrows,shapes,snakes,automata,backgrounds,petri}
 
+%usepackage{algpseudocode}
+%\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
 \newcommand{\Prob}{\text{Prob}}
 \newcommand{\Cor}{\text{Cor}}
 \newcommand{\EDP}{\text{EDP}}
@@ -33,7 +36,9 @@
 \newcommand{\Exp}{\text{Exp}}
 \newcommand{\calE}{\mathcal{E}}
 \newcommand{\calP}{\mathcal{P}}
-
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\true}{\text{true}}
+\newcommand{\false}{\text{false}}
 \makeatletter
 \newenvironment{breakablealgorithm}
   {% \begin{breakablealgorithm}
@@ -91,10 +96,7 @@ To conduct a successful differential (linear) cryptanalysis to a symmetric-key p
 %\input{introduction.tex}
 \input{preliminary.tex}
 \input{method.tex}
-%\input{paragraph1.tex}
-%\input{paragraph2.tex}
-%\input{paragraph3.tex}
-%\input{experiment.tex}
+\input{experiment.tex}
 %\input{paragraph4.tex}
 %\input{conclusion.tex}
 
