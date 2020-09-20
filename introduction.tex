@@ -1,0 +1,67 @@
+\section{Introduction}
+
+Differential cryptanalysis (DC) \cite{BS91,BS92} and linear cryptanalysis (LC) \cite{M93,M94_1} are two of the most powerful attacks against modern block ciphers. In 1990, Biham and Shamir introduced differential cryptanalysis and successfully attacked the full-round DES\cite{BS92}. In 1991, they improved the attack with $2^{47}$ chosen plaintexts\cite{BS92}. In 1993, Matsui introduced linear cryptanalysis and succeeded in breaking DES with $2^{47}$ known plaintexts\cite{M93}. In 1994, Matsui improved the data complexity to $2^{43}$\cite{M94_1}. Cryptanalysis also drives the design of ciphers in return. In 2001, Rijmen and Daemon proposed the wide trail design strategy\cite{DR01}, providing provable security against DC and LC for AES winner Rijndael\cite{DR98}. With increasing number of symmetric cryptographic primitives emerging, every well-designed block cipher must resist against DC and LC in the first place. To conduct the differential or linear attack, an adversary expects to find exploitable differential or linear distinguishers. Usually, the probability of the best differential trail and the correlation (or bias) of the best linear trail are respectively used as the indices to the resistance against DC and LC. The two main kinds of the automatic search tools for the best differential and linear trails are dedicated tree search algorithms \cite{M94_2,OMA95,AKM97,BZL14} and mathematical-solver-based methods \cite{MWG12,SHW14-1,SHW14-2,ZZDX19}. In this article, we focus on the dedicated search algorithms. 
+
+In 1994, Matsui proposed a branch-and-bound depth-first tree search algorithm for searching the best differential or linear trail of DES\cite{M94_2}. In 1995, Moriai et al. introduced the concept of search pattern to reduce unnecessary search candidates, which improves the performance of searching the best trail of FEAL\cite{OMA95}. In 1997, Aoki et al. further improved the performance by using a pre-search for impossible search patterns\cite{AKM97}. In 2014, Bao et al. proposed new strategies including starting from the narrowest point, concretizing and grouping search patterns and trailing in minimal changes order, achieving significant efficiency improvement on NOEKEON and Spongent\cite{BZL14}. Dobraunig et al. \cite{DEM15} proposed a stack-based depth-first search algorithm characterizing in guessing sbox by sbox or bit by bit instead of round by round in Matsui's algorithm. Hall-Andersen et al. \cite{HV18} modeled the trail search as a graph problem and managed to obtain results on clustering effect for many ciphers. 
+
+%Another line of research is modelling the differential or linear propagation and solve the model using mathematical tools. In 2011, Wu et al. modeled block ciphers using integer programming\cite{WW11}. Works that modelling using mixed integer linear programming (MILP) include but not limited to \cite{MWG12}. Works that modelling using SAT/SMT include but not limited to []. Works that modelling using constraint programming (CP) include but not limited to [].
+Besides automatically searching the best differential or linear trail, iterative trails are used to construct long-round significant trails in order to efficiently obtain exploitable trails for cryptanalysis. Iterative trails refer to trails that have the same input and output difference (or mask) and thus they can concatenate to themselves. Biham and Shamir used iterative differential characteristics to cryptanalyze DES with an arbitrary number of rounds\cite{BS91,BS92}. Knudsen examined the 2 iterative characteristics found in \cite{BS91,BS92} and found additional 3 iterative characteristics for DES\cite{K92}. Wang et al. found a 4-round iterative differential characteristic for PRESENT by which a 14-round significant differential characteristic is constructed\cite{W08}. 
+%If the iterative structure is not too complicated, our method is able to find all iterative trails in seconds. Using the iterative structure, We can further determine the weight of the best $n$-round trails constructed by iterative trails. 
+
+%\begin{table}
+%	\caption{results on weights of best trails and clusters}\label{tab:sum}
+%	\centering
+%	\begin{tabular}{|c|c|c|c|c|c|}
+%        \hline
+%        cipher&target&round&best weight&method&time\\
+%        \hline
+%        \multirow{9}{*}{KNOT-perm-256}
+%        &differential trail   &14     &71         &\cite{ZDY19}           &-\\
+%        &differential cluster  &14     &$\leq$ 65.4493    &Sec. \ref{sec:para3}   &511s\\
+%        &differential trail   &48     &252         &\cite{BZL14}           &2.87h\\
+%        &differential trail   &48     &$\leq$ 252        &Sec. \ref{sec:para2}   &0.1s\\
+%        \cline{2-6}
+%        &linear trail         &10     &23         &\cite{ZDY19}            &-\\
+%        &linear cluster        &10     &$\leq$ 21.8301    &Sec. \ref{sec:para3}   &7509s\\
+%        &linear trail         &39     &110         &\cite{BZL14}            &344.01h\\
+%        &linear trail         &39     &$\leq$ 110        &Sec. \ref{sec:para2}   &0.6s\\
+%        &linear trail         &44     &$\leq$ 125        &Sec. \ref{sec:para2}   &0.6s\\
+%        \hline
+%        \multirow{4}{*}{PRESENT}
+%        &differential trail   &14     &62         &\cite{ZZDX19}          &-\\
+%        &differential trail   &14     &$\leq$ 62         &Sec. \ref{sec:para2}   &0.6s\\
+%        \cline{2-6}
+%        &linear trail     &16     &30         &\cite{ZZDX19}          &-\\
+%        &linear trail      &16     &$\leq$ 30         &Sec. \ref{sec:para2}   &0.1s\\
+%        \hline
+%        \multirow{5}{*}{GIFT-64}
+%        &differential trail   &13     &62         &\cite{ZZDX19}          &-\\
+%        &differential trail   &13     &$\leq$ 62         &Sec. \ref{sec:para2}   &0.3s\\
+%        &differential cluster   &13     &$\leq$ 60.415     &Sec. \ref{sec:para3}   &414s\\
+%        \cline{2-6}
+%        &linear trail         &12     &31         &\cite{ZZDX19}          &-\\
+%        &linear trail         &12     &$\leq$ 32         &Sec. \ref{sec:para2}   &0.2s\\
+%        \hline
+%        \multirow{6}{*}{RECTANGLE}
+%        &differential trail   &14     &61         &\cite{ZBL15}           &-\\
+%        &differential trail   &14     &$\leq$ 61         &Sec. \ref{sec:para2}   &1.2s\\
+%        &differential cluster   &15     &$\leq$ 63.7857    &Sec. \ref{sec:para3}   &1329s\\
+%        \cline{2-6}
+%        &linear trail         &13     &31         &\cite{ZBL15}            &-\\
+%        &linear trail         &13     &$\leq$ 31         &Sec. \ref{sec:para2}   &0.2s\\
+%        &linear cluster ($c^2$)  &13     &$\leq$ 59.3561    &Sec. \ref{sec:para3}   &2481s\\
+%        \hline
+%	\end{tabular}
+%\end{table}
+
+\subsubsection{Our Contribution}
+%\begin{enumerate}
+%    \item We propose a new automatic tool for searching iterative trails for permutations or block ciphers based on S-boxes. We introduce the concept of $k$-hinge trails by which a directed graph is formed. Inspired by Johnson's algorithm \cite{J75} of finding all the elementary circuits of a directed graph, we find all iterative trails constructed by \textbf{$k$-hinge trails}. We call the directed graph that formed by all iterative trails found \textbf{iterative structure}. Extending a \textbf{general iterative trail} both forward and backward, we obtain the weight of the best trail constructed by iterative trails and the weight of the best differential or linear propagation composed of significant trails constructed by iterative trails. 
+%    \item For 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, we obtain and visualize the iterative trails, by which we hope to get some insights of symmetric-key primitives with weak diffusion, especially, bit permutation as a diffustion layer. For ASCON permutation, we find that its differential iterative structure based on $3$-hinge trails is empty, which illustrates that ASCON permutation doesn't have iterative differential trails with no more than 3 active S-boxes in each round. 
+%    \item For arbitrary-round the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, we obtain the weight of the best trails constructed by iterative trails, which is an upper bound of the weight of the best trails. The upper bound is tight when the round number is large. Our method finishes in several seconds. Comparing our results for the 256-bit KNOT permutation with the results obtained using the method proposed by Bao et al. \cite{BZL14}, we find that the upper bound is exactly the best weight and the time our method consumes is negligible. See Table \ref{tab:sum}. 
+%    \item For 256-bit KNOT permutation, GIFT-64 and RECTANGLE, we obtain the weight of the best differential or linear propagation composed of significant trails constructed by iterative trails. Because GIFT-64 and RECTANGLE are keyed block ciphers, the correlation potential ($\sum c^2$) is computed for a cluster of linear trails, while because KNOT permutations are permutations without key xor, the correlation contribution ($\sum c$) is computed for a cluster of linear trails. Except for linear cryptanalysis of GIFT-64, we obtain better weight of the best differential or linear propagation than the weight of the best single trail. See Table \ref{tab:sum}. 
+%    \item For different versions of KNOT-AEAD, we obtain the upper bound of the weight of the best trails with input and output differences or masks constrained depending on different attack scenarios. The differential and linear attacks proposed are universally applicable for any AEAD scheme based on the Duplex mode of operations. 
+%\end{enumerate}
+
+\subsubsection{Organization}
+%The paper is organized as follows. Section \ref{sec:pre} introduces some concepts and notations. Section \ref{sec:para1} gives the algorithm that computes the iterative structure. Section \ref{sec:para2} gives the algorithm that determines the weight of the best trail constructed by iterative trails. Section \ref{sec:para3} gives the algorithm that determine the weight of the best differential or linear propagation composed of significant trails constructed by iterative trails. Section \ref{sec:expe} gives experimental results. In Section \ref{sec:conc}, we conclude the paper. In Appendix \ref{sec:is}, iterative structures are illustrated. 

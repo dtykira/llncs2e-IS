@@ -88,12 +88,12 @@
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-To conduct a successful differential (linear) cryptanalysis to a symmetric-key primitive, a differential (linear) distinguisher with significant differential probability (correlation contribution) is needed. We observe that, for some lightweight symmetric-key primitives, their significant trails usually contain iterative trails. We propose an automatic tool for searching iterative trails and determinating the weight of the best trail constructed by iterative trails and the weight of the best differential or linear propagation composed of significant trails constructed by iterative trails. Respectively applying our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, iterative trails are found and visualized. An upper bound of the weight of the best trail with arbitrary rounds is obtained in several seconds. When the number of rounds is large, it's illustrated that the upper bound coincide with the best weight or is very tight. An upper bound of the weight of the best differential or linear propagation is also obtained by considering the clustering effect. For 14-round 256-bit KNOT permutation, 13-round GIFT-64 and 15-round RECTANGLE, better differential distinguishers than the best differential trails are obtained. For 10-round 256-bit KNOT permutation and 13-round RECTANGLE, better linear distinguishers than the best linear trails are obtained. Additionally, by constraining the input and output differences and masks, results for KNOT-AEAD fitting certain differential and linear attack scenarios in Duplex mode of operations are obtained. 
+%To conduct a successful differential (linear) cryptanalysis to a symmetric-key primitive, a differential (linear) distinguisher with significant differential probability (correlation contribution) is needed. We observe that, for some lightweight symmetric-key primitives, their significant trails usually contain iterative trails. We propose an automatic tool for searching iterative trails and determinating the weight of the best trail constructed by iterative trails and the weight of the best differential or linear propagation composed of significant trails constructed by iterative trails. Respectively applying our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, iterative trails are found and visualized. An upper bound of the weight of the best trail with arbitrary rounds is obtained in several seconds. When the number of rounds is large, it's illustrated that the upper bound coincide with the best weight or is very tight. An upper bound of the weight of the best differential or linear propagation is also obtained by considering the clustering effect. For 14-round 256-bit KNOT permutation, 13-round GIFT-64 and 15-round RECTANGLE, better differential distinguishers than the best differential trails are obtained. For 10-round 256-bit KNOT permutation and 13-round RECTANGLE, better linear distinguishers than the best linear trails are obtained. Additionally, by constraining the input and output differences and masks, results for KNOT-AEAD fitting certain differential and linear attack scenarios in Duplex mode of operations are obtained. 
 
 \keywords{Differential Cryptanalysis \and Linear Cryptanalysis \and Automatic Search Tools \and Iterative Trails \and Lightweight Cryptography}
 \end{abstract}
 
-%\input{introduction.tex}
+\input{introduction.tex}
 \input{preliminary.tex}
 \input{method.tex}
 \input{experiment.tex}
@@ -101,7 +101,7 @@ To conduct a successful differential (linear) cryptanalysis to a symmetric-key p
 %\input{conclusion.tex}
 
 \input{bib.tex}
-%\input{appendix.tex}
+\input{appendix.tex}
 
 
 \end{document}

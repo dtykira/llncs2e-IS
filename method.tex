@@ -27,7 +27,7 @@ else if $\calE$ is a permutation, the length is defined as:
 
 \subsection{Searching for Iterative Trails\label{subsec:iterative-trails}}
 
-The elementry circuits in $G_F$ are equivelent to the elementry iterative trails of $\calE$. Applying Johnson's algorithm in \cite{J75}, we can list all the elementry circuits in $G_F$. However, if $V_F=\mathbb{F}_2^n$, the size of $V_F$ is $2^n$ which is too large. In order to limit the size of $V_F$, we set a parameter $max\_asn$ which is defined as the maximum active S-boxes that a vertex can has. That is, given SPN round transformation $F$ and parameter $max\_asn$, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is a subgraph of $G_F$. The set of vertices is given by
+According to the definition of circuits and iterative trails, the elementry iterative trails of $\calE$ can be viewed as elementry circuits in $G_F$. Applying Johnson's algorithm in \cite{J75}, we can list all the elementry circuits in $G_F$. However, if $V_F=\mathbb{F}_2^n$, the size of $V_F$ is $2^n$ which is too large. In order to limit the size of $V_F$, we set a parameter $max\_asn$ which is defined as the maximum active S-boxes that a vertex can has. That is, given an SPN round transformation $F$ and the parameter $max\_asn$, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is a subgraph of $G_F$. The set of vertices is given by
 \[
     V_{F,max\_asn}=\{u|\text{Asn}(u)\leq max\_asn \text{ and } u\in V_F\}
 \]
@@ -35,7 +35,7 @@ where $\text{Asn}(\cdot)$ is a function returns the number of active S-boxes of 
 
 Applying Johnson's algorithm to $G_{F,max\_asn}$, we can obtain a set of elementry circuits
 \[
-    EIT=\{p_{uv}|u=v \text{ and } v^{(i)}\neq v^{(j)},\forall i,j\in[0,r-1]\},
+    \{p_{uv}|u=v \text{ and } v^{(i)}\neq v^{(j)},\forall i,j\in[0,r-1]\},
 \]
 in which each element represent an elementry iterative trails for $F$. 
 
