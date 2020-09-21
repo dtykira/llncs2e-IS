@@ -59,22 +59,26 @@ We consider the smallest weight per length an elementary iterative trail can has
 
 \subsection{Experiments on Finding Differential Trails and Linear Trails}
 
-We apply our method in Section \ref{subsec:find-trails} and \ref{subsec:find-clusters} to PRESENT, GIFT-64, RECTANGLE and 256-bit KNOT permutation. The algorithm is run on an Intel Core i7-6700 CPU at 3.40GHz with 16GB RAM. The results for differential cryptanalysis are shown in Table \ref{tab:EDP}. The results for linear cryptanalysis are shown in Table \ref{tab:ELP}. 
+We apply our method in Section \ref{subsec:find-trails} and \ref{subsec:find-clusters} to PRESENT, GIFT-64, RECTANGLE and 256-bit KNOT permutation. The algorithm is run on an Intel Core i7-6700 CPU at 3.40GHz with 16GB RAM. The results for differential cryptanalysis are shown in Table \ref{tab:EDP}. The results for linear cryptanalysis are shown in Table \ref{tab:ELP}. Results for PRESENT, RECTANGLE and GIFT-64 are not better than but close to results in \cite{HV18}, which implies that iterative trails dominate the good differentials and linear hulls of these ciphers. However our method costs much less time. The 256-bit KNOT permutation is used in NIST LWC round 2 candidate KNOT \cite{ZDY19}, which is a inheritor of RECTANGLE having a larger number of rounds and a larger block size. For the 256-bit KNOT permutation, we are able to find good differentials up to 52 rounds and good linear hulls up to 51 rounds. 
 
 \begin{table}
 	\caption{Results for differential cryptanalysis}\label{tab:EDP}
 	\centering
-	\begin{tabular}{|c|c|c|c|c|c|c|}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline
-		cipher & rounds & EDP1 & Time & EDP2 & Time \\
+		cipher & rounds & $r^F,r^{F^{-1}}$ & $\Prob$ & Time & $r^F,w^F,r^{F^{-1}},w^{F^{-1}}$ & EDP & Time \\
 		\hline
-		PRESENT & \\
+		PRESENT & 14 & 3,3 & 62 & <1s & 3,13,3,13 & 54.9879 & 425.15s \\
 		\hline 
-		RECTANGLE & 13 & 56 & 1.2s & 55.6601 & 12007.5s \\
+		PRESENT & 17 & - & - & - & 3,13,3,13 & 62.6897 & 498.513s\\
+		\hline 
+		RECTANGLE & 13 & 6,6 & 56 & 1.2s & 6,25,6,25 & 55.6601 & 12007.5s \\
 		\hline
-		GIFT-64 \\
+		GIFT-64 & 13 & 3,3 & 62 & <1s & 3,13,3,13 & 60.415 & 32.365s\\
 		\hline
-		KNOT-perm-256 \\
+		KNOT-perm-256 & 48 & 3,3 & 252 & <1s & 3,13,3,13 & 232.591 & 19.536s\\
+		\hline
+		KNOT-perm-256 & 52 & 3,3 & 274 & <1s & 3,13,3,13 & 251.831 & 20.407s\\
 		\hline
 	\end{tabular}
 \end{table}
@@ -82,22 +86,28 @@ We apply our method in Section \ref{subsec:find-trails} and \ref{subsec:find-clu
 \begin{table}
 	\caption{Results for linear cryptanalysis}\label{tab:ELP}
 	\centering
-	\begin{tabular}{|c|c|c|c|c|c|c|}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline
-		cipher & rounds & ELP1 & Time & ELP2 & Time \\
+		cipher & rounds & $r^F,r^{F^{-1}}$ & $\Cor^2$ & Time & $r^F,w^F,r^{F^{-1}},w^{F^{-1}}$ & ELP & Time \\
 		\hline
-		PRESENT & \\
+		PRESENT & 17 & 3,3 & 64 & <1s & 3,8,3,8 & 45.6582 & <1s\\
 		\hline 
-		RECTANGLE & 13 & 62 & 0.2s & 59.6377 & 337.195s \\
+		PRESENT & 23 & 3,3 & 92 & <1s & 3,8,3,8 & 61.1404 & <1s\\
+		\hline 
+		PRESENT & 24 & 3,3 & 96 & <1s & 3,8,3,8 & 63.7519 & <1s\\
+		\hline 
+		RECTANGLE & 13 & 5,5 & 62 & <1s & 5,20,5,20 & 59.6377 & 337.195s \\
 		\hline
-		GIFT-64 \\
+		GIFT-64 & 12 & 3,3 & 64 & <1s& 3,13,3,13 & 64 & <1s \\
 		\hline
-		KNOT-perm-256 \\
+		KNOT-perm-256 & 45 & 3,3 & 256 & <1s & 3,7,3,7 & 222 & 100.892s\\
+		\hline
+		KNOT-perm-256 & 51 & 3,3 & 292 & <1s & 3,7,3,7 & 252 & 111.763s\\
 		\hline
 	\end{tabular}
 \end{table}
 
-\subsection{Experiment on KNOT}
+%\subsection{Experiment on KNOT}
 
-\subsubsection{Attack Model 1}
+%\subsubsection{Attack Model 1}
 

@@ -76,12 +76,15 @@ It is often assumed that
     \Prob^{\calE_K}(a,b)\approx\EDP(a,b)
 \]
 for most keys. In the case of linear cryptanalysis, ELP (expected linear potential) is defined as:
+\begin{align*}
+    \ELP(a,b)&=\Exp_{K}[(\Cor^{\calE_K}(a,b))^2]\\
+    &=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(\Cor^{\calE_K}(U))^2.
+\end{align*}
+    
+
+If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}].$. Let $\calE$ be $\rho^{(r)}\circ\cdots\circ\rho^{(1)}$ without key addition, then we define:
 \[
-    \ELP(a,b)=\Exp_{K}[(\Cor^{\calE_K}(a,b))^2].
-\]
-If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}].$. Let $\calE$ be $\rho^{(r)}\circ\cdots\circ\rho^{(1)}$, then:
-\[
-    \ELP(a,b)=(\Cor^{\calE}(a,b))^2.
+    \ELP(a,b)=\Big(\sum\limits_{u^{(0)}=a,u^{(r)}=b}\Cor^{\calE}(U)\Big)^2.
 \]
 
 %For the sponge construction and its variant, no key is involved in the inner permutations. Thus the correlation of a linear hull is directly the signed sum of the correlations of the linear trails.
