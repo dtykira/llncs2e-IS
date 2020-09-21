@@ -62,7 +62,7 @@
 
 \begin{document}
 %
-\title{An Automatic Search Tool for Iterative Trails and its Application to KNOT, PRESENT, GIFT-64 and RECTANGLE 
+\title{An Automatic Search Tool for Iterative Trails and its Application to estimation of differentials and linear hulls 
 %\thanks{Supported by organization x.}
 }
 %
@@ -70,25 +70,32 @@
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
-%\author{First Author\inst{1}\orcidID{0000-1111-2222-3333} \and
-%Second Author\inst{2,3}\orcidID{1111-2222-3333-4444} \and
-%Third Author\inst{3}\orcidID{2222--3333-4444-5555}}
+\author{Tianyou Ding\inst{1,2}
+%\orcidID{0000-1111-2222-3333} 
+\and Wentao Zhang\inst{1,2}
+\and Chunning Zhou\inst{1,2}
+\and Fulei Ji\inst{1,2}
+}
 %
-%\authorrunning{F. Author et al.}
+\authorrunning{F. Author et al.}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
-%\institute{Princeton University, Princeton NJ 08544, USA \and
-%Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
-%\email{lncs@springer.com}\\
-%\url{http://www.springer.com/gp/computer-science/lncs} \and
-%ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
-%\email{\{abc,lncs\}@uni-heidelberg.de}}
+\institute{State Key Laboratory of Information Security, Institute of Information Engineering, Chinese Academy of Sciences, Beijing, China\\
+\email{\{dingtianyou, zhangwentao, zhouchunning, jifulei\}@iie.ac.cn}
+\and School of Cyber Security, University of Chinese Academy of Sciences, Beijing, China
+}
 %
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-%To conduct a successful differential (linear) cryptanalysis to a symmetric-key primitive, a differential (linear) distinguisher with significant differential probability (correlation contribution) is needed. We observe that, for some lightweight symmetric-key primitives, their significant trails usually contain iterative trails. We propose an automatic tool for searching iterative trails and determinating the weight of the best trail constructed by iterative trails and the weight of the best differential or linear propagation composed of significant trails constructed by iterative trails. Respectively applying our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, iterative trails are found and visualized. An upper bound of the weight of the best trail with arbitrary rounds is obtained in several seconds. When the number of rounds is large, it's illustrated that the upper bound coincide with the best weight or is very tight. An upper bound of the weight of the best differential or linear propagation is also obtained by considering the clustering effect. For 14-round 256-bit KNOT permutation, 13-round GIFT-64 and 15-round RECTANGLE, better differential distinguishers than the best differential trails are obtained. For 10-round 256-bit KNOT permutation and 13-round RECTANGLE, better linear distinguishers than the best linear trails are obtained. Additionally, by constraining the input and output differences and masks, results for KNOT-AEAD fitting certain differential and linear attack scenarios in Duplex mode of operations are obtained. 
+The design and cryptanalysis are the both sides from which we look at symmetric-key primitives. If a symmetric-key primitive is broken by a kind of cryptanalysis, it's definitely insecure. If a designer claims a symmetric-key primitive to be secure, one should demonstrate that the primitive resists against all known attacks. Differential and linear cryptanalysis are two of the most important kinds of cryptanalysis. To conduct a successful differential (linear) cryptanalysis, a differential (linear) distinguisher with significant differential probability (linear correlation) is needed. 
+
+We observe that, for some lightweight symmetric-key primitives, their significant trails usually contain iterative trails. In this work, We propose an automatic tool for searching iterative trails. We model the problem of searching itrative trails as a problem of finding elementry ciucuits in a graph. Based on the iterative trails found, we further propose a method to estimate the probability (correlation) of a differential (linear hull). 
+
+We apply our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, iterative trails are found and visualized. 
+
+%An upper bound of the weight of the best trail with arbitrary rounds is obtained in several seconds. When the number of rounds is large, it's illustrated that the upper bound coincide with the best weight or is very tight. An upper bound of the weight of the best differential or linear propagation is also obtained by considering the clustering effect. For 14-round 256-bit KNOT permutation, 13-round GIFT-64 and 15-round RECTANGLE, better differential distinguishers than the best differential trails are obtained. For 10-round 256-bit KNOT permutation and 13-round RECTANGLE, better linear distinguishers than the best linear trails are obtained. Additionally, by constraining the input and output differences and masks, results for KNOT-AEAD fitting certain differential and linear attack scenarios in Duplex mode of operations are obtained. 
 
 \keywords{Differential Cryptanalysis \and Linear Cryptanalysis \and Automatic Search Tools \and Iterative Trails \and Lightweight Cryptography}
 \end{abstract}

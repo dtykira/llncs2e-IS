@@ -15,8 +15,7 @@ The probability of a differential step $(q^{(i-1)},q^{(i)})$ is defined as:
     \Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)})&=\Prob_x[\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}]\\
     &=2^{-n}\times\#\{x\in \mathbb{F}_2^n|\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}\}
 \end{align*}
-    
-Assuming the independence of differenti differential steps, the probability of $Q$ is:
+Assuming the independence of the differential steps, the probability of $Q$ is:
 \[
     \Prob^{\beta}(Q)=\prod\limits_i\Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)}).
 \]
@@ -103,5 +102,5 @@ The set of all paths $p_{u,v}$ is called the \textit{hull} of $(u,v)$. The hull 
 \]
 i.e. the sum of the lengths of all the path contained in the hull. A \textit{circuit} is a path in which the first and last vertices are identical. A circuit is $elementary$ if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
 
-Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $i\in[0,l-1)$. We call the graph a \textit{multistage graph}.
+%Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $i\in[0,l-1)$. We call the graph a \textit{multistage graph}.
 
