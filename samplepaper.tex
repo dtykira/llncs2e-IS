@@ -66,7 +66,7 @@
 %\thanks{Supported by organization x.}
 }
 %
-%\titlerunning{Abbreviated paper title}
+\titlerunning{An Automatic Search Tool for Iterative Trails}
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
@@ -89,11 +89,12 @@
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
+
 The design and cryptanalysis are the both sides from which we look at symmetric-key primitives. If a symmetric-key primitive is broken by a kind of cryptanalysis, it's definitely insecure. If a designer claims a symmetric-key primitive to be secure, one should demonstrate that the primitive resists against all known attacks. Differential and linear cryptanalysis are two of the most important kinds of cryptanalysis. To conduct a successful differential (linear) cryptanalysis, a differential (linear) distinguisher with significant differential probability (linear correlation) is needed. 
 
 We observe that, for some lightweight symmetric-key primitives, their significant trails usually contain iterative trails. In this work, We propose an automatic tool for searching iterative trails. We model the problem of searching itrative trails as a problem of finding elementry ciucuits in a graph. Based on the iterative trails found, we further propose a method to estimate the probability (correlation) of a differential (linear hull). 
 
-We apply our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE, iterative trails are found and visualized. 
+We apply our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTANGLE. Iterative trails are found and visualized. If iterative trails are found, we show our method can efficiently find good differentials and linear hulls. What's more, we demonstrate that for the primitives we test with bit permutations as their linear layers, the good differentials and linear hulls are dominated by iterative trails. 
 
 %An upper bound of the weight of the best trail with arbitrary rounds is obtained in several seconds. When the number of rounds is large, it's illustrated that the upper bound coincide with the best weight or is very tight. An upper bound of the weight of the best differential or linear propagation is also obtained by considering the clustering effect. For 14-round 256-bit KNOT permutation, 13-round GIFT-64 and 15-round RECTANGLE, better differential distinguishers than the best differential trails are obtained. For 10-round 256-bit KNOT permutation and 13-round RECTANGLE, better linear distinguishers than the best linear trails are obtained. Additionally, by constraining the input and output differences and masks, results for KNOT-AEAD fitting certain differential and linear attack scenarios in Duplex mode of operations are obtained. 
 
@@ -104,8 +105,7 @@ We apply our methods to the 256-bit KNOT permutation, PRESENT, GIFT-64 and RECTA
 \input{preliminary.tex}
 \input{method.tex}
 \input{experiment.tex}
-%\input{paragraph4.tex}
-%\input{conclusion.tex}
+\input{conclusion.tex}
 
 \input{bib.tex}
 \input{appendix.tex}

@@ -59,7 +59,7 @@ We consider the smallest weight per length an elementary iterative trail can has
 
 \subsection{Experiments on Finding Differential Trails and Linear Trails}
 
-We apply our method in Section \ref{subsec:find-trails} to PRESENT, GIFT-64, RECTANGLE and 256-bit KNOT permutation. 
+We apply our method in Section \ref{subsec:find-trails} and \ref{subsec:find-clusters} to PRESENT, GIFT-64, RECTANGLE and 256-bit KNOT permutation. The algorithm is run on an Intel Core i7-6700 CPU at 3.40GHz with 16GB RAM. The results for differential cryptanalysis are shown in Table \ref{tab:EDP}. The results for linear cryptanalysis are shown in Table \ref{tab:ELP}. 
 
 \begin{table}
 	\caption{Results for differential cryptanalysis}\label{tab:EDP}
@@ -88,7 +88,7 @@ We apply our method in Section \ref{subsec:find-trails} to PRESENT, GIFT-64, REC
 		\hline
 		PRESENT & \\
 		\hline 
-		RECTANGLE \\
+		RECTANGLE & 13 & 62 & 0.2s & 59.6377 & 337.195s \\
 		\hline
 		GIFT-64 \\
 		\hline
@@ -96,3 +96,8 @@ We apply our method in Section \ref{subsec:find-trails} to PRESENT, GIFT-64, REC
 		\hline
 	\end{tabular}
 \end{table}
+
+\subsection{Experiment on KNOT}
+
+\subsubsection{Attack Model 1}
+
