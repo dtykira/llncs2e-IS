@@ -82,7 +82,7 @@ for most keys. In the case of linear cryptanalysis, ELP (expected linear potenti
 \end{align*}
     
 
-If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}].$. Let $\calE$ be $\rho^{(r)}\circ\cdots\circ\rho^{(1)}$ without key addition, then we define:
+If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}]$. Let $\calE$ be $\rho^{(r)}\circ\cdots\circ\rho^{(1)}$ without key addition, then we define:
 \[
     \ELP(a,b)=\Big(\sum\limits_{u^{(0)}=a,u^{(r)}=b}\Cor^{\calE}(U)\Big)^2.
 \]
@@ -91,13 +91,13 @@ If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\
 
 \subsection{Concepts in Graph Theory}
 
-A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. For a weighted graph, each edge $u\rightarrow v$ has a \textit{length}, denoted as $l(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_1,v_2,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E$. The \textit{length} of the path is
+A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. For a weighted graph, each edge $u\rightarrow v$ has a \textit{weight}, denoted as $w(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_1,v_2,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E$. The \textit{length} of the path is
 \[
     l(p_{u,v})=k-1,
 \]
 the \textit{weight} of the path is
 \[
-    w(p_{u,v})=\prod\limits_{i=1}^{k-1}l(v_i\rightarrow v_{i+1}).
+    w(p_{u,v})=\prod\limits_{i=1}^{k-1}w(v_i\rightarrow v_{i+1}).
 \]
 The set of all paths $p_{u,v}$ is called the \textit{hull} of $(u,v)$. The hull is denoted as $h_{u,v}$ and its weight is defined as:
 \[
