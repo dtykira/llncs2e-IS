@@ -91,19 +91,24 @@ If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\
 
 \subsection{Concepts in Graph Theory}
 
-A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. For a weighted graph, each edge $u\rightarrow v$ has a \textit{weight}, denoted as $w(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_1,v_2,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E$. The \textit{length} of the path is
+A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. For a weighted graph, each edge $u\rightarrow v$ has a \textit{weight}, denoted as $w(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_0,v_1,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E$. The \textit{length} of the path is
 \[
-    l(p_{u,v})=k-1,
+    l(p_{u,v})=k,
 \]
 the \textit{weight} of the path is
 \[
-    w(p_{u,v})=\prod\limits_{i=1}^{k-1}w(v_i\rightarrow v_{i+1}).
+    w(p_{u,v})=\prod\limits_{i=1}^{k}w(v_{i-1}\rightarrow v_i).
 \]
-The set of all paths $p_{u,v}$ is called the \textit{hull} of $(u,v)$. The hull is denoted as $h_{u,v}$ and its weight is defined as:
+The \textit{hull} of $(u,v)$ is denoted as $h_{u,v}$ and is defined as the set of all paths $p_{u,v}$. The weight of $h_{u,v}$ is defined as:
 \[
     w(h_{u,v})=\sum w(p_{u,v}),
 \]
-i.e. the sum of the lengths of all the path contained in the hull. A \textit{circuit} is a path in which the first and last vertices are identical. A circuit is $elementary$ if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
+i.e. the sum of the weights of all the paths contained in the hull. In this article, we further denote the hull of $(u,v)$ with length $k$ as $h_{u,v}^k$ and it's defined as the set of all paths $p_{u,v}$ with $l(p_{u,v})=k$. The weight of $h_{u,v}^k$ is then defined as:
+\[
+    w(h_{u,v}^k)=\sum\limits_{l(p_{u,v})=k} w(p_{u,v}),
+\]
+
+A \textit{circuit} is a path in which the first and last vertices are identical. A circuit is $elementary$ if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
 
 %Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $i\in[0,l-1)$. We call the graph a \textit{multistage graph}.
 

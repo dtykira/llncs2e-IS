@@ -1,18 +1,8 @@
 \section{Searching for Iterative Trails and Estimation of Differentials and Linear Hulls\label{sec:method}}
 
-\subsection{Definition of Iterative Trails}
+\subsection{Modelling Difference or Mask Propagations Using Graph}
 
-\begin{definition}[Iterative Trails]
-	A differential or linear trail $(v^{(0)},\cdots,v^{(r)})$ is iterative if $v^{(0)}=v^{(r)}$.
-\end{definition}
-
-\begin{definition}[Elementry Iterative Trails]
-    An iterative differential or linear trail $(v^{(0)},\cdots,v^{(r)}=v^{(0)})$ is elementry if $v^{(i)}\neq v^{(j)},\forall i,j\in [0,r-1]$.
-\end{definition}
-
-\subsection{Modelling 1-round Differentials and Linear Hulls Using Graph}
-
-In a directed graph, each vertex can be associated with a difference or mask value. Given the round transformation $F$ of an iterative block cipher or permutation $\calE$, a weighted directed graph $G_{F}=(V_{F},E_{F})$ can be generated to describe the 1-round differentials or linear hulls of $F$. $G_{F}$ has $2^n$ vertices representing the elements of $\mathbb{F}_2^n$. $G_{F}$ contains all edges $u\rightarrow v$ for $u,v\in \mathbb{F}_2^n$ of which weight is not zero. In the case of differential cryptanalysis, the weight of an edge is defined as:
+In a directed graph, each vertex can be associated with a difference or mask value. Each edge $u\rightarrow v$ represents a 1-round differential or linear trail. Given the round transformation $F$ of an iterative block cipher or permutation $\calE$, in the case of differential cryptanalysis, the weight of an edge is defined as:
 \[
     w(u\rightarrow v)=\Prob^{F}(u,v).
 \]
@@ -24,6 +14,25 @@ else if $\calE$ is a permutation, the weight is defined as:
 \[
     w(u\rightarrow v)=\Cor^{F}(u,v).
 \]
+
+In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to describe the difference or mask propagations given $F$. A path in the graph represents a differential or linear trail. A hull with length $k$ in the graph represents a differential or linear hull. A circuit in the graph represents an iterative trail. 
+%$G_{F}$ has $2^n$ vertices representing the elements of $\mathbb{F}_2^n$. $G_{F}$ contains all edges $u\rightarrow v$ for $u,v\in \mathbb{F}_2^n$ of which weight is not zero. 
+
+\subsection{Iterative Trails}
+
+\begin{definition}[Iterative Trails]
+	A differential or linear trail $(v^{(0)},\cdots,v^{(r)})$ is iterative if $v^{(0)}=v^{(r)}$.
+\end{definition}
+
+\begin{definition}[Elementry Iterative Trails]
+    An iterative differential or linear trail $(v^{(0)},\cdots,v^{(r)}=v^{(0)})$ is elementry if $v^{(i)}\neq v^{(j)},\forall i,j\in [0,r-1]$.
+\end{definition}
+
+When an iterative trails is found, it can be concatenated to itself arbitary times. Further extending the trail forward and backward, we can an exploitable trail. The method is used in \cite{BS91,BS92,W08} to find exploitable differential trails for DES and PRESENT. 
+
+Our work is motivated by iterative trails. An observation is that the best long-round differential or linear trail contains iterative sub-trails for including but not limited to DES, PRESENT, RECTANGLE and GIFT. 
+
+Given $G_F$ generated in the previous subsection, theoretically we can list all elementary iterative trails applying Johnson's algorithm in \cite{J75}. 
 
 \subsection{Searching for Iterative Trails\label{subsec:iterative-trails}}
 
