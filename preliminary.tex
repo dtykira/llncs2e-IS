@@ -110,5 +110,7 @@ i.e. the sum of the weights of all the paths contained in the hull. In this arti
 
 A \textit{circuit} is a path in which the first and last vertices are identical. A circuit is $elementary$ if no vertex but the first and last appears twice. Two elementary circuits are distinct if one is not a cyclic permutation of the other. 
 
-%Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $i\in[0,l-1)$. We call the graph a \textit{multistage graph}.
+%An induced subgraph $G'=(V',E')$ is a (maximal) \textit{strong component} of $G$ if for all $u, v\in V'$ there exist paths $p_{uv}$ and $p_{vu}$ and this property holds for no subgraph of $G$ induced by a vertex set $\overline{V'}$ such that $V' \subset \overline{V'} \subseteq V$.
+
+Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $i\in[0,l-1)$. We call the graph a \textit{multistage graph}.
 

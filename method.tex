@@ -1,6 +1,6 @@
 \section{Searching for Iterative Trails and Estimation of Differentials and Linear Hulls\label{sec:method}}
 
-\subsection{Modelling Difference or Mask Propagations Using Graph}
+\subsection{Generating a Graph Modelling Difference or Mask Propagations}
 
 In a directed graph, each vertex can be associated with a difference or mask value. Each edge $u\rightarrow v$ represents a 1-round differential or linear trail. Given the round transformation $F$ of an iterative block cipher or permutation $\calE$, in the case of differential cryptanalysis, the weight of an edge is defined as:
 \[
@@ -15,20 +15,40 @@ else if $\calE$ is a permutation, the weight is defined as:
     w(u\rightarrow v)=\Cor^{F}(u,v).
 \]
 
-In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to describe the difference or mask propagations given $F$. A path in the graph represents a differential or linear trail. A hull with length $k$ in the graph represents a differential or linear hull. A circuit in the graph represents an iterative trail. 
-%$G_{F}$ has $2^n$ vertices representing the elements of $\mathbb{F}_2^n$. $G_{F}$ contains all edges $u\rightarrow v$ for $u,v\in \mathbb{F}_2^n$ of which weight is not zero. 
+In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to describe the difference or mask propagations given $F$. A path in the graph represents a differential or linear trail. A hull with length $k$ in the graph represents a differential or linear hull. 
 
-\subsection{Iterative Trails}
+However, the $G_F$ generated is too large for it has $2^n$ vertices. Therefore we need to choose a interesting graph according to computation power. 
+
+\subsection{Choosing a Subgraph}
+
+In order to limit the size of $V_F$, we set a parameter $max_asn$ defined as the maximum number of active S-boxes that a vertex can has. Then $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is an induced subgraph of $G_F$. $V_{F,max\_asn}$ is given by
+\[
+    V_{F,max\_asn}=\{u|\text{Asn}(u)\leq max\_asn \text{ and } u\in V_F\}
+\]
+where $\text{Asn}(\cdot)$ is a function returns the number of active S-boxes of a difference or mask.
+
+\subsection{Finding the Best Iterative Trail}
 
 \begin{definition}[Iterative Trails]
 	A differential or linear trail $(v^{(0)},\cdots,v^{(r)})$ is iterative if $v^{(0)}=v^{(r)}$.
 \end{definition}
 
 \begin{definition}[Elementry Iterative Trails]
-    An iterative differential or linear trail $(v^{(0)},\cdots,v^{(r)}=v^{(0)})$ is elementry if $v^{(i)}\neq v^{(j)},\forall i,j\in [0,r-1]$.
+    An iterative differential or linear trail $(v^{(0)},\cdots,v^{(r)}=v^{(0)})$ is elementary if $v^{(i)}\neq v^{(j)},\forall i,j\in [0,r-1]$.
 \end{definition}
 
-When an iterative trails is found, it can be concatenated to itself arbitary times. Further extending the trail forward and backward, we can an exploitable trail. The method is used in \cite{BS91,BS92,W08} to find exploitable differential trails for DES and PRESENT. 
+According to the definition, Obiviously a (elementary) circuit in the graph represents an (elementary) iterative trail. Applying Johnson's algorithm in \cite{J75}, we can enumerate all elementary circuits in $G_{F,max\_asn}$. 
+
+Once a short-round iterative trails is found, it can be concatenated to itself arbitary times and forms a long-round trail. For an $r$-round iterative trail with $rd$ and weight $wt$, the weight per round $wt/rd$ can be regarded as an index describing the weight growth of the iterative trail. Then the best iterative trail is the one with the largest weight per round. We claim that the best iterative trail must be an elementary one. 
+
+\subsection{Finding the Best Iterative Cluster}
+
+\begin{example}
+	Suppose that we find two elementary iterative trails $p_0=u_0\rightarrow u_1\rightarrow u_0$ and $p_1=u_0\rightarrow u_2 \rightarrow u_0$, then four iterative trails with lenght 4 can be constructed.
+\end{example}
+
+
+Further extending the trail forward and backward, we can an exploitable trail. The method is used in \cite{BS91,BS92,W08} to find exploitable differential trails for DES and PRESENT. 
 
 Our work is motivated by iterative trails. An observation is that the best long-round differential or linear trail contains iterative sub-trails for including but not limited to DES, PRESENT, RECTANGLE and GIFT. We 
 
@@ -36,19 +56,19 @@ Given $G_F$ generated in the previous subsection, theoretically we can list all 
 
 \subsection{Searching for Iterative Trails\label{subsec:iterative-trails}}
 
-According to the definition of circuits and iterative trails, the elementry iterative trails of $\calE$ can be viewed as elementry circuits in $G_F$. Applying Johnson's algorithm in \cite{J75}, we can list all the elementry circuits in $G_F$. However, if $V_F=\mathbb{F}_2^n$, the size of $V_F$ is $2^n$ which is too large. In order to limit the size of $V_F$, we set a parameter $max\_asn$ which is defined as the maximum active S-boxes that a vertex can has. That is, given an SPN round transformation $F$ and the parameter $max\_asn$, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is a subgraph of $G_F$. The set of vertices is given by
+According to the definition of circuits and iterative trails, the elementary iterative trails of $\calE$ can be viewed as elementary circuits in $G_F$. Applying Johnson's algorithm in \cite{J75}, we can list all the elementary circuits in $G_F$. However, if $V_F=\mathbb{F}_2^n$, the size of $V_F$ is $2^n$ which is too large. In order to limit the size of $V_F$, we set a parameter $max\_asn$ which is defined as the maximum active S-boxes that a vertex can has. That is, given an SPN round transformation $F$ and the parameter $max\_asn$, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is a subgraph of $G_F$. The set of vertices is given by
 \[
     V_{F,max\_asn}=\{u|\text{Asn}(u)\leq max\_asn \text{ and } u\in V_F\}
 \]
 where $\text{Asn}(\cdot)$ is a function returns the number of active S-boxes of its input. The set $E_{F,max\_asn}$ of weighted edges between any two vertices in $V_{F,max\_asn}$ is given according to the method in the last subsection. 
 
-Applying Johnson's algorithm to $G_{F,max\_asn}$, we can obtain a set of elementry circuits
+Applying Johnson's algorithm to $G_{F,max\_asn}$, we can obtain a set of elementary circuits
 \[
     \{p_{uv}|u=v \text{ and } v^{(i)}\neq v^{(j)},\forall i,j\in[0,r-1]\},
 \]
-in which each element represent an elementry iterative trails for $F$. 
+in which each element represent an elementary iterative trails for $F$. 
 
-We extract every vertex that lies in at least one elementry circuit and denote the set of vertices as $V^{IT}_{F,max\_asn}$. $V^{IT}_{F,max\_asn}$ is a subset of $V_{F,max\_asn}$ and it forms a subgraph $G^{IT}_{F,max\_asn}=(V^{IT}_{F,max\_asn},E^{IT}_{F,max\_asn})$ of $G_{F,max\_asn}$. 
+We extract every vertex that lies in at least one elementary circuit and denote the set of vertices as $V^{IT}_{F,max\_asn}$. $V^{IT}_{F,max\_asn}$ is a subset of $V_{F,max\_asn}$ and it forms a subgraph $G^{IT}_{F,max\_asn}=(V^{IT}_{F,max\_asn},E^{IT}_{F,max\_asn})$ of $G_{F,max\_asn}$. 
 
 \subsection{Finding Differential Trails and Linear Trails\label{subsec:find-trails}}
 
