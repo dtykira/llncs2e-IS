@@ -19,17 +19,14 @@ In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to des
 
 However, the $G_F$ generated is too large for it has $2^n$ vertices. Therefore we need to choose a interesting graph according to computation power. 
 
-\subsection{Choosing a Subgraph}
-
-In order to limit the size of $V_F$, we set a parameter $max_asn$ defined as the maximum number of active S-boxes that a vertex can has. Then $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is an induced subgraph of $G_F$. $V_{F,max\_asn}$ is given by
+In order to limit the size of $V_F$, we set a parameter $max\_asn$ defined as the maximum number of active S-boxes that a vertex can has. Given $\text{Asn}(\cdot)$ as the function that returns the number of active S-boxes of a difference or mask, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is an induced subgraph of $G_F$ where $V_{F,max\_asn}$ is given by
 \[
-    V_{F,max\_asn}=\{u|\text{Asn}(u)\leq max\_asn \text{ and } u\in V_F\}
+    V_{F,max\_asn}=\{u|u\in V_F \text{ and } \text{Asn}(u)\leq max\_asn\}.
 \]
-where $\text{Asn}(\cdot)$ is a function returns the number of active S-boxes of a difference or mask.
 
-\subsection{Finding the Best Iterative Trail}
+\subsection{Finding the Best Iterative Trail}\label{sec:fbit}
 
-\begin{definition}[Iterative Trails]
+\begin{definition}[Iterative Trails]\label{def:it}
 	A differential or linear trail $(v^{(0)},\cdots,v^{(r)})$ is iterative if $v^{(0)}=v^{(r)}$.
 \end{definition}
 
@@ -37,199 +34,163 @@ where $\text{Asn}(\cdot)$ is a function returns the number of active S-boxes of 
     An iterative differential or linear trail $(v^{(0)},\cdots,v^{(r)}=v^{(0)})$ is elementary if $v^{(i)}\neq v^{(j)},\forall i,j\in [0,r-1]$.
 \end{definition}
 
-According to the definition, Obiviously a (elementary) circuit in the graph represents an (elementary) iterative trail. Applying Johnson's algorithm in \cite{J75}, we can enumerate all elementary circuits in $G_{F,max\_asn}$. 
+According to the definition, Obiviously a (elementary) circuit in the graph represents an (elementary) iterative trail. Applying Johnson's algorithm in \cite{J75}, we can enumerate all elementary circuits in $G_{F,max\_asn}$. The time complexity is $O((n + e)(c + 1))$ and memory complexity is $O(n + e)$, where there are $n$ vertices, $e$ edges and $c$ elementary circuits in the graph.
 
-Once a short-round iterative trails is found, it can be concatenated to itself arbitary times and forms a long-round trail. For an $r$-round iterative trail with $rd$ and weight $wt$, the weight per round $wt/rd$ can be regarded as an index describing the weight growth of the iterative trail. Then the best iterative trail is the one with the largest weight per round. We claim that the best iterative trail must be an elementary one. 
+Once a short-round elementary iterative trails is found, it can be concatenated to itself arbitary times and forms a long-round iterative trail. For a cipher that has iterative trails, the negative logarithm of the largest differential probability or linear correlation increases no faster than a linear function of the round number. 
 
-\subsection{Finding the Best Iterative Cluster}
+For an $rd$-round iterative trail with weight $wt$, we regard its weight per round $wt/rd$ as an index describing the weight growth of the iterative trail. We refer the best iterative trail to the one with the largest weight per round. We claim that one of the best iterative trails must be an elementary one. Thus we can find out the best elementary iterative trail
+among the ones enumerated by Johnson's algorithm \cite{J75} and evaluate the best weight growth of one single iterative trail. The procedure is given in Algorithm \ref{algo:1} and the details of Johnson's algorithm are given in Appendix. 
 
-\begin{example}
-	Suppose that we find two elementary iterative trails $p_0=u_0\rightarrow u_1\rightarrow u_0$ and $p_1=u_0\rightarrow u_2 \rightarrow u_0$, then four iterative trails with lenght 4 can be constructed.
+\begin{algorithm}
+	\caption{Finding the best iterative trail}
+	\label{algo:1}
+	\begin{algorithmic}[1]
+		\Require $G_{F,max\_asn}$
+		\Ensure the largest weight per round of an iterative trail
+		\Procedure {}{}
+		\State $wpr\leftarrow 0$
+		\For{each elementary circuit $p'$ in $G_{F,max\_asn}$ enumerated by Johnson's algorithm}
+		\If{$w(p')/l(p')>wpr$}
+		\State $wpr\leftarrow w(p')/l(p'),p\leftarrow p'$
+		\EndIf
+		\EndFor
+		\State \Return{$wpr$}
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Finding the Best Iterative Hull}\label{sec:fbih}
+
+\begin{example}\label{eg:1}
+	Suppose that we find two elementary iterative trails $p_0=u_0\rightarrow u_1\rightarrow u_0$ and $p_1=u_0\rightarrow u_2 \rightarrow u_0$. $p_0$ itself can form a 4-round iterative trail $u_0\rightarrow u_1\rightarrow u_0\rightarrow u_1\rightarrow u_0$ with weight $w^2(p_0)$. Additionally combined with $p_1$, 4 4-round iterative trails can be formed which are
+	\begin{align*}
+		&u_0\rightarrow u_1\rightarrow u_0\rightarrow u_1\rightarrow u_0\\
+		&u_0\rightarrow u_1\rightarrow u_0\rightarrow u_2\rightarrow u_0\\
+		&u_0\rightarrow u_2\rightarrow u_0\rightarrow u_1\rightarrow u_0\\
+		&u_0\rightarrow u_2\rightarrow u_0\rightarrow u_2\rightarrow u_0.
+	\end{align*}
+	Thus a 4-round iterative hull containing 4 trails with weight $w^2(p_0)+w^2(p_1)+2w(p_0)w(p_1)$ can be constructed.
 \end{example}
 
+From Example \ref{eg:1}, we find that it's not enough to evaluate the best weight growth of one single iterative trail. If two elementary circuits have common vertices, then the combination of elementary iterative trails may result in iterative hulls with better weight growths.  
 
-Further extending the trail forward and backward, we can an exploitable trail. The method is used in \cite{BS91,BS92,W08} to find exploitable differential trails for DES and PRESENT. 
+To evaluate the weight growth of iterative hulls, we define subgraph \textit{iterative structure}. 
 
-Our work is motivated by iterative trails. An observation is that the best long-round differential or linear trail contains iterative sub-trails for including but not limited to DES, PRESENT, RECTANGLE and GIFT. We 
+\begin{definition}[Iterative Structure]
+	An induced subgraph $G'=(V',E')$ is a (maximal) iterative structure of $G$ if for all $u\in V'$, there exist at least one edge originating from it and one edge terminating at it. And this property holds for subgraph of $G$ induced by a vertex set $\overline{V'}$ such that $V' \subset \overline{V'} \subseteq V$.
+\end{definition}
 
-Given $G_F$ generated in the previous subsection, theoretically we can list all elementary iterative trails applying Johnson's algorithm in \cite{J75}. 
+We claim that for an arbitary vertex in the iterative structure, it whether belongs to at least one elementary circuit or belongs to at least one path linking two elementary circuits. 
 
-\subsection{Searching for Iterative Trails\label{subsec:iterative-trails}}
+To compute the iterative structure $G^{IS}_{F,max\_asn}$ of $G_{F,max\_asn}$, we eliminate the vertices in having no incoming or outgoing edges until the size of the graph become stable. 
 
-According to the definition of circuits and iterative trails, the elementary iterative trails of $\calE$ can be viewed as elementary circuits in $G_F$. Applying Johnson's algorithm in \cite{J75}, we can list all the elementary circuits in $G_F$. However, if $V_F=\mathbb{F}_2^n$, the size of $V_F$ is $2^n$ which is too large. In order to limit the size of $V_F$, we set a parameter $max\_asn$ which is defined as the maximum active S-boxes that a vertex can has. That is, given an SPN round transformation $F$ and the parameter $max\_asn$, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is a subgraph of $G_F$. The set of vertices is given by
-\[
-    V_{F,max\_asn}=\{u|\text{Asn}(u)\leq max\_asn \text{ and } u\in V_F\}
-\]
-where $\text{Asn}(\cdot)$ is a function returns the number of active S-boxes of its input. The set $E_{F,max\_asn}$ of weighted edges between any two vertices in $V_{F,max\_asn}$ is given according to the method in the last subsection. 
-
-Applying Johnson's algorithm to $G_{F,max\_asn}$, we can obtain a set of elementary circuits
-\[
-    \{p_{uv}|u=v \text{ and } v^{(i)}\neq v^{(j)},\forall i,j\in[0,r-1]\},
-\]
-in which each element represent an elementary iterative trails for $F$. 
-
-We extract every vertex that lies in at least one elementary circuit and denote the set of vertices as $V^{IT}_{F,max\_asn}$. $V^{IT}_{F,max\_asn}$ is a subset of $V_{F,max\_asn}$ and it forms a subgraph $G^{IT}_{F,max\_asn}=(V^{IT}_{F,max\_asn},E^{IT}_{F,max\_asn})$ of $G_{F,max\_asn}$. 
-
-\subsection{Finding Differential Trails and Linear Trails\label{subsec:find-trails}}
-
-For any trail based on iterative trails, it can be treated as three parts: the extension backward, the iterative trail and the extension forward. The 14-round differential trail of PRESENT found in \cite{W08} is shown in Table \ref{tab:trail-present}. It is constructed by concatenating a 4-round iterative trail to itself two times and extending both forward and backward by 1 round. Thus the subtrail from round 0 to round 1 is the extension backward part, the one from round 1 to round 13 is the iterative trail part and the one from round 13 to round 14 is the extension forward part. In the following, we try to compute the largest probability a trail of such type can has based on $G^{IT}_{F,max\_asn}$. 
-
-\begin{table}
-	\caption{A 14-round differential trail of PRESENT}\label{tab:trail-present}
-	\centering
-	\begin{tabular}{|c|c|c|}
-		\hline
-		Round &  Diffference & Prob.\\
-		\hline
-		0 &  $x_2=7,x_{14}=7$ & \\
-		1 &  $x_0=4,x_3=4$ & $2^{-4}$\\
-		2 &  $x_0=9,x_8=9$ & $2^{-4}$\\
-		3 &  $x_8=1,x_{10}=1$ & $2^{-4}$\\
-		4 &  $x_2=5,x_{14}=5$ & $2^{-4}$\\
-		5 &  $x_0=4,x_3=4$ & $2^{-6}$\\
-		6 &  $x_0=9,x_8=9$ & $2^{-4}$\\
-		7 &  $x_8=1,x_{10}=1$ & $2^{-4}$\\
-		8 &  $x_2=5,x_{14}=5$ & $2^{-4}$\\
-		9 &  $x_0=4,x_3=4$ & $2^{-6}$\\
-		10 &  $x_0=9,x_8=9$ & $2^{-4}$\\
-		11 &  $x_8=1,x_{10}=1$ & $2^{-4}$\\
-		12 &  $x_2=5,x_{14}=5$ & $2^{-4}$\\
-		13 &  $x_0=4,x_3=4$ & $2^{-6}$\\
-		14 &  $x_0=9,x_8=9$ & $2^{-4}$\\
-		\hline
-	\end{tabular}
-\end{table}
-
-%example
-
-Let $B^F_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail starting from $u$ can has, $u\in V^{IT}_{F,max\_asn}$. Let $B^{F^{-1}}_{u,i}$ be the largest probability (correlation) that an $i$-round differential (linear) trail ending with $u$ can has, $u\in V^{IT}_{F,max\_asn}$. Given parameters $r^F$ and $r^{F^{-1}}$ which represent the number of rounds to be extended forward and backward, we can obtain $B^F_{u,i},i\in [0,r^F]$ and $B^{F^{-1}}_{u,j},j\in [0,r^{F^{-1}}]$ for each $u\in V^{IT}_{F,max\_asn}$ using Matsui's branch-and-bound depth-first search algorithm.  Based on iterative trails, the largest probability (correlation) $B_r$ that a single $r$-round trail can has is
-\[
-    B_r=\max\limits_{\substack{p_{u,v}\in E^{IT}_{F,max\_asn}\\r_1+l(p_{u,v})+r_2=r\\0\leq r_1\leq r^{F^{-1}},0\leq r_2\leq r^F}} B^{F^{-1}}_{u,r_1}\times w(p_{u,v})\times B^F_{v,r_2}.
-\]
-To obtain $B_r$, instead of traversing all $p_{u,v}$, we use dynamic programming. See Algorithm \ref{algo1}. 
+Given the round number $r$, we can compute $w(h_{u,v}^r)$ for all $u,v$ in $V^{IS}_{F,max\_asn}$. For a sufficient large $r$, we regard $\max\limits_{u,v}w(h_{u,v}^r)/r$ as an index describing the best weight growth of the iterative hull. The procedure is given in Algorithm \ref{algo:2}.
 
 \begin{algorithm}
-	\caption{Compute $B_r$}
-	\label{algo1}
-	\begin{algorithmic}[1] %每�?�显示�?�号
-		\Require $r$, parameters $r^F\leq r,r^{F^{-1}}\leq r$, the round function $F$, $G^{IT}_{F,max\_asn}$
-		\Ensure $B_r$
-		\Procedure {ComputeB}{}
-		\State /*Phase 1: Compute $B^F$ and $B^{F^{-1}}$*/
-		\For{each $u\in V^{IT}_{F,max\_asn}$}
-		\State $B^F_{u,0}\leftarrow 1,B^{F^{-1}}_{u,0}\leftarrow 1$
+	\caption{Finding the best iterative hull}
+	\label{algo:2}
+	\begin{algorithmic}[1]
+		\Require $G_{F,max\_asn}$, the number of rounds $r$
+		\Ensure the largest weight per round of an $r$-round hull in the iterative structure
+		\Procedure {}{}
+		\State Eliminate all vertices having no incoming or outgoing edges repeatedly until no more vertices can be eliminated and restore the subgraph into $G^{IS}_{F,max\_asn}$
+		\State Let $\mathcal{H}$ be a hash table. Set $\mathcal{H}(u,v)\leftarrow 0$ for all $u,v\in V^{IS}_{F,max\_asn}$
+		\For{$i=1:r$}
+		\State Create a new hash table $\mathcal{H}'$. 
+		\For{each pair of keys $(u,v)$ of $\mathcal{H}$}
+		\For{each edge $v\rightarrow x$ originating from $v$ in $G^{IS}_{F,max\_asn}$}
+		\State $\mathcal{H}'(u,x)\leftarrow \mathcal{H}'(u,x)+\mathcal{H}(u,v)\cdot w(v\rightarrow x)$
 		\EndFor
-		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^F$}
-		\State $BW\leftarrow B^F_{u,i-1}\times\max\limits_{a,b} \Prob^F(a,b)$
-		\While{not \Call{Search}{$u,i,0,F,BW$}}
-		\State $BW\leftarrow BW\times 2^{-1}$
-		\EndWhile
-		\State $B^f_{u,i}\leftarrow BW$
 		\EndFor
-		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^{F^{-1}}$}
-		\State $BW\leftarrow B^{F^{-1}}_{u,i-1}\times\max\limits_{a,b} \Prob^{F^{-1}}(a,b)$
-		\While{not \Call{Search}{$u,i,0,F^{-1},BW$}}
-		\State $BW\leftarrow BW\times 2^{-1}$
-		\EndWhile
-		\State $B^{F^{-1}}_{u,i}\leftarrow BW$
+		\State $\mathcal{H}\leftarrow \mathcal{H}'$
 		\EndFor
-		\State /*Phase 2: Computation using dynamic programming*/
-		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\in [0,r^F]$}
-		\State $\overline{B^F_{u,i}}\leftarrow B^f_{u,i}$
-		\EndFor
-		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow (r^F+1):r$}
-		\State $\overline{B^F_{u,i}}\leftarrow\max\limits_{v\in V^{IT}_{F,max\_asn}} w(u\rightarrow v)\times\overline{B^F_{v,i-1}}$
-		\EndFor
-		\State /*Phase 3: Compute $B_r$*/
-		\State $B_r\leftarrow\max\limits_{\substack{i+j=r\\u\in V^{IT}_{F,max\_asn}}} B^{F^{-1}}_{u,i}\times \overline{B^F_{u,j}}$
+		\State \Return{$\max\limits_{u,v}\mathcal{H}(u,v)$}
 		\EndProcedure
-		
-		\Function{Search}{$u,j,w,rf,BW$}
-		\State $found\leftarrow\false$
-		\For{each $v$ such that $\Prob^{rf}(u,v)\geq BW\div w\div j\times\max\limits_{a,b}\Prob^{rf}(a,b)$}
-		\State $w'\leftarrow w\times \Prob^{rf}(u,v)$
-		\If{$j=0$}
-		\If{$w'>=BW$}
-		\State$BW\leftarrow w'$, $found\leftarrow \true$
-		\EndIf
-		\Else
-		\State $found\leftarrow found$ or \Call{Search}{$v,j-1,w',rf,BW$}
-		\EndIf
-		\EndFor
-		\State \Return{$found$}
-		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Finding Differentials and Linear Hulls\label{subsec:find-clusters}}
+\subsection{Finding the Best Differential or Linear Hull}\label{sec:fbh}
 
-Let $w^F_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(u,v)$ where $u\in V^{IT}_{F,max\_asn}$. Let $w^{F^{-1}}_{u,v,i}$ be the probability (correlation) of the $i$-round differential (linear hull) $(v,u)$ where $u\in V^{IT}_{F,max\_asn}$. Given parameters $r^F,r^{F^{-1}}$ which represent the maximum number of rounds to be extended forward and backward and parameters $w^F,w^{F^{-1}}$ which heuristically bounds the probability (correlation) of the extension subtrails. To compute $w^F_{u,v,i}$ and $w^{F^{-1}}_{u,v,i}$, We collect as many extension subtrails as possible using Matsui's branch-and-bound depth-first algorithm. Note that during traversing extension subtrails, we abandon any subtrail that contains any value in $V^{IT}_{F,max\_asn}$ to avoid duplicate trails in the next step.
+In \cite{W08}, a 4-round elementary iterative trail is found and is used to construct a 12-round iterative trail. By further extending the trail forward and backward by one round, a 14-round trail is obtained. 
 
-In a graph, a hull $h_{u,v}$ is the set of all paths from $u$ to $v$. Here, we define a hull $h_{u,v,r}$ as the set of all paths $p_{u,v}$ with $l(p_{u,v})=r$. Then its weight is
-\[
-	w(h_{u,v,r})=\sum\limits_{l(p_{u,v})=r} w(p_{u,v}).
-\]
-$w(h_{u,v,r})$ can be computed using dynamic programming.
-
-Based on iterative trails, the largest probability (correlation) $BC_r$ that a $r$-round differential (linear hull) can has is
-\[
-	BC_r=\max\limits_{\substack{x,y\in \mathbb{F}_2^n\\u,v\in V^{IT}_{F,max\_asn}\\r_1+r_2+r_3=r\\0\leq r_1\leq r^{F^{-1}},0\leq r_3\leq r^F}} w^{F^{-1}}_{x,u,r_1}\times w(h_{u,v,r_2})\times w^F_{v,y,r_3}.
-\]
-See Algorithm \ref{algo2}. 
+Following this idea, we first generate a multi-stage graph according to $G^{IS}_{F,max\_asn}$ and extend both forward and backward from each vertex in $V^{IS}_{F,max\_asn}$ for several rounds and restore the trails in the multi-stage graph. Then we compute the weight stage by stage. The procedure is given in Algorithm \ref{algo:3}
 
 \begin{algorithm}
-	\caption{Compute $BC_r$}
-	\label{algo2}
-	\begin{algorithmic}[1] %每�?�显示�?�号
-		\Require $r$, parameters $r^F\leq r,r^{F^{-1}}\leq r$, parameters $wb^F,wb^{F^{-1}}$, the round function $F$, $G^{IT}_{F,max\_asn}$
-		\Ensure $BC_r$
-		\Procedure {ComputeBC}{}
-		\State /*Phase 1: Compute $w^F$ and $w^{F^{-1}}$*/
-		\For{each $u\in V^{IT}_{F,max\_asn}$}
-		\State $w^F_{u,u,0}\leftarrow 1,w^b_{u,u,0}\leftarrow 1$
+	\caption{Finding the best differential or linear hull}
+	\label{algo:3}
+	\begin{algorithmic}[1]
+		\Require $G^{IS}_{F,max\_asn}$, the number of rounds $r$, the number of round to be extended $k$, the smallest weight that a single round of a extended trail can has $wlb$
+		\Ensure the largest weight of an $r$-round hull
+		\Procedure {}{}
+		\State Build a graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$ where $S_i\leftarrow V^{IS}_{F,max\_asn}$. For each edge $u\rightarrow v$ in $E^{IS}_{F,max\_asn}$, we append $u\rightarrow v, u\in S_i,v\in S_{i+1}, \forall i$ to $MSG$. 
+		\For{each trail $p=(v_0,v_1,\cdots,v_l)$ extended from a vertex in $V^{IS}_{F,max\_asn}$ with $l\le k$ and $w(v_{i-1}\rightarrow v_i)\ge wlb$}
+		\If{$p$ is a trail extended forward from $v_0\in V^{IS}_{F,max\_asn}$}
+		\For{$i\leftarrow 1:l$}
+		\State Append $v_{i-1}\rightarrow v_i$ between $S_{r-l+i-1}$ and $S_{r-l+i}$
 		\EndFor
-		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^F$}
-		\State \Call{Collect}{$u,u,r^F,1,F$}
+		\ElsIf{$p$ is a trail extended backward from $v_l\in V^{IS}_{F,max\_asn}$}
+		\For{$i\leftarrow 1:l$}
+		\State Append $v_{i-1}\rightarrow v_i$ between $S_{i-1}$ and $S_{i}$
 		\EndFor
-		\For{each $u\in V^{IT}_{F,max\_asn}$ and $i\leftarrow 1:r^{F^{-1}}$}
-		\State \Call{Collect}{$u,u,r^{F^{-1}},1,F^{-1}$}
-		\EndFor
-		\State /*Phase 1: Compute $w(h_{u,v,i})$ using dynamic programming*/
-		\For{each $u,v\in V^{IT}_{F,max\_asn}$}
-		\State $w(h_{u,v,0})\leftarrow 1$
-		\EndFor
-		\For{$i\leftarrow 1:r$}
-		\For{each $u,v\in V^{IT}_{F,max\_asn}$}
-		\State $w(h_{u,v,i})\leftarrow \sum\limits_x w(h_{u,x,i-1})\times w(x\rightarrow v)$
-		\EndFor
-		\EndFor
-		\State /*Phase 1: Compute $BC_r$*/
-		\For{each possible first subscript index $x$ of $w^{F^{-1}}$}
-		\For{each possible second subscript index $y$ of $w^F$}
-		\State $BC_{y,r}\leftarrow \sum\limits_{\substack{r_1+r_2+r_3=r\\u,v\in V^{IT}_{F,max\_asn}}}w^{F^{-1}}_{x,u,r_1}\times w(h_{u,v,r_2})\times w^F_{v,y,r_3}$
-		\If{$BC_{y,r}>BC_r$}
-		\State $BC_r\leftarrow BC_{y,r}$
 		\EndIf
 		\EndFor
+		\State Let $\mathcal{H}$ be a hash table. 
+		\For{each $u\in S_0$}
+		\State $\mathcal{H}(u)\leftarrow 0$
+		\For{$i=1:r$}
+		\State Create a new hash table $\mathcal{H}'$. 
+		\For{each key $v$ of $\mathcal{H}$}
+		\For{each edge $v\rightarrow x, v\in S_{i-1},x\in S_i$}
+		\State $\mathcal{H}'(x)\leftarrow \mathcal{H}'(x)+\mathcal{H}(v)\cdot w(v\rightarrow x)$
 		\EndFor
-		\EndProcedure
-		
-		\Procedure{Collect}{$s,x,j,w,rf$}
-		\For{each $y$ such that $\Prob^{rf}(x,y)\geq wb^{rf}\div w\div (j\times\max\limits_{a,b}\Prob^{rf}(a,b))$}
-		\State $w'\leftarrow w+\Prob^{rf}(x,y)$
-		\If{$w^{rf}_{s,y,r_f-j}$ exists}
-		\State $w^{rf}_{s,y,r_{rf}-j}\leftarrow w^{rf}_{s,y,r^{r43}-j}\times w'$
-		\Else
-		\State $w^{rf}_{s,y,r_{rf}-j}\leftarrow w'$
-		\EndIf
-		\If{$j\neq 0$}
-		\State \Call{Collect}{$s,y,j-1,w',rf$}
+		\EndFor
+		\State $\mathcal{H}\leftarrow \mathcal{H}'$
+		\EndFor
+		\If{$\max\limits_{v}\mathcal{H}(v)>wt$}
+		\State $wt\leftarrow \max\limits_{v}\mathcal{H}(v)$
 		\EndIf
 		\EndFor
-
+		\State \Return{$wt$}
 		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
+
+
+%For any trail based on iterative trails, it can be treated as three parts: the extension backward, the iterative trail and the extension forward. The 14-round differential trail of PRESENT found in \cite{W08} is shown in Table \ref{tab:trail-present}. It is constructed by concatenating a 4-round iterative trail to itself two times and extending both forward and backward by 1 round. Thus the subtrail from round 0 to round 1 is the extension backward part, the one from round 1 to round 13 is the iterative trail part and the one from round 13 to round 14 is the extension forward part. In the following, we try to compute the largest probability a trail of such type can has based on $G^{IT}_{F,max\_asn}$. 
+
 %In another way, a weighted 2-stage graph $G^1_F=(V^1_F,E^1_F)$ can also be generated to describe the 1-round differentials or linear hulls. $G^1_F$ has 2 stages $S_0$ and $S_1$ each being $\mathbb{F}_2^n$. For $u\in S_0$ and $v\in S_1$, the weight of an edge $w^1(u\rightarrow v)$ is defined the same way as $l(u\rightarrow v)$ in $G_F$ is.
 
 %If $S_0=S_1$, then $G^1_F$ can be iteratively concatenated to itself. 
+
+
+\section{Improvements}\label{sec:improvements}
+
+\subsection{Expanding $G_{F,max\_asn}$}
+
+\begin{definition}[Activity Pattern]
+	The activity pattern of a trail $(u^{(0)},u^{(1)}$ $,\cdots,u^{(r)})$ is a sequence $(a_0,a_1,\cdots,a_r)$ where $a_i=\text{Asn}(u^{(i)})$. 
+\end{definition}
+
+\begin{definition}[Collective Activity Pattern]
+	A trail $(u^{(0)},u^{(1)},\cdots,u^{(r)})$ with activity pattern $(a_0,a_1,\cdots,a_r)$ belongs to collective acticity pattern $(b_0,b_1,\cdots,b_r)$ if $a_i\leq b_i,\forall 0\leq i\le r$. 
+\end{definition}
+
+When generating graph $G_{F,max\_asn}$, we only consider trails with collective activity pattern $(max\_asn,max\_asn)$. To get more accurate results on finding best exploitable differentials and linear hulls, search space should be further expanded. Thus when generating $G_{F,max\_asn}$, we can instead consider trails with collective activity pattern $(max\_asn, max\_asn+1, max\_asn)$ or $(max\_asn, max\_asn+1, max\_asn+1, max\_asn)$, etc.
+
+\subsection{Modification in case of Rotation Equivalence}
+
+According to \cite{ZBL15}, RECTANGLE has the property of rotational symmetry, for all its operations have rotational symmetry. 
+
+\begin{definition}[Rotational Symmetry and Rotation Equivalence]
+	First suppose that a trail $p=(u^{(0)},u^{(1)},\cdots,u^{(r)})$ is found valid. If the cipher is based on SPN structure, the difference or mask value $u^{(i)}$ can be further described by S-boxes as $u^{(i)}=(u_1^{(i)},u_2^{(i)},\cdots,u_k^{(i)})$ where $k$ is the number of S-boxes of each round. If the cipher has rotation equivalence, then another trail $p'=(v^{(0)},v^{(1)},\cdots,v^{(r)})$ is also valid, if there exists $j$ such that $(v_1^{(i)},v_2^{(i)},\cdots,v_k^{(i)})=(u_{j+1}^{(i)},u_{j+2}^{(i)},\cdots,u_{j}^{(i)}),\forall i$. And we call two values $u=(u_1,u_2,\cdots,u_k)$ and $v=(v_1,v_2,\cdots,v_k)$ are rotation equivalent if there exists $j$ such that $(u_1,u_2,\cdots,u_k)=(v_{j+1},v_{j+2},\cdots,v_{j})$. 
+\end{definition}
+
+\begin{example}\label{exp:itre}
+	Suppose that a cipher $\mathcal{E}$ has rotational symmetry and a 1-round trail $0x3000f000\rightarrow 0x03000f00$ is found. According to Definition \ref{def:it}, it's not an iterative trail. However, it can also be concatenated to itself arbitary times.
+\end{example}
+
+From Example \ref{exp:itre}, we can see that if a cipher has rotational symmetry, the definition of iterative trails should be modified as follows:  
+
+\begin{definition}[Iterative Trails under Rotation Equivalence]
+	A differential or linear trail $(v^{(0)},\cdots,v^{(r)})$ is iterative if $v^{(0)}$ and $v^{(r)}$ are rotation equivalent.
+\end{definition}
