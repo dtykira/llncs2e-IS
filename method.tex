@@ -179,7 +179,7 @@ When generating graph $G_{F,max\_asn}$, we only consider trails with collective 
 
 \subsection{Modification in case of Rotation Equivalence}
 
-According to \cite{ZBL15}, RECTANGLE has the property of rotational symmetry, for all its operations have rotational symmetry. 
+According to \cite{ZBL15}, RECTANGLE has the property of rotational symmetry, that is, all its operations have rotational symmetry. 
 
 \begin{definition}[Rotational Symmetry and Rotation Equivalence]
 	First suppose that a trail $p=(u^{(0)},u^{(1)},\cdots,u^{(r)})$ is found valid. If the cipher is based on SPN structure, the difference or mask value $u^{(i)}$ can be further described by S-boxes as $u^{(i)}=(u_1^{(i)},u_2^{(i)},\cdots,u_k^{(i)})$ where $k$ is the number of S-boxes of each round. If the cipher has rotation equivalence, then another trail $p'=(v^{(0)},v^{(1)},\cdots,v^{(r)})$ is also valid, if there exists $j$ such that $(v_1^{(i)},v_2^{(i)},\cdots,v_k^{(i)})=(u_{j+1}^{(i)},u_{j+2}^{(i)},\cdots,u_{j}^{(i)}),\forall i$. And we call two values $u=(u_1,u_2,\cdots,u_k)$ and $v=(v_1,v_2,\cdots,v_k)$ are rotation equivalent if there exists $j$ such that $(u_1,u_2,\cdots,u_k)=(v_{j+1},v_{j+2},\cdots,v_{j})$. 
@@ -194,3 +194,17 @@ From Example \ref{exp:itre}, we can see that if a cipher has rotational symmetry
 \begin{definition}[Iterative Trails under Rotation Equivalence]
 	A differential or linear trail $(v^{(0)},\cdots,v^{(r)})$ is iterative if $v^{(0)}$ and $v^{(r)}$ are rotation equivalent.
 \end{definition}
+
+The rotation equivalence then defines a rotation equivalent class. In the euivalent class, we define a representive element as follows:
+
+\begin{definition}[Rotation Equivalent Class and Rotation Representive Element]
+	A rotation equivalent class is a difference or mask value maximal set that for every two elements $u$ and $v$ in it, we have $u$ and $v$ are ratation equivalent. The representive element of the rotation equivalent class is the largest value in it. The rotation is operated on S-boxes. For any element $u$ in a rotation equivalent class, we call the distance between $u$ and its representive element $u'$ the left rotation number from it to its representive elelent and denote the distance as $d(u)$. 
+\end{definition}
+
+We denote the transform from $u=(u_1,u_2,\cdots,u_k)$ to $u'=(u_{j+1},u_{j+2},\cdots,u_{j+k})$ where $u_i$ is the value of the i-th S-box as $\rotl_j(\cdot)$. In the same way, the inverse transfrom is $\rotr_j(\cdot)$. We denote the transform from $u$ to its representive element as $r(\cdot)$. We define $d(u\rightarrow v)=(d(v)-d(u))\mod sn$ where $sn$ is the number of S-boxes. 
+
+In the graph generation of a cipher having rotational symmetry, a vertex representives a rotation equivalent class instead of a value. However, This results in multiple costs of one edge. Or it can be seen as multiple edges between two vertices. 
+
+\begin{example}
+	For a cipher having rotational symmetry, suppose that we find two 1-round trails $0x3000f000\rightarrow 0x0e000020$ with weight $2^5$ and $0xf0003000\rightarrow 0xe0000200$ with weight $2^6$, then edge $u=0xf0003000\rightarrow v=0xe0000200$ is appended to the graph. The edge has two costs: $w(u\rightarrow v)=2^5$ when $d(u\rightarrow v)=5$ and $w(u\rightarrow v)=2^6$ when $d(u\rightarrow v)=0$. 
+\end{example}
