@@ -1,57 +1,52 @@
 \section{Experiments\label{sec:experiment}}
 
-\subsection{Experiments on Searching for Iterative Trails}
+\subsection{Experiments on Computing the Best Iterative Trail}
 
-We apply our method in Section \ref{sec:fbit} and Section \ref{sec:fbih} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation and ASCON permutation. The results on iterative trails are shown in Table \ref{tab:it}. The visualizations of $G^{IS}_{F,max\_asn}$ are shown in Appendix \ref{app:visualization}.
+We apply our method in Section \ref{sec:fbit} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation and ASCON permutation. The results on the best iterative trail are shown in Table \ref{tab:it}. The visualizations of $G^{IS}_{F,max\_asn}$ without further improvements in Section \ref{sec:expansion} are shown in Appendix \ref{app:visualization} .
 
-%The iterative structures are illustrated in Figures \ref{fig:graph_knot256_ddt}-\ref{fig:graph_gift_lat} in Appendix \ref{sec:is}. The differential and linear iterative structures of PRESENT are too big to be illustrated. The quantitive summary results are illustrated in Table \ref{tab:is}. For PRESENT, we constrain the elementary differential iterative trails within 10 rounds, for the genuine iterative structure is too complicated.
 \begin{table}
-	\caption{Results on weight growth of iterative trails}\label{tab:it}
+	\caption{Results on the weight growth of one best single iterative trail}\label{tab:it}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|}
 		\hline
 		cryptanalysis & cipher & $max\_asn$ & $-\log_2(wt/rd)$ & method\\
 		\hline
-		diff. & KNOT-perm-256 & 2 & 5.3 & Section \ref{sec:fbit}\\
-		\hline
-		diff. & KNOT-perm-256 & 2 & 5.02 & Section \ref{sec:fbih}\\
+		diff. & 256-bit KNOT permutation & 2 & 5.3 & Section \ref{sec:fbit}\\
 		\hline
 		diff. & PRESENT & 2 & 4.5 & Section \ref{sec:fbit}\\
 		\hline
-		diff. & PRESENT & 2 & 3.92 & Section \ref{sec:fbih}\\
-		\hline
 		diff. & GIFT-64 & 2 & 5 & Section \ref{sec:fbit}\\
-		\hline
-		diff. & GIFT-64 & 2 & 4.77 & Section \ref{sec:fbih}\\
 		\hline
 		diff. & RECTANGLE & 2 & 5 & Section \ref{sec:fbit}\\
 		\hline
-		diff. & RECTANGLE & 2 & 4.87 & Section \ref{sec:fbih}\\
+		diff. & ASCON permutation & 3 & - & Section \ref{sec:fbit}\\
 		\hline
-		diff. & ASCON-perm & 3 & - & Section \ref{sec:fbit}\\
-		\hline
-		linear & KNOT-perm-256 & 2 & 6 & Section \ref{sec:fbit}\\
-		\hline
-		linear & KNOT-perm-256 & 2 & 4.93 & Section \ref{sec:fbih}\\
+		linear & 256-bit KNOT permutation & 2 & 6* & Section \ref{sec:fbit}\\
 		\hline
 		linear & PRESENT & 1 & 4 & Section \ref{sec:fbit}\\
 		\hline
-		linear & PRESENT & 1 & 2.84 & Section \ref{sec:fbih}\\
-		\hline
 		linear & GIFT-64 & 2 & 6 & Section \ref{sec:fbit}\\
-		\hline
-		linear & GIFT-64 & 2 & 5.87 & Section \ref{sec:fbih}\\
 		\hline
 		linear & RECTANGLE & 2 & 6 & Section \ref{sec:fbit}\\
 		\hline
-		linear & RECTANGLE & 2 & 5.03 & Section \ref{sec:fbih}\\
-		\hline
-		linear & ASCON-perm & 3 & - & Section \ref{sec:fbit}\\
+		linear & ASCON permutation & 3 & - & Section \ref{sec:fbit}\\
 		\hline
 	\end{tabular}
 \end{table}
 
-For any cipher we conduct experiments on, the weight growth of iterative hulls is larger than the weight growth of iterative trails. This implies that the combination of iterative trails results in stronger differential and linear propagations. 
+Note that for 256-bit KNOT permutation has no key addition, the weight of the linear trail we compute is the correlation of the linear trail instead of the correlation square averaging on round keys for block ciphers. To fairly compare the result of the best linear trail of 256-bit KNOT permutation with other ciphers, we square its correlation.
+
+\subsection{Experiments on Computing the Best Iterative Hull}
+
+We apply our method in Section \ref{sec:fbih} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation. The results on the best iterative hull according to a given number of rounds are shown in Figure \ref{fig:plot_ih}. s
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{fig/plot_iterative_hulls.PNG}
+	\caption{Results on the weight growth of the best iterative hull} \label{fig:plot_ih}
+\end{figure}
+
+For any cipher we conduct experiments on, the weight growth of iterative hulls is larger than the weight growth of iterative trails except for the case of linear cryptanalysis of GIFT-64. In most cases with the given number of round $rd$ increasing, we observe that the weight per round of the best iterative hull increases. This implies that the combination of iterative trails enhances differential and linear propagations. 
 
 
 %We consider the smallest weight per length an elementary iterative trail can has (best w/l. in Table \ref{tab:iterative-trails}) as an index describing the growth of iterative differential and linear propagations. We can see that PRESENT has both the weakest growth of iterative differential and linear propagations. The weakest differential iterative trail is exactly the one found by Wang et al.\cite{W08}. 
@@ -122,24 +117,42 @@ We apply our method in Section \ref{sec:fbh} to PRESENT, GIFT-64, RECTANGLE and 
 
 \subsection{Experiment on KNOT}
 
-KNOT is a family of lightweight authenticated encryption algorithms and hash functions \cite{ZDY19}. The modes of operation of KNOT for AE and hash are shown in Figure . The modes are similar to the ones used in Ketje and ASCON. The inner permutations are inheritors of RECTANGLE, which are bit-sliced lightweight. The round transformation has 3 steps: 4-bit S-boxes, row rotations and a constant addition. 
+KNOT is a family of lightweight authenticated encryption algorithms and hash functions \cite{ZDY19}. The modes of operation of KNOT for AE and hash are shown in Figure . The modes are similar to the ones used in Ketje and ASCON. The inner permutations are inheritors of RECTANGLE, which are bit-sliced lightweight. The round transformation has 3 steps: 4-bit S-boxes, row rotations and a constant addition. The operation modes of AEAD and Hash are shown in 
 
-The differential and linear distinguishers with no restrictions can not be directly uesd to attack the duplex construction. In the following, we propose a few differential and linear attacks, each demanding specific restrictions on the distinguishers, on the primary version of KNOT which uses the 256-bit KNOT permutation.
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{fig/mode_aead.PNG}
+	\caption{The operation mode of KNOT AEAD} \label{fig:mode_aead}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{fig/mode_hash.PNG}
+	\caption{The operation mode of KNOT Hash} \label{fig:mode_hash}
+\end{figure}
+
+In the original specification document of KNOT, The largest differential probability and linear correlation is given. However first, the differential and linear distinguishers with no restrictions can not be directly uesd to attack the MonkeyDuplex construction. Second, the clustering effect is not taken into consideration. 
+
+In the following, we propose differential and linear attacks targeting different phases, each demanding specific restrictions on the distinguishers. The attacks proposed are general for cryptographic schemes based on MonkeyDuplex construction. For each attack, we give the largest differential probability or linear correlation square of the longest distinguisher as in Table \ref{tab:knot}. 
 
 \subsubsection{Attack Model 1}
-This is a chosen-nonce differential distinguishing attack targeting the initialization phase of KNOT-AEAD. The input difference has the nonce part and key part $\Delta SI=(\Delta SI_N,\Delta SI_K)$. The output difference has the rate part and capacity part $\Delta SO=(\Delta SO_R,\Delta SO_C)$. We restrict that $\Delta SI_K=0$. And $\Delta SO_C$ is truncated.  
+This is a chosen-nonce differential distinguishing attack targeting the initialization phase of KNOT-AEAD. The input difference has the nonce part and key part $\Delta SI=(\Delta SI_N,\Delta SI_K)$. The output difference has the rate part and capacity part $\Delta SO=(\Delta SO_R,\Delta SO_C)$. We restrict that $\Delta SI_K=0$. And $\Delta SO_C$ is truncated. 
 
 \subsubsection{Attack Model 2}
-This is a known-nonce and known-plaintext linear key recovery attack targeting the initialization phase of KNOT-AEAD. The input mask $\Gamma SI=(\Gamma SI_N,\Gamma SI_K)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SO_C=0$. Note that if $\Gamma SI_K\neq 0$, the attack degrades to a distinguishing one. 
+This is a known-nonce and known-plaintext linear key recovery attack targeting the initialization phase of KNOT-AEAD. The input mask $\Gamma SI=(\Gamma SI_N,\Gamma SI_K)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SO_C=0$. Note that if $\Gamma SI_K\neq 0$, the attack degrades to a distinguishing one. which is very unlikely. 
+
+%\subsubsection{Attack Model 3}
+%This is a known-nonce and known-plaintext linear distinguishing attack targeting the initialization phase of KNOT-AEAD in multi-key setting. The input mask $\Gamma SI=(\Gamma SI_N,\Gamma SI_K)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SO_C=0$ and $\Gamma SI_K=0$.
 
 \subsubsection{Attack Model 3}
-This is a known-nonce and known-plaintext linear distinguishing attack targeting the initialization phase of KNOT-AEAD in multi-key setting. The input mask $\Gamma SI=(\Gamma SI_N,\Gamma SI_K)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SO_C=0$ and $\Gamma SI_K=0$.
-
-\subsubsection{Attack Model 4}
 This is a known-plaintext linear distinguishing attack targeting the encryption phase of KNOT-AEAD. The input mask $\Gamma SI=(\Gamma SI_R,\Gamma SI_C)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SI_C=0$ and $\Gamma SO_C=0$. 
 
-\subsubsection{Attack Model 5}
+\subsubsection{Attack Model 4}
 This is a differential forgery attack targeting the finalization phase of KNOT-AEAD. The input difference $\Delta SI=(\Delta SI_R,\Delta SI_C)$ and the output difference $\Delta SO=(\Delta SO_T,\Delta SO_nT)$. We restrictions that $\Delta SI_C=0$. And $\Delta SO_nT$ is truncated. 
+
+
+\subsubsection{Attack Model 5}
+
 
 \subsubsection{Attack Model 6}
 This is a differential collsion attack targeting the absorb phase of KNOT-Hash. The input difference $\Delta SI=(\Delta SI_R,\Delta SI_C)$ and the output difference $\Delta SO=(\Delta SO_R,\Delta SO_C)$. We restrictions that $\Delta SI_C=0$ and $\Delta SO_C=0$. 
