@@ -1,6 +1,6 @@
 \section{Experiments\label{sec:experiment}}
 
-\subsection{Experiments on Computing the Best Iterative Trail}
+\subsection{Experiments on Finding the Best Iterative Trail}
 
 We apply our method in Section \ref{sec:fbit} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation and ASCON permutation. The results on the best iterative trail are shown in Table \ref{tab:it}. The visualizations of $G^{IS}_{F,max\_asn}$ without further improvements in Section \ref{sec:expansion} are shown in Appendix \ref{app:visualization} .
 
@@ -36,9 +36,13 @@ We apply our method in Section \ref{sec:fbit} to PRESENT, GIFT-64, RECTANGLE, 25
 
 Note that for 256-bit KNOT permutation has no key addition, the weight of the linear trail we compute is the correlation of the linear trail instead of the correlation square averaging on round keys for block ciphers. To fairly compare the result of the best linear trail of 256-bit KNOT permutation with other ciphers, we square its correlation.
 
-\subsection{Experiments on Computing the Best Iterative Hull}
+For ASCON permutation, we set $max\_asn$ to 3 and find no iterative trail though the graph is not empty. 
 
-We apply our method in Section \ref{sec:fbih} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation. The results on the best iterative hull according to a given number of rounds are shown in Figure \ref{fig:plot_ih}. s
+Among other ciphers which we experiment on, we find that 256-bit KNOT permutation has the smallest differential probability growth of the best single differential iterative trail, while PRESENT has the largest. And also PRESENT has the largest linear correlation growth of the best single linear iterative trail, while the other three have the same. 
+
+\subsection{Experiments on Finding the Best Iterative Hull}
+
+We apply our method in Section \ref{sec:fbih} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation. The results on the best iterative hull according to a given number of rounds are shown in Figure \ref{fig:plot_ih}. 
 
 \begin{figure}
 	\centering
@@ -46,7 +50,7 @@ We apply our method in Section \ref{sec:fbih} to PRESENT, GIFT-64, RECTANGLE, 25
 	\caption{Results on the weight growth of the best iterative hull} \label{fig:plot_ih}
 \end{figure}
 
-For any cipher we conduct experiments on, the weight growth of iterative hulls is larger than the weight growth of iterative trails except for the case of linear cryptanalysis of GIFT-64. In most cases with the given number of round $rd$ increasing, we observe that the weight per round of the best iterative hull increases. This implies that the combination of iterative trails enhances differential and linear propagations. 
+For any cipher we conduct experiments on, the weight growth of iterative hulls is larger than the weight growth of iterative trails except for the case of linear cryptanalysis of GIFT-64. In most cases with the given number of round $rd$ increasing, we observe that the weight per round of the best iterative hull increases (its negative logrithm decreases). This implies that the combination of iterative trails enhances differential and linear propagations. 
 
 
 %We consider the smallest weight per length an elementary iterative trail can has (best w/l. in Table \ref{tab:iterative-trails}) as an index describing the growth of iterative differential and linear propagations. We can see that PRESENT has both the weakest growth of iterative differential and linear propagations. The weakest differential iterative trail is exactly the one found by Wang et al.\cite{W08}. 
@@ -131,7 +135,7 @@ KNOT is a family of lightweight authenticated encryption algorithms and hash fun
 	\caption{The operation mode of KNOT Hash} \label{fig:mode_hash}
 \end{figure}
 
-In the original specification document of KNOT, The largest differential probability and linear correlation is given. However first, the differential and linear distinguishers with no restrictions can not be directly uesd to attack the MonkeyDuplex construction. Second, the clustering effect is not taken into consideration. 
+In the original specification document of KNOT, The largest differential probability and linear correlation is given. However firstly, the differential and linear distinguishers with no restrictions can not be directly uesd to attack the MonkeyDuplex construction. Secondly, the clustering effect is not taken into consideration. Thirdly, because only the rate part and the tag part is visible, differences can be truncated in the capacity part and in the non-tag part. 
 
 In the following, we propose differential and linear attacks targeting different phases, each demanding specific restrictions on the distinguishers. The attacks proposed are general for cryptographic schemes based on MonkeyDuplex construction. For each attack, we give the largest differential probability or linear correlation square of the longest distinguisher as in Table \ref{tab:knot}. 
 
@@ -139,7 +143,7 @@ In the following, we propose differential and linear attacks targeting different
 This is a chosen-nonce differential distinguishing attack targeting the initialization phase of KNOT-AEAD. The input difference has the nonce part and key part $\Delta SI=(\Delta SI_N,\Delta SI_K)$. The output difference has the rate part and capacity part $\Delta SO=(\Delta SO_R,\Delta SO_C)$. We restrict that $\Delta SI_K=0$. And $\Delta SO_C$ is truncated. 
 
 \subsubsection{Attack Model 2}
-This is a known-nonce and known-plaintext linear key recovery attack targeting the initialization phase of KNOT-AEAD. The input mask $\Gamma SI=(\Gamma SI_N,\Gamma SI_K)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SO_C=0$. Note that if $\Gamma SI_K\neq 0$, the attack degrades to a distinguishing one. which is very unlikely. 
+This is a known-nonce and known-plaintext linear key recovery attack targeting the initialization phase of KNOT-AEAD. The input mask $\Gamma SI=(\Gamma SI_N,\Gamma SI_K)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SO_C=0$. Note that if for the best linear distinguisher $\Gamma SI_K\neq 0$, then the attack degrades to a distinguishing one, which is however very unlikely. 
 
 %\subsubsection{Attack Model 3}
 %This is a known-nonce and known-plaintext linear distinguishing attack targeting the initialization phase of KNOT-AEAD in multi-key setting. The input mask $\Gamma SI=(\Gamma SI_N,\Gamma SI_K)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SO_C=0$ and $\Gamma SI_K=0$.
@@ -147,11 +151,13 @@ This is a known-nonce and known-plaintext linear key recovery attack targeting t
 \subsubsection{Attack Model 3}
 This is a known-plaintext linear distinguishing attack targeting the encryption phase of KNOT-AEAD. The input mask $\Gamma SI=(\Gamma SI_R,\Gamma SI_C)$ and the output mask $\Gamma SO=(\Gamma SO_R,\Gamma SO_C)$. We restrict that $\Gamma SI_C=0$ and $\Gamma SO_C=0$. 
 
-\subsubsection{Attack Model 4}
-This is a differential forgery attack targeting the finalization phase of KNOT-AEAD. The input difference $\Delta SI=(\Delta SI_R,\Delta SI_C)$ and the output difference $\Delta SO=(\Delta SO_T,\Delta SO_nT)$. We restrictions that $\Delta SI_C=0$. And $\Delta SO_nT$ is truncated. 
 
+\subsubsection{Attack Model 4}
+This is a differential forgery attack targeting the encryption phase of KNOT-AEAD. The input difference $\Delta SI=(\Delta SI_R,\Delta SI_C)$ and the output difference $\Delta SO=(\Delta SO_R,\Delta SO_C)$. We restrict that $\Delta SI_C=0$ and $\Delta SO_C=0$. 
 
 \subsubsection{Attack Model 5}
+This is a differential forgery attack targeting the finalization phase of KNOT-AEAD. The input difference $\Delta SI=(\Delta SI_R,\Delta SI_C)$ and the output difference $\Delta SO=(\Delta SO_T,\Delta SO_{nT})$. We restrictions that $\Delta SI_C=0$. And $\Delta SO_{nT}$ is truncated. 
+
 
 
 \subsubsection{Attack Model 6}
@@ -165,15 +171,15 @@ This is a differential collsion attack targeting the squeezing phase of KNOT-Has
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline
-		Attack Model & rounds & $k,,-\log_2wlb$ & EDP or ELP & Time & Security Claim\\
+		Attack Model & rounds & $k,-\log_2wlb$ & $-\log_2$(EDP or ELP) & Time & data limit\\
 		\hline
-		AM1 & 27 & 5,20,5,20 & 124.5 & & 125 \\
-		AM2 & 24 & 3,8,3,8 & 120 & & 125 \\
-		AM3 & 24 & 3,8,3,8 & 122 & & 125 \\
-		AM4 & 24 & 3,10,3,10 & 124 & & 125 \\
-		AM5 & 26 & 5,20,5,20 & 123.7 & & 125 \\
-		AM6 & 21 & 5,20,5,20 & 107.0 & & 112 \\
-		AM7 & 23 & 5,20,5,20 & 109.0 & & 112 \\
+		AM1 & 14 & 5,20,5,20 & 62.2 & & $2^{64}$ \\
+		AM2 & 12 & 3,8,3,8 & 30*2 & & $2^{64}$ \\
+		AM3 & 11 & 3,10,3,10 & 30*2 & & $2^{64}$ \\
+		AM4 & 12 & 5,20,5,20 & 62.4 & & $2^{64}$ \\
+		AM5 & 13 & 5,20,5,20 & 61.4 & & $2^{64}$ \\
+		AM6 & 12 & 5,20,5,20 & 62.7 & & $2^{64}$ \\
+		AM7 & 13 & 5,20,5,20 & 61.4 & & $2^{64}$ \\
 		\hline
 	\end{tabular}
 \end{table}

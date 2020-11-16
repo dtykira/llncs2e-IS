@@ -2,9 +2,7 @@
 
 In this work, we propose a new automatic tool to search for iterative trails for symmetric-key primitives based on S-boxes. We visualize the graph representation of iterative trails hoping to provide additional insignts. Based on the iterative trails, we efficiently estimate the probabilities of differentials and correlations of linear hulls. The results show that for ciphers with bit permutations we conduct experiments on, the good differentials and linear hulls are dominated by iterative trails. 
 
-We have conducted an initial study on ASCON permutation. For its comparatively strong diffusion layer, iterative trails are difficult to be found. 
+We have conducted an initial study on ASCON permutation. For its comparatively strong diffusion layer, iterative trails are difficult to be found. A question raised for designers is that, whether a cipher with bit permutation as its linear layer can have no iterative trails. And we plan to continue experimenting on ciphers with bit permutations as linear layers like ICEBERG, PUFFIN, etc. Ciphers with Feistel structure are also going to be considered. 
 
-A question raised for designers is that, whether a cipher with bit permutation as its linear layer can have no iterative trails. 
-
-In the extension phase of Algorithm \ref{algo2}, the bounds $w^{F},w^{F^{-1}}$ set in the collection procedure is heuristic. One can loose the bounds to obtain more accurate results but costing more time and memory. One can also heuristically alter the way how the bounds restrict trails. What's more, Our methods are also expected to be appliable for lightweight Feistel ciphers by regarding two Feistel rounds as one round. We leave these for future work. 
+In the extension phase of Algorithm \ref{algo:3}, the bounds set in the collection procedure is heuristic. One can loose the bounds to obtain more accurate results but costing more time and memory. One can also heuristically alter the way how the bounds restrict trails. What's more, Our methods are also expected to be appliable for lightweight Feistel ciphers by regarding two Feistel rounds as one round. We leave these for future work. 
 

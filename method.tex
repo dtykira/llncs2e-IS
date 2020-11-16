@@ -38,8 +38,7 @@ According to the definition, Obiviously a (elementary) circuit in the graph repr
 
 Once a short-round elementary iterative trails is found, it can be concatenated to itself arbitary times and forms a long-round iterative trail. For a cipher that has iterative trails, the negative logarithm of the largest differential probability or linear correlation increases no faster than a linear function of the round number. 
 
-For an $rd$-round iterative trail with weight $wt$, we regard its weight per round $wt/rd$ as an index describing the weight growth of the iterative trail. We refer the best iterative trail to the one with the largest weight per round. We claim that one of the best iterative trails must be an elementary one. Thus we can find out the best elementary iterative trail
-among the ones enumerated by Johnson's algorithm \cite{J75} and evaluate the best weight growth of one single iterative trail. The procedure is given in Algorithm \ref{algo:1} and the details of Johnson's algorithm are given in Appendix. 
+For an $rd$-round iterative trail with weight $wt$, we regard its weight per round $wt/rd$ as an index describing the weight growth of the iterative trail. We refer the best iterative trail to the one with the largest weight per round. We claim that one of the best iterative trails must be an elementary one. Thus we can find out the best elementary iterative trail among the ones enumerated by Johnson's algorithm \cite{J75} and evaluate the best weight growth of one single iterative trail. The procedure is given in Algorithm \ref{algo:1} and the details of Johnson's algorithm are given in Appendix. 
 
 \begin{algorithm}
 	\caption{Finding the best iterative trail}
@@ -84,14 +83,14 @@ We claim that for an arbitary vertex in the iterative structure, it whether belo
 
 To compute the iterative structure $G^{IS}_{F,max\_asn}$ of $G_{F,max\_asn}$, we eliminate the vertices in having no incoming or outgoing edges until the size of the graph become stable. 
 
-Given the round number $r$, we can compute $w(h_{u,v}^r)$ for all $u,v$ in $V^{IS}_{F,max\_asn}$. For a sufficient large $r$, we regard $\max\limits_{u,v}w(h_{u,v}^r)/r$ as an index describing the best weight growth of the iterative hull. The procedure is given in Algorithm \ref{algo:2}.
+Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for all $u$ in $V^{IS}_{F,max\_asn}$. An $r$-round iterative hull is a hull containing all iterative trails with the same input and output difference of mask value. We regard $\max\limits_{u}w(h_{u,u}^r)/r$ as an index describing the best weight growth among the iterative hulls. The procedure is given in Algorithm \ref{algo:2}.
 
 \begin{algorithm}
 	\caption{Finding the best iterative hull}
 	\label{algo:2}
 	\begin{algorithmic}[1]
 		\Require $G_{F,max\_asn}$, the number of rounds $r$
-		\Ensure the largest weight per round of an $r$-round hull in the iterative structure
+		\Ensure the largest weight per round of an $r$-round iterative hull
 		\Procedure {}{}
 		\State Eliminate all vertices having no incoming or outgoing edges repeatedly until no more vertices can be eliminated and restore the subgraph into $G^{IS}_{F,max\_asn}$
 		\State Let $\mathcal{H}$ be a hash table. Set $\mathcal{H}(u,v)\leftarrow 0$ for all $u,v\in V^{IS}_{F,max\_asn}$
@@ -104,7 +103,7 @@ Given the round number $r$, we can compute $w(h_{u,v}^r)$ for all $u,v$ in $V^{I
 		\EndFor
 		\State $\mathcal{H}\leftarrow \mathcal{H}'$
 		\EndFor
-		\State \Return{$\max\limits_{u,v}\mathcal{H}(u,v)$}
+		\State \Return{$\max\limits_{u=v}\mathcal{H}(u,v)$}
 		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
@@ -123,7 +122,8 @@ Following this idea, we first generate a multi-stage graph according to $G^{IS}_
 		\Ensure the largest weight of an $r$-round hull
 		\Procedure {}{}
 		\State Build a graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$ where $S_i\leftarrow V^{IS}_{F,max\_asn}$. For each edge $u\rightarrow v$ in $E^{IS}_{F,max\_asn}$, we append $u\rightarrow v, u\in S_i,v\in S_{i+1}, \forall i$ to $MSG$. 
-		\For{each trail $p=(v_0,v_1,\cdots,v_l)$ extended from a vertex in $V^{IS}_{F,max\_asn}$ with $l\le k$ and $w(v_{i-1}\rightarrow v_i)\ge wlb$}
+		\State $min\_w\_r\leftarrow$ the largest weight of one single S-box
+		\For{each trail $p=(v_0,v_1,\cdots,v_l)$ extended from a vertex in $V^{IS}_{F,max\_asn}$ with $l\le k$ and $w(p)\times (min\_w\_r)^{k-l} \ge wlb$}
 		\If{$p$ is a trail extended forward from $v_0\in V^{IS}_{F,max\_asn}$}
 		\For{$i\leftarrow 1:l$}
 		\State Append $v_{i-1}\rightarrow v_i$ between $S_{r-l+i-1}$ and $S_{r-l+i}$
