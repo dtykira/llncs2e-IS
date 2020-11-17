@@ -38,7 +38,7 @@ According to the definition, Obiviously a (elementary) circuit in the graph repr
 
 Once a short-round elementary iterative trails is found, it can be concatenated to itself arbitary times and forms a long-round iterative trail. For a cipher that has iterative trails, the negative logarithm of the largest differential probability or linear correlation increases no faster than a linear function of the round number. 
 
-For an $rd$-round iterative trail with weight $wt$, we regard its weight per round $wt/rd$ as an index describing the weight growth of the iterative trail. We refer the best iterative trail to the one with the largest weight per round. We claim that one of the best iterative trails must be an elementary one. Thus we can find out the best elementary iterative trail among the ones enumerated by Johnson's algorithm \cite{J75} and evaluate the best weight growth of one single iterative trail. The procedure is given in Algorithm \ref{algo:1} and the details of Johnson's algorithm are given in Appendix. 
+For an $rd$-round iterative trail with weight $wt$, we regard its weight per round $\sqrt[rd]{wt}$ as an index describing the weight growth of the iterative trail. We refer the best iterative trail to the one with the largest weight per round. We claim that one of the best iterative trails must be an elementary one. Thus we can find out the best elementary iterative trail among the ones enumerated by Johnson's algorithm \cite{J75} and evaluate the best weight growth of one single iterative trail. The procedure is given in Algorithm \ref{algo:1} and the details of Johnson's algorithm are given in Appendix. 
 
 \begin{algorithm}
 	\caption{Finding the best iterative trail}
