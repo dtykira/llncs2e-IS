@@ -2,47 +2,49 @@
 
 \subsection{Experiments on Finding the Best Iterative Trail}
 
-We apply our method in Section \ref{sec:fbit} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation and ASCON permutation. The results on the best iterative trail are shown in Table \ref{tab:it}. The visualizations of $G^{IS}_{F,max\_asn}$ without further improvements in Section \ref{sec:expansion} are shown in Appendix \ref{app:visualization} .
+We apply our method in Section \ref{sec:fbit} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation and ASCON permutation. The results on the best iterative trail are shown in Table \ref{tab:it}. The visualizations of $G^{IS}_{F,max\_asn}$ are shown in Appendix \ref{app:visualization}. These results are not improved by the technique in Section \ref{sec:expansion}
 
 \begin{table}
 	\caption{Results on the weight growth of one best single iterative trail}\label{tab:it}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|}
 		\hline
-		cryptanalysis & cipher & $max\_asn$ & $-\log_2(wt/rd)$ & method\\
+		cryptanalysis & cipher & $max\_asn$ & $-\log_2(wt)/rd$\\
 		\hline
-		diff. & 256-bit KNOT permutation & 2 & 5.3 & Section \ref{sec:fbit}\\
+		diff. & 256-bit KNOT permutation & 2 & 5.3\\
 		\hline
-		diff. & PRESENT & 2 & 4.5 & Section \ref{sec:fbit}\\
+		diff. & PRESENT & 2 & 4.5\\
 		\hline
-		diff. & GIFT-64 & 2 & 5 & Section \ref{sec:fbit}\\
+		diff. & GIFT-64 & 2 & 5\\
 		\hline
-		diff. & RECTANGLE & 2 & 5 & Section \ref{sec:fbit}\\
+		diff. & RECTANGLE & 2 & 5\\
 		\hline
-		diff. & ASCON permutation & 3 & - & Section \ref{sec:fbit}\\
+		diff. & ASCON permutation & 3 & -\\
 		\hline
-		linear & 256-bit KNOT permutation & 2 & 6* & Section \ref{sec:fbit}\\
+		linear & 256-bit KNOT permutation & 2 & 6*\\
 		\hline
-		linear & PRESENT & 1 & 4 & Section \ref{sec:fbit}\\
+		linear & PRESENT & 1 & 4\\
 		\hline
-		linear & GIFT-64 & 2 & 6 & Section \ref{sec:fbit}\\
+		linear & GIFT-64 & 2 & 6\\
 		\hline
-		linear & RECTANGLE & 2 & 6 & Section \ref{sec:fbit}\\
+		linear & RECTANGLE & 2 & 6\\
 		\hline
-		linear & ASCON permutation & 3 & - & Section \ref{sec:fbit}\\
+		linear & ASCON permutation & 3 & -\\
 		\hline
 	\end{tabular}
 \end{table}
 
 Note that for 256-bit KNOT permutation has no key addition, the weight of the linear trail we compute is the correlation of the linear trail instead of the correlation square averaging on round keys for block ciphers. To fairly compare the result of the best linear trail of 256-bit KNOT permutation with other ciphers, we square its correlation.
 
-For ASCON permutation, we set $max\_asn$ to 3 and find no iterative trail though the graph is not empty. 
+For ASCON permutation, we set $max\_asn$ to 3 and find no iterative trail though the generated graph is not empty. 
 
 Among other ciphers which we experiment on, we find that 256-bit KNOT permutation has the smallest differential probability growth of the best single differential iterative trail, while PRESENT has the largest. And also PRESENT has the largest linear correlation growth of the best single linear iterative trail, while the other three have the same. 
 
 \subsection{Experiments on Finding the Best Iterative Hull}
 
-We apply our method in Section \ref{sec:fbih} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation. The results on the best iterative hull according to a given number of rounds are shown in Figure \ref{fig:plot_ih}. The number of rounds is denoted as $rd$ which is the x axis of Figure \ref{fig:plot_ih}. The weight of the best iterative hull is denoted as $wt$ and the y axis of Figure \ref{fig:plot_ih} is $\log_2(wt)/rd$
+We apply our method in Section \ref{sec:fbih} to PRESENT, GIFT-64, RECTANGLE, 256-bit KNOT permutation. And we generate $G_{F,T_{a,b,c}}$ using the technique in Section \ref{sec:expansion} instead of generating $G_{F,max\_asn}$. In case of linear cryptanalysis of PRESENT, the parameters $(a,b,c)$ is set to (1,2,3). In other cases, $(a,b,c)$ is set to (2,3,3).
+
+The results on the best iterative hull according to a given number of rounds are shown in Figure \ref{fig:plot_ih}. The number of rounds is denoted as $rd$ which is the x axis of Figure \ref{fig:plot_ih}. The weight of the best iterative hull is denoted as $wt$ and the y axis of Figure \ref{fig:plot_ih} is $-\log_2(wt)/rd$ which describes the weight growth. 
 
 \begin{figure}
 	\centering
@@ -67,28 +69,28 @@ For any cipher we conduct experiments on, the weight growth of iterative hulls i
 %
 %%Our method finishes in minutes or even in seconds and is able to obtain an upper bound of the best weight for ciphers have iterative trails.
 
-\subsection{Experiments on Finding Differential Trails and Linear Trails}
+\subsection{Experiments on Estimating EDPs and ELPs}
 
-We apply our method in Section \ref{sec:fbh} to PRESENT, GIFT-64, RECTANGLE and 256-bit KNOT permutation. The algorithm is run on an Intel Core i7-6700 CPU at 3.40GHz with 16GB RAM. The results for differential cryptanalysis are shown in Table \ref{tab:EDP}. The results for linear cryptanalysis are shown in Table \ref{tab:ELP}. Results for PRESENT, RECTANGLE and GIFT-64 are not better than but close to results in \cite{HV18}, which implies that iterative trails dominate the good differentials and linear hulls of these ciphers. However our method costs much less time. The 256-bit KNOT permutation is used in NIST LWC round 2 candidate KNOT \cite{ZDY19}, which is a inheritor of RECTANGLE having a larger number of rounds and a larger block size. For the 256-bit KNOT permutation, we are able to find good differentials up to 52 rounds and good linear hulls up to 51 rounds. 
+We apply our method in Section \ref{sec:fbh} to PRESENT, GIFT-64, RECTANGLE and 256-bit KNOT permutation. The algorithm is run on an Intel Core i7-6700 CPU at 3.40GHz with 16GB RAM. The results for differential cryptanalysis are shown in Table \ref{tab:EDP}. The results for linear cryptanalysis are shown in Table \ref{tab:ELP}. 
+
+Same as the work in \cite{HV18}, we use a multistage graph method to find good differentials and linear hulls. But our method is motivated by iterative trails and has a different routine of choosing the interesting subgraph. Results for PRESENT, RECTANGLE and GIFT-64 are close to the results in \cite{HV18}, which implies that iterative trails dominate the good differentials and linear hulls of these ciphers. Our method costs much less time. For RECTANGLE, we improve the 14-round ELP to $2^{-62.31}$. 
+
+The 256-bit KNOT permutation is used in NIST LWC round 2 candidate KNOT \cite{ZDY19}, which is an inheritor of RECTANGLE having a larger number of rounds and a larger block size. For the 256-bit KNOT permutation, we are able to find good differentials up to 52 rounds and good linear hulls up to 51 rounds, while the best single differential trail is found up to 48 rounds and the best single linear trail is found up to 44 rounds according to the specification document of KNOT \cite{ZDY19}. 
 
 \begin{table}
 	\caption{Results on estimating EDPs}\label{tab:EDP}
 	\centering
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline
-		cipher & rounds & $k$ & $\Prob$ & Time & $k,-\log_2wlb$ & EDP & Time \\
+		cipher & rd & $(a,b,c)$ & $(k,-\log_2wlb)$ & $-\log_2\Prob$ & $-\log_2\EDP$ & Time \\
 		\hline
-		PRESENT & 14 & 3 & 62 & $<$1s & 3,13 & 54.9879 & 425.15s \\
+		PRESENT & 16 & (2,3,3) & (3,10) & 70 & 61.84 & 26s+165s\\
+		\hline
+		GIFT-64 & 13 & (2,3,3) & (3,13) & 62 & 60.42 & 24s+76s\\
 		\hline 
-		PRESENT & 17 & - & - & - & 3,13 & 62.6897 & 498.513s\\
-		\hline 
-		RECTANGLE & 13 & 6 & 56 & 1.2s & 6,25 & 55.6601 & 12007.5s \\
+		RECTANGLE & 14 & (2,*,1) & (6,25) &  &  &  \\
 		\hline
-		GIFT-64 & 13 & 3 & 62 & $<$1s & 3,13 & 60.415 & 32.365s\\
-		\hline
-		KNOT-perm-256 & 48 & 3 & 252 & $<$1s & 3,13 & 232.591 & 19.536s\\
-		\hline
-		KNOT-perm-256 & 52 & 3 & 274 & $<$1s & 3,13 & 251.831 & 20.407s\\
+		KNOT-perm-256 & 52 & (2,*,1) & (3,12) & 274 & 251.831 & 0s+10s\\
 		\hline
 	\end{tabular}
 \end{table}
@@ -96,28 +98,22 @@ We apply our method in Section \ref{sec:fbh} to PRESENT, GIFT-64, RECTANGLE and 
 \begin{table}
 	\caption{Results on estimating ELPs}\label{tab:ELP}
 	\centering
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline
-		cipher & rounds & $k$ & $\Cor^2$ & Time & $k,-\log_2wlb$ & ELP & Time \\
+		cipher & rd & $(a,b,c)$ & $(k,-\log_2wlb)$ & $-2\log_2\Cor$ & $-\log_2\ELP$ & Time \\
 		\hline
-		PRESENT & 17 & 3 & 64 & $<$1s & 3,8 & 45.6582 & $<$1s\\
+		PRESENT & 24 & (1,2,3) & (3,8) & 92 & 63.61 & 0s+14s\\
+		\hline
+		GIFT-64 & 13 & (2,*,1) & (3,10) & 64 & 64 & 1s+1s\\
 		\hline 
-		PRESENT & 23 & 3 & 92 & $<$1s & 3,8 & 61.1404 & $<$1s\\
-		\hline 
-		PRESENT & 24 & 3 & 96 & $<$1s & 3,8 & 63.7519 & $<$1s\\
-		\hline 
-		RECTANGLE & 13 & 5 & 62 & $<$1s & 5,20 & 59.6377 & 337.195s \\
+		RECTANGLE & 14 & (2,3,3) & (3,14) & 68 & 62.31 & 17s+5433s \\
 		\hline
-		RECTANGLE & 13 & - & - & - & 6,25 & 59.3095 & 7565.67s \\
-		\hline
-		GIFT-64 & 12 & 3 & 64 & $<$1s& 3,13 & 64 & $<$1s \\
-		\hline
-		KNOT-perm-256 & 45 & 3 & 256 & $<$1s & 3,7 & 222 & 100.892s\\
-		KNOT-perm-256 & 51 & 3 & 292 & $<$1s & 3,7 & 252 & 111.763s\\
-		KNOT-perm-256 & 51 & - & - & - & 3,9 & 251.356 & 4642.19s\\
+		KNOT-perm-256 & 52 & (2,3,3) & (2,6) &  &  & \\
 		\hline
 	\end{tabular}
 \end{table}
+
+
 
 \subsection{Experiment on KNOT}
 
@@ -171,15 +167,20 @@ This is a differential collsion attack targeting the squeezing phase of KNOT-Has
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline
-		Attack Model & rounds & $k,-\log_2wlb$ & $-\log_2$(EDP or ELP) & Time & data limit\\
+		Attack Model & rounds & $(a,b,c)$ & $(k,-\log_2wlb)$ & $-\log_2$(EDP or ELP)\\
 		\hline
-		AM1 & 14 & 5,20,5,20 & 62.2 & & $2^{64}$ \\
-		AM2 & 12 & 3,8,3,8 & 30*2 & & $2^{64}$ \\
-		AM3 & 11 & 3,10,3,10 & 30*2 & & $2^{64}$ \\
-		AM4 & 12 & 5,20,5,20 & 62.4 & & $2^{64}$ \\
-		AM5 & 13 & 5,20,5,20 & 61.4 & & $2^{64}$ \\
-		AM6 & 12 & 5,20,5,20 & 62.7 & & $2^{64}$ \\
-		AM7 & 13 & 5,20,5,20 & 61.4 & & $2^{64}$ \\
+		AM1 & 14 & (2,*,1) & (5,20) & 62.2 \\
+		AM2 & 13 & (2,3,3) & (3,8) & 30.7*2=61.4 \\
+		AM3 & 12 & (2,3,3) & (3,10) & 30.2*2=60.4 \\
+		AM4 & 12 & (2,*,1) & (5,20) & 62.4 \\
+		AM5 & 13 & (2,*,1) & (5,20) & 61.4 \\
+		AM6 & 12 & (2,*,1) & (5,20) & 62.7 \\
+		AM7 & 13 & (2,*,1) & (5,20) & 61.4 \\
 		\hline
 	\end{tabular}
 \end{table}
+
+\subsubsection{Summary}
+
+The results in Table \ref{tab:knot} show that the inner permutations in the initialization, encryption and finalization phases of the primary version of KNOT-AEAD should have more than 14 rounds, 12 rounds and 13 rounds respectively. The inner permutations in the absorbing and squeezing phases of the primary version of KNOT-Hash should have more than 12 rounds and 13 rounds. 
+

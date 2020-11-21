@@ -15,7 +15,7 @@ else if $\calE$ is a permutation, the weight is defined as:
     w(u\rightarrow v)=\Cor^{F}(u,v).
 \]
 
-In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to describe the difference or mask propagations given $F$. A path in the graph represents a differential or linear trail. A hull with length $k$ in the graph represents a differential or linear hull. 
+In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to describe the difference or mask propagations given $F$. A path in the graph represents a differential or linear trail. A hull with length $k$ in the graph represents a $k$-round differential or linear hull. 
 
 However, the $G_F$ generated is too large for it has $2^n$ vertices. Therefore we need to choose a interesting graph according to computation power. 
 
@@ -49,8 +49,8 @@ For an $rd$-round iterative trail with weight $wt$, we regard its weight per rou
 		\Procedure {}{}
 		\State $wpr\leftarrow 0$
 		\For{each elementary circuit $p'$ in $G_{F,max\_asn}$ enumerated by Johnson's algorithm}
-		\If{$w(p')/l(p')>wpr$}
-		\State $wpr\leftarrow w(p')/l(p'),p\leftarrow p'$
+		\If{$\sqrt[l(p')]{w(p')}>wpr$}
+		\State $wpr\leftarrow \sqrt[l(p')]{w(p')},p\leftarrow p'$
 		\EndIf
 		\EndFor
 		\State \Return{$wpr$}
@@ -81,16 +81,17 @@ To evaluate the weight growth of iterative hulls, we define subgraph \textit{ite
 
 We claim that for an arbitary vertex in the iterative structure, it whether belongs to at least one elementary circuit or belongs to at least one path linking two elementary circuits. 
 
-To compute the iterative structure $G^{IS}_{F,max\_asn}$ of $G_{F,max\_asn}$, we eliminate the vertices in having no incoming or outgoing edges until the size of the graph become stable. 
+To compute the iterative structure $G^{IS}_{F,max\_asn}$ of $G_{F,max\_asn}$, we eliminate the vertices in having no incoming or outgoing edges until the size of the graph becomes stable. 
 
-Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for all $u$ in $V^{IS}_{F,max\_asn}$. An $r$-round iterative hull is a hull containing all iterative trails with the same input and output difference of mask value. We regard $\max\limits_{u}w(h_{u,u}^r)/r$ as an index describing the best weight growth among the iterative hulls. The procedure is given in Algorithm \ref{algo:2}.
+Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for all $u$ in $V^{IS}_{F,max\_asn}$. An $r$-round iterative hull is a hull containing all iterative trails with the same input and output difference of mask value. We regard $\max\limits_{u}\sqrt[r]{w(h_{u,u}^r)}$ as an index describing the best weight growth among the iterative hulls. The procedure of obtain the weight per round of the best iterative hull is given in Algorithm \ref{algo:2}.
+
 
 \begin{algorithm}
 	\caption{Finding the best iterative hull}
 	\label{algo:2}
 	\begin{algorithmic}[1]
 		\Require $G_{F,max\_asn}$, the number of rounds $r$
-		\Ensure the largest weight per round of an $r$-round iterative hull
+		\Ensure the largest weight of an $r$-round iterative hull
 		\Procedure {}{}
 		\State Eliminate all vertices having no incoming or outgoing edges repeatedly until no more vertices can be eliminated and restore the subgraph into $G^{IS}_{F,max\_asn}$
 		\State Let $\mathcal{H}$ be a hash table. Set $\mathcal{H}(u,v)\leftarrow 0$ for all $u,v\in V^{IS}_{F,max\_asn}$
@@ -103,25 +104,33 @@ Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for
 		\EndFor
 		\State $\mathcal{H}\leftarrow \mathcal{H}'$
 		\EndFor
-		\State \Return{$\max\limits_{u=v}\mathcal{H}(u,v)$}
+		\State \Return{$\sqrt[r]{\max\limits_{u=v}\mathcal{H}(u,v)}$}
 		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
 
 \subsection{Finding the Best Differential or Linear Hull}\label{sec:fbh}
 
-In \cite{W08}, a 4-round elementary iterative trail is found and is used to construct a 12-round iterative trail. By further extending the trail forward and backward by one round, a 14-round trail is obtained. 
+In \cite{W08}, a 4-round elementary iterative trail is found and is used to construct a 12-round iterative trail. By further extending the trail forward and backward by one round, a 14-round trail is obtained. Following this idea, we hope to collect trails constructed by iterative trails as many as possible. Such a trail is treated as three parts: the core middle part which is a path in $G^{IS}_{F,max\_asn}$, the extension forward part and the extension backward part. 
 
-Following this idea, we first generate a multi-stage graph according to $G^{IS}_{F,max\_asn}$ and extend both forward and backward from each vertex in $V^{IS}_{F,max\_asn}$ for several rounds and restore the trails in the multi-stage graph. Then we compute the weight stage by stage. The procedure is given in Algorithm \ref{algo:3}
+In \cite{HV18}, a multistage graph is generated and pruned in order to find good differentials and linear hulls. Here we generate a multistage graph $MSG$ from $G^{IS}_{F,max\_asn}$. Firstly, we append every edge in $E^{IS}_{F,max\_asn}$ between every two adjacent stages in $MSG$. Then we extend both forward and backward from each vertex in $V^{IS}_{F,max\_asn}$ for several rounds and restore the trails into $MSG$. The generating procedure is given in Algorithm \ref{algo:3}. 
+
+Once $MSG$ generated, we can compute the largest weight that a hull in $MSG$ can has. The computation is conducted stage by stage. The procedure is given in Algorithm \ref{algo:4}.
 
 \begin{algorithm}
-	\caption{Finding the best differential or linear hull}
+	\caption{Generating multistage graph $MSG$}
 	\label{algo:3}
 	\begin{algorithmic}[1]
-		\Require $G^{IS}_{F,max\_asn}$, the number of rounds $r$, the number of round to be extended $k$, the smallest weight that a single round of a extended trail can has $wlb$
-		\Ensure the largest weight of an $r$-round hull
+		\Require $G^{IS}_{F,max\_asn}$, the number of rounds $r$, the number of round to be extended $k$, a weight bound $wlb$ constraining extended trails
+		\Ensure multistage graph $MSG$
 		\Procedure {}{}
-		\State Build a graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$ where $S_i\leftarrow V^{IS}_{F,max\_asn}$. For each edge $u\rightarrow v$ in $E^{IS}_{F,max\_asn}$, we append $u\rightarrow v, u\in S_i,v\in S_{i+1}, \forall i$ to $MSG$. 
+		\State Build a multistage graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$
+		\For{$i=0:r+1$}
+		\State $S_i\leftarrow V^{IS}_{F,max\_asn}$
+		\EndFor
+		\For{each edge $u\rightarrow v$ in $E^{IS}_{F,max\_asn}$}
+		\State Append $u\rightarrow v, u\in S_i,v\in S_{i+1}, \forall i$ to $MSG$
+		\EndFor
 		\State $min\_w\_r\leftarrow$ the largest weight of one single S-box
 		\For{each trail $p=(v_0,v_1,\cdots,v_l)$ extended from a vertex in $V^{IS}_{F,max\_asn}$ with $l\le k$ and $w(p)\times (min\_w\_r)^{k-l} \ge wlb$}
 		\If{$p$ is a trail extended forward from $v_0\in V^{IS}_{F,max\_asn}$}
@@ -134,6 +143,17 @@ Following this idea, we first generate a multi-stage graph according to $G^{IS}_
 		\EndFor
 		\EndIf
 		\EndFor
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{Finding the best differential or linear hull}
+	\label{algo:4}
+	\begin{algorithmic}[1]
+		\Require $MSG$
+		\Ensure the largest weight of an $r$-round hull
+		\Procedure {}{}
 		\State Let $\mathcal{H}$ be a hash table. 
 		\For{each $u\in S_0$}
 		\State $\mathcal{H}(u)\leftarrow 0$
@@ -167,15 +187,13 @@ Following this idea, we first generate a multi-stage graph according to $G^{IS}_
 
 \subsection{Expanding $G_{F,max\_asn}$}\label{sec:expansion}
 
-\begin{definition}[Activity Pattern]
-	The activity pattern of a trail $(u^{(0)},u^{(1)}$ $,\cdots,u^{(r)})$ is a sequence $(a_0,a_1,\cdots,a_r)$ where $a_i=\text{Asn}(u^{(i)})$. 
+When generating graph $G_{F,max\_asn}$, we only consider 1-round trails with the maximum number of S-boxes of the input and output difference or mask values no larger than $max\_asn$. However, a difference or mask value of which the number of S-boxes is larger than $max\_asn$ may also participates in the differential or linear propagations. In the following, we define a set of trails:
+
+\begin{definition}
+	A trail $p=(u^{(0)},u^{(1)},\cdots,u^{(r)})$ belongs to the set of trails $T_{a,b,c}$ if (1) $\Asn(u^{(0)})\leq a,\Asn(u^{(r)})\leq a$, (2) $a< \Asn(u^{(i)})\leq b,\forall 0<i<r$ and (3) $r\leq c$.
 \end{definition}
 
-\begin{definition}[Collective Activity Pattern]
-	A trail $(u^{(0)},u^{(1)},\cdots,u^{(r)})$ with activity pattern $(a_0,a_1,\cdots,a_r)$ belongs to collective acticity pattern $(b_0,b_1,\cdots,b_r)$ if $a_i\leq b_i,\forall 0\leq i\le r$. 
-\end{definition}
-
-When generating graph $G_{F,max\_asn}$, we only consider trails with collective activity pattern $(max\_asn,max\_asn)$. To get more accurate results on finding best exploitable differentials and linear hulls, search space should be further expanded. Thus when generating $G_{F,max\_asn}$, we can instead consider trails with collective activity pattern $(max\_asn, max\_asn+1, max\_asn)$ or $(max\_asn, max\_asn+1, max\_asn+1, max\_asn)$, etc.
+According to the definition above, the generated graph $G_{F,max\_asn}$ only considers the set of trails $T_{max\_asn,*,1}$. We denote a graph generated by the collected trails $T_{a,b,c}$ by $G_{F,T_{a,b,c}}$. With each parameter of $T_{a,b,c}$ larger, the size of $G_{F,T_{a,b,c}}$ becomes larger and thus the results obtained afterwards will be more accurate because the search space is larger. The parameters $a,b,c$ should be set as large as possible while keeping the collection of trails in $T_{a,b,c}$ efficient. The choice of $a,b,c$ is a trade-off between the accuracy of results and the efficiency of the algorithm.
 
 \subsection{Modification in case of Rotation Equivalence}
 
@@ -204,6 +222,8 @@ The rotation equivalence then defines a rotation equivalent class. In the euival
 We denote the transform from $u=(u_1,u_2,\cdots,u_k)$ to $u'=(u_{j+1},u_{j+2},\cdots,u_{j+k})$ where $u_i$ is the value of the i-th S-box as $\rotl_j(\cdot)$. In the same way, the inverse transfrom is $\rotr_j(\cdot)$. We denote the transform from $u$ to its representive element as $r(\cdot)$. We define $d(u\rightarrow v)=(d(v)-d(u))\mod sn$ where $sn$ is the number of S-boxes. 
 
 In the graph generation of a cipher having rotational symmetry, a vertex representives a rotation equivalent class instead of a value. However, This results in multiple costs of one edge. Or it can be seen as multiple edges between two vertices. 
+
+Taking advantage of the property of rotational symmetry, which RECTANGLE, KNOT permutations and ASCON permutation has, we can avoid restoring duplicate differential and linear propagations and thus accelerate the computation process. %The modified versions adapting to rotational symmetry of algorithms in Section \ref{sec:method} are given in Appendix.
 
 \begin{example}
 	For a cipher having rotational symmetry, suppose that we find two 1-round trails $0x3000f000\rightarrow 0x0e000020$ with weight $2^5$ and $0xf0003000\rightarrow 0xe0000200$ with weight $2^6$, then edge $u=0xf0003000\rightarrow v=0xe0000200$ is appended to the graph. The edge has two costs: $w(u\rightarrow v)=2^5$ when $d(u\rightarrow v)=5$ and $w(u\rightarrow v)=2^6$ when $d(u\rightarrow v)=0$. 
