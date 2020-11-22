@@ -61,12 +61,12 @@ For an $rd$-round iterative trail with weight $wt$, we regard its weight per rou
 \subsection{Finding the Best Iterative Hull}\label{sec:fbih}
 
 \begin{example}\label{eg:1}
-	Suppose that we find two elementary iterative trails $p_0=u_0\rightarrow u_1\rightarrow u_0$ and $p_1=u_0\rightarrow u_2 \rightarrow u_0$. $p_0$ itself can form a 4-round iterative trail $u_0\rightarrow u_1\rightarrow u_0\rightarrow u_1\rightarrow u_0$ with weight $w^2(p_0)$. Additionally combined with $p_1$, 4 4-round iterative trails can be formed which are
+	Suppose that we find two elementary iterative trails $p_0=(u_0,u_1,u_0$ and $p_1=(u_0,u_2 ,u_0$. $p_0)$ itself can form a 4-round iterative trail $(u_0,u_1,u_0,u_1,u_0)$ with weight $w^2(p_0)$. Additionally combined with $p_1$, 4 4-round iterative trails can be formed which are
 	\begin{align*}
-		&u_0\rightarrow u_1\rightarrow u_0\rightarrow u_1\rightarrow u_0\\
-		&u_0\rightarrow u_1\rightarrow u_0\rightarrow u_2\rightarrow u_0\\
-		&u_0\rightarrow u_2\rightarrow u_0\rightarrow u_1\rightarrow u_0\\
-		&u_0\rightarrow u_2\rightarrow u_0\rightarrow u_2\rightarrow u_0.
+		&(u_0,u_1,u_0,u_1,u_0)\\
+		&(u_0,u_1,u_0,u_2,u_0)\\
+		&(u_0,u_2,u_0,u_1,u_0)\\
+		&(u_0,u_2,u_0,u_2,u_0).
 	\end{align*}
 	Thus a 4-round iterative hull containing 4 trails with weight $w^2(p_0)+w^2(p_1)+2w(p_0)w(p_1)$ can be constructed.
 \end{example}
@@ -83,7 +83,7 @@ We claim that for an arbitary vertex in the iterative structure, it whether belo
 
 To compute the iterative structure $G^{IS}_{F,max\_asn}$ of $G_{F,max\_asn}$, we eliminate the vertices in having no incoming or outgoing edges until the size of the graph becomes stable. 
 
-Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for all $u$ in $V^{IS}_{F,max\_asn}$. An $r$-round iterative hull is a hull containing all iterative trails with the same input and output difference of mask value. We regard $\max\limits_{u}\sqrt[r]{w(h_{u,u}^r)}$ as an index describing the best weight growth among the iterative hulls. The procedure of obtain the weight per round of the best iterative hull is given in Algorithm \ref{algo:2}.
+Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for all $u$ in $V^{IS}_{F,max\_asn}$. An $r$-round iterative hull $h_{u,u}^r$ is a hull containing all iterative trails with the same input and output difference of mask value. We regard $\max\limits_{u}\sqrt[r]{w(h_{u,u}^r)}$ as an index describing the best weight growth among the iterative hulls. The procedure of obtaining the best weight per round of the iterative hulls is given in Algorithm \ref{algo:2}.
 
 
 \begin{algorithm}
@@ -113,7 +113,13 @@ Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for
 
 In \cite{W08}, a 4-round elementary iterative trail is found and is used to construct a 12-round iterative trail. By further extending the trail forward and backward by one round, a 14-round trail is obtained. Following this idea, we hope to collect trails constructed by iterative trails as many as possible. Such a trail is treated as three parts: the core middle part which is a path in $G^{IS}_{F,max\_asn}$, the extension forward part and the extension backward part. 
 
-In \cite{HV18}, a multistage graph is generated and pruned in order to find good differentials and linear hulls. Here we generate a multistage graph $MSG$ from $G^{IS}_{F,max\_asn}$. Firstly, we append every edge in $E^{IS}_{F,max\_asn}$ between every two adjacent stages in $MSG$. Then we extend both forward and backward from each vertex in $V^{IS}_{F,max\_asn}$ for several rounds and restore the trails into $MSG$. The generating procedure is given in Algorithm \ref{algo:3}. 
+In \cite{HV18}, a multistage graph is generated and pruned in order to find good differentials and linear hulls. Here given the number of rounds $r$, we generate a multistage graph $MSG$ with $r+1$ stages from $G^{IS}_{F,max\_asn}$. Firstly, we append every edge in $E^{IS}_{F,max\_asn}$ between every two adjacent stages in $MSG$. For each vertex in $V^{IS}_{F,max\_asn}$, we extend a trail both forward and backward from it. The number of rounds of the extended trails is limited within a parameter $k$. The weight of the extended trails is limited by a parameter $wb$. Thus for an extended trail $p=(v_0,v_1,\cdots,v_l)$, it has 
+\begin{enumerate}
+	\item $v_0\in V^{IS}_{F,max\_asn}$ or $v_l\in V^{IS}_{F,max\_asn}$,
+	\item $l\leq k$,
+	\item $w(p)\times (mw)^{k-l} \geq wb$ where $mw$ is the largest weight that a 1-round trail can have.
+\end{enumerate}
+The first restriction ensures the extended trails are attached to $G^{IS}_{F,max\_asn}$. The next two restrictions are used to keep the extended trails with large weights while keeping the collection of extended trails efficient. We restore these extended trails into $MSG$. The generating procedure is given in Algorithm \ref{algo:3}. 
 
 Once $MSG$ generated, we can compute the largest weight that a hull in $MSG$ can has. The computation is conducted stage by stage. The procedure is given in Algorithm \ref{algo:4}.
 

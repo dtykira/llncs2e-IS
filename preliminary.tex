@@ -1,6 +1,6 @@
-\section{Preliminary\label{sec:pre}}
+\section{Preliminaries\label{sec:pre}}
 
-\subsection{Differential Trails, Differentials and Truncated Differentials}
+\subsection{Differential Trails, Differentials and Truncated Differentials \cite{DR02}}
 
 Let $\beta$ be an iterative Boolean transformation from $\mathbb{F}_2^n$ to $\mathbb{F}_2^n$: 
 \[
@@ -28,7 +28,7 @@ Let $\lambda$ be a linear function corresponding to an $n\times l$ binary matrix
     \Prob^{\lambda\circ\beta}(a,b)=\sum\limits_{\omega|b=M\omega}\Prob^{\lambda\circ\beta}(a,\omega).
 \]
 
-\subsection{Linear Trails and Linear Hulls}
+\subsection{Linear Trails and Linear Hulls \cite{DR02}}
 
 A \textit{linear trail} $U$ over $\beta$ consists of a sequence of $r+1$ masks:
 \[
@@ -66,7 +66,7 @@ We denote the square of a correlation by correlation potential. The average corr
     \text{Exp}_{K}[(\Cor^{\beta'}(a,b))^2]=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(\Cor^{\beta'}(U))^2.
 \]
 
-\subsection{EDP and ELP}
+\subsection{EDP and ELP \cite{DR02}}
 The differential probabilities and linear correlations of a cipher $\calE_K$ both depend on the specific key used $K$. In the case of differential cryptanalysis, EDP (expected differential probability) is defined as:
 \[
     \EDP(a,b)=\Exp_{K}[\Prob^{\calE_K}(a,b)].
