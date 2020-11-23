@@ -36,10 +36,20 @@ According to the definition, obiviously a (elementary) circuit in the graph repr
 
 Once a short-round elementary iterative trails is found, it can be concatenated to itself arbitary times and forms a long-round iterative trail. For a cipher that has iterative trails, the negative logarithm of the largest differential probability or linear correlation increases no faster than a linear function of the round number. 
 
-For an $r$-round iterative trail with weight $w$, we regard its weight per round $\sqrt[r]{w}$ as an index describing the weight growth of the iterative trail. We refer the best iterative trail to the one with the largest weight per round. We claim that one of the best iterative trails must be an elementary one. Thus we can find out the best elementary iterative trail among the ones enumerated by Johnson's algorithm \cite{J75} and evaluate the best weight growth of one single iterative trail. The procedure is given in Algorithm \ref{algo:1}. %and the details of Johnson's algorithm are given in Appendix. 
+For an $r$-round iterative trail with weight $w$, we regard its weight per round $\sqrt[r]{|w|}$ as an index describing the weight growth of the iterative trail. We refer the best iterative trail to the one with the largest weight per round. We proof that one of the best iterative trails must be an elementary one. Thus it's enough to investigate only elementary iterative trails. 
+
+\begin{theorem}
+	One of the best iterative trails must be an elementary one.
+\end{theorem}
+
+\begin{proof}
+	Suppose that none of the best iterative trails are elementary ones. Then for any one of the best iterative trail $c$, there exist a value $u\in c$ such that $c$ has the form $(u,\cdots,u,\cdots,u)$, for it's elementary otherwise. Thus a non-elementary iterative trail $c$ can be divided into two iterative trails $c_1$ and $c_2$. The weight per round of $c_1$, $c_2$ and $c$ is respectively $wpr_1=\sqrt[l(c_1)]{|w(c_1)|}$, $wpr_2=\sqrt[l(c_2)]{|w(c_2)|}$ and $wpr=\sqrt[l(c_1)+l(c_2)]{|w(c_1)w(c_2)|}$. If $wpr_1< wpr_2$, then $wpr_1<wpr<wpr_2$, which contradicts to that $c$ is a best iterative trail. Else if $wpr_1=wpr_2$, then $c_1$ and $c_2$ are both not elementary, for they are also best iterative trails. So the above steps can be continuously conducted on $c_1$ and $c_2$. However, the division can't be conducted infinite times. One of $c_1$ and $c_2$ will be elementary at some time and then we get a contradiction. 
+\end{proof}
+
+By finding the best elementary iterative trail among the ones enumerated by Johnson's algorithm \cite{J75}, we can evaluate the best weight growth of one single iterative trail. The procedure is given in Algorithm \ref{algo:1}. %and the details of Johnson's algorithm are given in Appendix. 
 
 \begin{algorithm}
-	\caption{Finding the best iterative trail}
+	\caption{Evaluating the best weight growth of one single iterative trail}
 	\label{algo:1}
 	\begin{algorithmic}[1]
 		\Require $G_{F,max\_asn}$
@@ -47,8 +57,8 @@ For an $r$-round iterative trail with weight $w$, we regard its weight per round
 		\Procedure {}{}
 		\State $wpr\leftarrow 0$
 		\For{each elementary circuit $p'$ in $G_{F,max\_asn}$ enumerated by Johnson's algorithm}
-		\If{$\sqrt[l(p')]{w(p')}>wpr$}
-		\State $wpr\leftarrow \sqrt[l(p')]{w(p')},p\leftarrow p'$
+		\If{$\sqrt[l(p')]{|w(p')|}>wpr$}
+		\State $wpr\leftarrow \sqrt[l(p')]{|w(p')|},p\leftarrow p'$
 		\EndIf
 		\EndFor
 		\State \Return{$wpr$}
@@ -71,47 +81,49 @@ For an $r$-round iterative trail with weight $w$, we regard its weight per round
 
 From Example \ref{eg:1}, we find that it's not enough to evaluate the best weight growth of one single iterative trail. If two elementary circuits have common vertices, then the combination of elementary iterative trails may result in iterative hulls with better weight growths.  
 
-To evaluate the weight growth of iterative hulls, we define subgraph \textit{iterative structure}. 
+To evaluate the weight growth of iterative hulls, we define a subgraph of graph $G$ called the \textit{iterative structure} of $G$ denoted as $G^{IS}$. 
 
 \begin{definition}[Iterative Structure]
-	An induced subgraph $G'=(V',E')$ is a (maximal) iterative structure of $G$ if for all $u\in V'$, there exist at least one edge originating from it and one edge terminating at it. And this property holds for subgraph of $G$ induced by a vertex set $\overline{V'}$ such that $V' \subset \overline{V'} \subseteq V$.
+	A maximal induced subgraph $G^{IS}=(V^{IS},E^{IS})$ of $G$ is the iterative structure of $G$ if for all $u\in V^{IS}$, there exist at least one edge originating from it and one edge terminating at it.
 \end{definition}
 
-We claim that for an arbitary vertex in the iterative structure, it whether belongs to at least one elementary circuit or belongs to at least one path linking two elementary circuits. 
+For an arbitary vertex in the iterative structure, it whether belongs to at least one elementary circuit or belongs to at least one path linking two elementary circuits. To compute the iterative structure $G^{IS}_{F,max\_asn}$ of $G_{F,max\_asn}$, we eliminate the vertices having no incoming or outgoing edges until the size of the graph becomes stable. 
 
-To compute the iterative structure $G^{IS}_{F,max\_asn}$ of $G_{F,max\_asn}$, we eliminate the vertices in having no incoming or outgoing edges until the size of the graph becomes stable. 
-
-Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for all $u$ in $V^{IS}_{F,max\_asn}$. An $r$-round iterative hull $h_{u,u}^r$ is a hull containing all iterative trails with the same input and output difference of mask value. We regard $\max\limits_{u}\sqrt[r]{w(h_{u,u}^r)}$ as an index describing the best weight growth among the iterative hulls. The procedure of obtaining the best weight per round of the iterative hulls is given in Algorithm \ref{algo:2}.
+Given the round number $r$, we can compute the iterative hull $w(h_{u,u}^r)$ for all $u$ in $V^{IS}_{F,max\_asn}$. An $r$-round iterative hull $h_{u,u}^r$ is a hull containing all iterative trails with the same input and output difference of mask value. We regard $\max\limits_{u}\sqrt[r]{|w(h_{u,u}^r)|}$ as an index describing the best weight growth among the iterative hulls. The procedure of obtaining the best weight per round of the iterative hulls is given in Algorithm \ref{algo:2}.
 
 
 \begin{algorithm}
-	\caption{Finding the best iterative hull}
+	\caption{Evaluating the best weight growth of an iterative hull}
 	\label{algo:2}
 	\begin{algorithmic}[1]
 		\Require $G_{F,max\_asn}$, the number of rounds $r$
-		\Ensure the largest weight of an $r$-round iterative hull
+		\Ensure the largest weight per round of an $r$-round iterative hull
 		\Procedure {}{}
-		\State Eliminate all vertices having no incoming or outgoing edges repeatedly until no more vertices can be eliminated and restore the subgraph into $G^{IS}_{F,max\_asn}$
-		\State Let $\mathcal{H}$ be a hash table. Set $\mathcal{H}(u,v)\leftarrow 0$ for all $u,v\in V^{IS}_{F,max\_asn}$
+		\State For $G_{F,max\_asn}$, eliminate all vertices having no incoming or outgoing edges repeatedly until no more vertices can be eliminated. Restore the new subgraph as $G^{IS}_{F,max\_asn}$
+		\State Let $\mathcal{H}$ be a hash table of which the key has two values.Set $\mathcal{H}(u,v)\leftarrow 0$ for all $u,v\in V^{IS}_{F,max\_asn}$
 		\For{$i=1:r$}
 		\State Create a new hash table $\mathcal{H}'$. 
-		\For{each pair of keys $(u,v)$ of $\mathcal{H}$}
+		\For{each key $(u,v)$ of $\mathcal{H}$}
 		\For{each edge $v\rightarrow x$ originating from $v$ in $G^{IS}_{F,max\_asn}$}
+		\If{$\mathcal{H}'$ has the key $(u,x)$}
 		\State $\mathcal{H}'(u,x)\leftarrow \mathcal{H}'(u,x)+\mathcal{H}(u,v)\cdot w(v\rightarrow x)$
+		\Else 
+		\State $\mathcal{H}'(u,x)\leftarrow \mathcal{H}(u,v)\cdot w(v\rightarrow x)$
+		\EndIf
 		\EndFor
 		\EndFor
 		\State $\mathcal{H}\leftarrow \mathcal{H}'$
 		\EndFor
-		\State \Return{$\sqrt[r]{\max\limits_{u=v}\mathcal{H}(u,v)}$}
+		\State \Return{$\sqrt[r]{\max\limits_{u=v}|\mathcal{H}(u,v)|}$}
 		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
 
 \subsection{Finding the Best Differential or Linear Hull}\label{sec:fbh}
 
-In \cite{W08}, a 4-round elementary iterative trail is found and is used to construct a 12-round iterative trail. By further extending the trail forward and backward by one round, a 14-round trail is obtained. Following this idea, we hope to collect trails constructed by iterative trails as many as possible. Such a trail is treated as three parts: the core middle part which is a path in $G^{IS}_{F,max\_asn}$, the extension forward part and the extension backward part. 
+We treat a trail constructed by iterative trails as three parts: the core middle part which is a path in $G^{IS}_{F,max\_asn}$, the extension forward part and the extension backward part. We hope to collect such trails as many as possible and so that we can obtain a good differential or linear hull. 
 
-In \cite{HV18}, a multistage graph is generated and pruned in order to find good differentials and linear hulls. Here given the number of rounds $r$, we generate a multistage graph $MSG$ with $r+1$ stages from $G^{IS}_{F,max\_asn}$. Firstly, we append every edge in $E^{IS}_{F,max\_asn}$ between every two adjacent stages in $MSG$. For each vertex in $V^{IS}_{F,max\_asn}$, we extend a trail both forward and backward from it. The number of rounds of the extended trails is limited within a parameter $k$. The weight of the extended trails is limited by a parameter $wb$. Thus for an extended trail $p=(v_0,v_1,\cdots,v_l)$, it has 
+Given the number of rounds $r$, we generate a multistage graph $MSG$ with $r+1$ stages from $G^{IS}_{F,max\_asn}$. Firstly, we append every edge in $E^{IS}_{F,max\_asn}$ between every two adjacent stages in $MSG$. For each vertex in $V^{IS}_{F,max\_asn}$, we extend a trail both forward and backward from it. The number of rounds of the extended trails is limited within a parameter $k$. The weight of the extended trails is limited by a parameter $wb$. Thus for an extended trail $p=(v_0,v_1,\cdots,v_l)$, it has 
 \begin{enumerate}
 	\item $v_0\in V^{IS}_{F,max\_asn}$ or $v_l\in V^{IS}_{F,max\_asn}$,
 	\item $l\leq k$,
@@ -119,7 +131,7 @@ In \cite{HV18}, a multistage graph is generated and pruned in order to find good
 \end{enumerate}
 The first restriction ensures the extended trails are attached to $G^{IS}_{F,max\_asn}$. The next two restrictions are used to keep the extended trails with large weights while keeping the collection of extended trails efficient. We restore these extended trails into $MSG$. The generating procedure is given in Algorithm \ref{algo:3}. 
 
-Once $MSG$ generated, we can compute the largest weight that a hull in $MSG$ can has. The computation is conducted stage by stage. The procedure is given in Algorithm \ref{algo:4}.
+Once $MSG$ generated, we can compute the largest weight that an $r$-round hull in $MSG$ can has. The computation is conducted in a stage-by-stage manner. The procedure is given in Algorithm \ref{algo:4}.
 
 \begin{algorithm}
 	\caption{Generating multistage graph $MSG$}
@@ -201,7 +213,7 @@ According to the definition above, the generated graph $G_{F,max\_asn}$ only con
 
 \subsection{Modification in case of Rotation Equivalence}
 
-According to \cite{ZBL15}, RECTANGLE has the property of rotational symmetry, that is, all its operations have rotational symmetry. 
+Since all the operations in ASCON permutation, KNOT permutations and RECTANGLE have rotational symmetry, every differential and linear trail has rotation equiavlent variants. 
 
 \begin{definition}[Rotational Symmetry and Rotation Equivalence]
 	First suppose that a trail $p=(u^{(0)},u^{(1)},\cdots,u^{(r)})$ is found valid. If the cipher is based on SPN structure, the difference or mask value $u^{(i)}$ can be further described by S-boxes as $u^{(i)}=(u_1^{(i)},u_2^{(i)},\cdots,u_k^{(i)})$ where $k$ is the number of S-boxes of each round. If the cipher has rotation equivalence, then another trail $p'=(v^{(0)},v^{(1)},\cdots,v^{(r)})$ is also valid, if there exists $j$ such that $(v_1^{(i)},v_2^{(i)},\cdots,v_k^{(i)})=(u_{j+1}^{(i)},u_{j+2}^{(i)},\cdots,u_{j}^{(i)}),\forall i$. And we call two values $u=(u_1,u_2,\cdots,u_k)$ and $v=(v_1,v_2,\cdots,v_k)$ are rotation equivalent if there exists $j$ such that $(u_1,u_2,\cdots,u_k)=(v_{j+1},v_{j+2},\cdots,v_{j})$. 
