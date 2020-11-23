@@ -15,11 +15,9 @@ else if $\calE$ is a permutation, the weight is defined as:
     w(u\rightarrow v)=\Cor^{F}(u,v).
 \]
 
-In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to describe the difference or mask propagations given $F$. A path in the graph represents a differential or linear trail. A hull with length $k$ in the graph represents a $k$-round differential or linear hull. 
+In this way, a weighted directed graph $G_{F}=(V_{F},E_{F})$ is generated to describe the difference or mask propagations given the round function $F$. A path in the graph represents a differential or linear trail. A hull with length $k$ in the graph represents a $k$-round differential or linear hull. 
 
-However, the $G_F$ generated is too large for it has $2^n$ vertices. Therefore we need to choose a interesting graph according to computation power. 
-
-In order to limit the size of $V_F$, we set a parameter $max\_asn$ defined as the maximum number of active S-boxes that a vertex can has. Given $\text{Asn}(\cdot)$ as the function that returns the number of active S-boxes of a difference or mask, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is an induced subgraph of $G_F$ where $V_{F,max\_asn}$ is given by
+However, the $G_F$ generated is too large for it has $2^n$ vertices, while an exploitable differential or linear trail usually has a large probability or correlation in each round. In order to limit the size of $V_F$, we set a parameter $max\_asn$ defined as the maximum number of active S-boxes that a vertex can has. Given $\text{Asn}(\cdot)$ as the function that returns the number of active S-boxes of a difference or mask, $G_{F,max\_asn}=(V_{F,max\_asn},E_{F,max\_asn})$ is an induced subgraph of $G_F$ where $V_{F,max\_asn}$ is given by
 \[
     V_{F,max\_asn}=\{u|u\in V_F \text{ and } \text{Asn}(u)\leq max\_asn\}.
 \]
