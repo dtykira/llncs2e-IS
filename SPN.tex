@@ -1,0 +1,62 @@
+\begin{figure}[H]
+    \centering
+\begin{tikzpicture}
+    \tikzstyle{every node}=[transform shape];
+    \tikzstyle{every node}=[node distance=1.2cm];
+    \tikzstyle{every node}=[font=\footnotesize,scale=0.9]
+    \node (P) [] {$P(SI)$};
+    \node (XOR-0) [right of=P,XOR] {};
+    \node (S-0) [right of=XOR-0,draw,rectangle] {$\calS$};
+    \node (L-0) [right of=S-0,draw,rectangle] {$\calL$};
+    \node (XOR-1) [right of=L-0,XOR] {};
+    \node (S-1) [right of=XOR-1,draw,rectangle] {$\calS$};
+    \node (L-1) [right of=S-1,draw,rectangle] {$\calL$};
+    \node (dots) [right of=L-1,] {$\dots$};
+    \node (XOR-r-1) [right of=dots,XOR] {};
+    \node (S-r-1) [right of=XOR-r-1,draw,rectangle] {$\calS$};
+    \node (L-r-1) [right of=S-r-1,draw,rectangle] {$\calL$};
+    \node (XOR-r) [right of=L-r-1,XOR] {};
+    \node (C) [right of=XOR-r] {$C(SO)$};
+    
+    \path[line] (P) edge (XOR-0);
+    \path[line] (XOR-0) edge node[above] {$X_0$} (S-0);
+    \path[line] (S-0) edge node[above] {$Y_0$} (L-0);
+    \path[line] (L-0) edge node[above] {$Z_0$} (XOR-1);
+    \path[line] (XOR-1) edge node[above] {$X_1$} (S-1);
+    \path[line] (S-1) edge node[above] {$Y_1$} (L-1);
+    \path[line] (L-1) edge node[above] {$Z_1$} (dots);
+    \path[line] (dots) edge node[above] {$Z_{r-2}$} (XOR-r-1);
+    \path[line] (XOR-r-1) edge node[above] {$X_{r-1}$} (S-r-1);
+    \path[line] (S-r-1) edge node[above] {$Y_{r-1}$} (L-r-1);
+    \path[line] (L-r-1) edge node[above] {$Z_{r-1}$} (XOR-r);
+    \path[line] (XOR-r) edge (C);
+
+    \node (W-0) [above of=XOR-0] {$W_0$};
+    \node (W-1) [above of=XOR-1] {$W_1$};
+    \node (W-r-1) [above of=XOR-r-1] {$W_{r-1}$};
+    \node (W-r) [above of=XOR-r] {$W_r$};
+
+    \path[line] (W-0) edge (XOR-0);
+    \path[line] (W-1) edge (XOR-1);
+    \path[line] (W-r-1) edge (XOR-r-1);
+    \path[line] (W-r) edge (XOR-r);
+
+    \draw [decorate,decoration={brace,amplitude=5pt,mirror},xshift=-0.5cm,yshift=0pt] (1.2,-0.5) -- ++(2.3,0) node [black,midway,yshift=-0.5cm] {$\calR_0$};
+    \draw [decorate,decoration={brace,amplitude=5pt,mirror},xshift=-0.5cm,yshift=0pt] (3.9,-0.5) -- ++(2.3,0) node [black,midway,yshift=-0.5cm] {$\calR_1$};
+    \draw [decorate,decoration={brace,amplitude=5pt,mirror},xshift=-0.5cm,yshift=0pt] (7.5,-0.5) -- ++(2.3,0) node [black,midway,yshift=-0.5cm] {$\calR_{r-1}$};
+
+    \draw [decorate,decoration={brace,amplitude=5pt},xshift=-0.5cm,yshift=0pt] (2.1,0.5) -- ++(1.3,0) node [black,midway,yshift=0.5cm] {$\calR_0^*$};
+    \draw [decorate,decoration={brace,amplitude=5pt},xshift=-0.5cm,yshift=0pt] (4.8,0.5) -- ++(1.3,0) node [black,midway,yshift=0.5cm] {$\calR_1^*$};
+    \draw [decorate,decoration={brace,amplitude=5pt},xshift=-0.5cm,yshift=0pt] (8.4,0.5) -- ++(1.3,0) node [black,midway,yshift=0.5cm] {$\calR_{r-1}^*$};
+
+    %\draw [decorate,decoration={brace,amplitude=10pt,mirror},xshift=-0.5cm,yshift=0pt] (XOR-0.south west) -- node [black,midway,yshift=-0.7cm] {$\calR_0$} (L-0.south east);
+    %\draw [decorate,decoration={brace,amplitude=10pt,mirror},xshift=-0.5cm,yshift=0pt] (XOR-1.south west) -- node [black,midway,yshift=-0.7cm] {$\calR_1$} (L-1.south east);
+    %\draw [decorate,decoration={brace,amplitude=10pt,mirror},xshift=-0.5cm,yshift=0pt] (XOR-r-1.south west) -- node [black,midway,yshift=-0.7cm] {$\calR_{r-1}$} (L-r-1.south east);
+
+    %\draw [decorate,decoration={brace,amplitude=10pt},xshift=-0.5cm,yshift=0pt] (S-0.north west) -- node [black,midway,yshift=0.7cm] {$\calR_0^*$} (L-0.north east);
+    %\draw [decorate,decoration={brace,amplitude=10pt},xshift=-0.5cm,yshift=0pt] (S-1.north west) -- node [black,midway,yshift=0.7cm] {$\calR_1^*$} (L-1.north east);
+    %\draw [decorate,decoration={brace,amplitude=10pt},xshift=-0.5cm,yshift=0pt] (S-r-1.north west) -- node [black,midway,yshift=0.7cm] {$\calR_{r-1}^*$} (L-r-1.north east);
+\end{tikzpicture}
+\caption{Structure of an SPN block cipher or permutation}
+\label{fig:SPN}
+\end{figure}

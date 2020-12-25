@@ -15,7 +15,7 @@
 
 \usepackage{amssymb}
 \usepackage[super]{nth}
-\newcommand{\ith}{i\textsuperscript{th} }
+
 \usepackage{algorithm}
 \usepackage{algorithmicx}
 \usepackage{algpseudocode}
@@ -31,11 +31,13 @@
 \tikzset{sparsam/.style={inner sep=1pt}}
 \tikzset{bitwidth/.style={above=-1pt, font=\tiny}}
 \tikzset{next/.style={->, >=latex}}
+\usetikzlibrary{crypto.symbols,decorations.pathreplacing}
 %\usetikzlibrary{arrows,shapes,snakes,automata,backgrounds,petri}
 
 %usepackage{algpseudocode}
 %\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
 
+\newcommand{\ith}{i\textsuperscript{th} }
 \newcommand{\Prob}{\text{Prob}}
 \newcommand{\Cor}{\text{Cor}}
 \newcommand{\EDP}{\text{EDP}}
@@ -44,6 +46,12 @@
 \newcommand{\calE}{\mathcal{E}}
 \newcommand{\calP}{\mathcal{P}}
 \newcommand{\calH}{\mathcal{H}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbP}{\mathbb{P}}
 \newcommand{\true}{\text{true}}
 \newcommand{\false}{\text{false}}
 \newcommand{\rotr}{\text{rotr}}
@@ -118,9 +126,7 @@ For KNOT, which is a round 2 candidate of the NIST lightweight cryptography stan
 \input{method.tex}
 \input{experiment.tex}
 \input{conclusion.tex}
-
 \input{bib.tex}
 \input{appendix.tex}
-
 
 \end{document}

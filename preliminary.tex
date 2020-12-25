@@ -1,5 +1,93 @@
 \section{Preliminaries\label{sec:pre}}
 
+A block cipher is a function $\calE:\bbF_2^k \times \bbF_2^n \rightarrow \bbF_2^n$ with $C=\calE(K,P)$ where $K$, $P$ and $C$ are the $k$-bit master key, $n$-bit plaintext and $n$-bit ciphertext. $k$ is the key size and $n$ is the block size. Embedded into an operation mode, a block cipher can be used to encrypt a message with arbitrary length. 
+
+A permutation is a function $\calP:\bbF_2^n \rightarrow \bbF_2^n$ with $SO=\calP(SI)$ where $SI$ and $SO$ are the $n$-bit input and output state. The sponge/duplex construction where a permutation is embedded can build various primitives such as a hash function, a stream cipher, a MAC or an authenticated encryption scheme \cite{bertoni2007sponge}. Note that a block cipher can be seen as a permutation when its key is fixed.
+
+In this paper, we focus on symmetric-key primitives including iterated key-alternating block ciphers and permutations with SPN structures. The state of such a primitive can be seperated into $m$ words of $s$ bits and it holds that $n=s\times m$. The round function of the $i$-th round consists of three layers and is denoted by $\calR_i=\calL\circ\calS\circ\calA_{W_i}$ where the three layers are:
+\begin{itemize}
+    \item Addition layer $\calA_{W_i}$: xor the $i$-th $n$-bit round key or constant $W_i$ to the state,
+    \item Non-linear layer $\calS$: apply $m$ parallel $s$-bit S-boxes to the words,
+    \item Linear layer $\calL$: multiply an $n\times n$ bijective binary matrix to the state. 
+\end{itemize}
+\input{SPN.tex}
+$W_i$ denotes the $i$-th round key for a block cipher or round constant for a permutation. The primitive iterates the round function several times (See Fig. \ref{fig:SPN}). We denote the $i$-th round function excluding the addition layer by $\calR_i^*=\calL\circ\calS$. We denote the states before the non-linear layer, before the linear layer and after the linear layer of the $i$-th round function by $X_i$, $Y_i$ and $Z_i$. $X_i[j]$ denotes the $j$-th word of $X_i$. 
+
+\subsection{Differential Cryptanalysis}
+
+In differential cryptanalysis, the attacker tries to finds an exploitable \textit{differential} which is a difference pair $(\Delta P=P\oplus P',\Delta C=C\oplus C')$ with high probability to distinguish the traget block cipher or permutation from a random permutation. 
+
+\begin{definition}[Differential Probability of $\calP$]
+    For a permutation $\calP$, given $\alpha,\beta\in \bbF_2^n$, the differential probability of the differential $(\alpha,\beta)$ is
+    \begin{align*}
+        \bbP(\alpha\xrightarrow{\calP}\beta)=2^{-n}\cdot\Big|\{x\in\bbF_2^n|\calP(x)\oplus\calP(x\oplus\alpha)=\beta\}\Big|.
+    \end{align*}
+\end{definition}
+
+Since the fixed-key block cipher $\calE_K$ is a permutation, its differential probability is also defined as above. However, the key $K$ of $\calE_K$ is unknown for the attacker. Thus the \textit{expected differential probability} (EDP) over all keys is defined.
+
+\begin{definition}[EDP of $\calE$]
+    For a block cipher $\calE$, given $\alpha,\beta\in \bbF_2^n$, the EDP of the differential $(\alpha,\beta)$ over a uniformly distributed random key $K\in \bbF_2^k$ is 
+    \begin{align*}
+        \EDP(\alpha\xrightarrow{\calE}\beta):=2^{-k}\cdot\sum\limits_{K\in \bbF_2^k}\bbP(\alpha\xrightarrow{\calE_K}\beta)
+    \end{align*}
+\end{definition}
+
+\begin{definition}[Differential Characteristics]
+    An $r$-round differential characteristic is a sequence of $r+1$ differences $(\alpha_0,\cdots,\alpha_r)\in(\bbF_2^n)^{r+1}$. Its probability is calculated by
+    \begin{align*}
+        &\bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
+        =&2^{-n}\cdot\Big|\{x\in\bbF_2^n|\forall i, \calR_i\circ\cdots\circ\calR_0(x)\oplus\calR_i\circ\cdots\circ\calR_0(x\oplus\alpha_0)=\alpha_{i+1}\}\Big|\\
+    \end{align*}
+\end{definition}
+
+Under the assumption of independent random round keys and the hypothesis of stochastic equivalence \cite{lai1991markov}, the probability of a differential characteristic is calculated round by round and S-box by S-box:
+\begin{align*}
+    \bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)
+    =&\prod\limits_{i=0}^{r-1}\bbP(\alpha_i\xrightarrow{\calR_i^*}\alpha_{i+1})\\
+    =&\prod\limits_{i=0}^{r-1}\prod\limits_{j=0}^{m-1}\bbP(\alpha_i[j]\xrightarrow{S_i}\beta_i[j])
+\end{align*}
+where $\alpha_{i+1}=\calL(\beta_i),0\leq i<r$. 
+
+The probability of a differential is calculated by summing the probabilities of all differential characteristics sharing the same input and output differences:
+\begin{align*}
+    \bbP(\alpha\xrightarrow{\calP}\beta) \text{ or } \EDP(\alpha\xrightarrow{\calE}\beta)=&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
+    =&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\prod\limits_{i=0}^{r-1}\prod\limits_{j=0}^{m-1}\bbP(\alpha_i[j]\xrightarrow{S_i}\beta_i[j])
+\end{align*}
+%\begin{definition}[Differential Characteristics]
+%    An $r$-round differential characteristic is a sequence of $r+1$ differences $(\alpha_0,\cdots,\alpha_r)\in(\bbF_2^n)^{r+1}$. It has probability
+%    \begin{align*}
+%        &\bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
+%        =&2^{-n}\cdot\Big|\{x\in\bbF_2^n|\forall i, \calR_i\circ\cdots\circ\calR_0(x)\oplus\calR_i\circ\cdots\circ\calR_0(x\oplus\alpha_0)=\alpha_{i+1}\}\Big|
+%    \end{align*}
+%\end{definition}
+
+%For block ciphers, the assumption that all round keys are independent randomizes the value of the state after key addition, so that it's reasonable to believe that the difference transitions between rounds are independent. Thus the EDP of a differential characteristic can be computed round by round and without considering the key:
+%\begin{align*}
+%    \EDP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)    =\prod\limits_{i=0}^{r-1}\bbP(\alpha_i\xrightarrow{\calR_i^*}\alpha_{i+1}).
+%\end{align*}
+
+%For permutations, we follow the hypothesis of stochastic equivalence, that is
+%\begin{align*}
+%    \bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\approx\prod\limits_{i=0}^{r-1}\bbP(\alpha_i\xrightarrow{\calR_i^*}\alpha_{i+1}).
+%\end{align*}
+%For permutations, since there is no key addition, the assumption that the difference transitions are independent may not hold well. 
+
+%Further assuming that the difference transitions among S-boxes are independent, we have
+%\begin{align*}
+%    \prod\limits_{i=0}^{r-1}\bbP(\alpha_i\xrightarrow{\calR_i^*}\alpha_{i+1})=\prod\limits_{i=0}^{r-1}\prod\limits_{j=0}^{m-1}\bbP(\alpha_i[j]\xrightarrow{S_i}\beta_i[j])
+%\end{align*}
+%where $\alpha_{i+1}=\calL(\beta_i),0\leq i<r$. 
+
+%The probability of a differential is the sum of the probabilities of all characteristics which share the same input and output differences:
+%\[
+%    \EDP(\alpha_o\xrightarrow{\calE}\alpha_r)=\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\EDP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)
+%\]
+%and
+%\[
+%    \bbP(\alpha_o\xrightarrow{\calP}\alpha_r)=\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)
+%\]
+
 \subsection{Differential Trails, Differentials and Truncated Differentials \cite{DR02}}
 
 Let $\beta$ be an iterative Boolean transformation from $\mathbb{F}_2^n$ to $\mathbb{F}_2^n$: 
