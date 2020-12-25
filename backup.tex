@@ -1,0 +1,88 @@
+\subsection{Differential Trails, Differentials and Truncated Differentials \cite{DR02}}
+
+Let $\beta$ be an iterative Boolean transformation from $\mathbb{F}_2^n$ to $\mathbb{F}_2^n$: 
+\[
+    \beta=\rho^{(r)}\circ\rho^{(r-1)}\circ\cdots\circ\rho^{(2)}\circ\rho^{(1)}.
+\]
+A \textit{diffrential trail} $Q$ over $\beta$ consists of a sequence of $r+1$ differences:
+\[
+    Q=(q^{(0)},q^{(1)},q^{(2)},\cdots,q^{(r-1)},q^{(r)}).
+\]
+The probability of a differential step $(q^{(i-1)},q^{(i)})$ is defined as:
+\begin{align*}
+    \Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)})&=\Prob_x[\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}]\\
+    &=2^{-n}\times\#\{x\in \mathbb{F}_2^n|\rho^{(i)}(x)\oplus\rho^{(i)}(x\oplus q^{(i-1)})=q^{(i)}\}
+\end{align*}
+Assuming the independence of the differential steps, the probability of $Q$ is:
+\[
+    \Prob^{\beta}(Q)=\prod\limits_i\Prob^{\rho^{(i)}}(q^{(i-1)},q^{(i)}).
+\]
+A \textit{differential} of $\beta$ is composed of $r$-round differential trails with the same initial and final differences. The probability of a differential $(a,b)$ is the sum of the probabilities of all these differential trails:
+\[
+    \Prob^{\beta}(a,b)=\sum\limits_{q^{(0)}=a,q^{(r)}=b}\Prob^{\beta}(Q).
+\]
+Let $\lambda$ be a linear function corresponding to an $n\times l$ binary matrix $M$. The probabilities of \textit{truncated} differentials of $\lambda\circ\beta$ are given by:
+\[
+    \Prob^{\lambda\circ\beta}(a,b)=\sum\limits_{\omega|b=M\omega}\Prob^{\lambda\circ\beta}(a,\omega).
+\]
+
+\subsection{Linear Trails and Linear Hulls \cite{DR02}}
+
+A \textit{linear trail} $U$ over $\beta$ consists of a sequence of $r+1$ masks:
+\[
+    U=(u^{(0)},u^{(1)},u^{(2)},\cdots,u^{(r-1)},u^{(r)}).
+\]
+The correlation of a linear step $(u^{(i-1)},u^{(i)})$ is defined as:
+\begin{align*}
+    \Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})&=2\times(\Prob_x[u^{(i-1)}\cdot x=u^{(i)}\cdot \rho^{(i)}(x)]-\frac{1}{2})\\
+    &=2^{-n+1}\times\#\{x\in \mathbb{F}_2^n|u^{(i-1)}\cdot x=u^{(i)}\cdot \rho^{(i)}(x)\}-1.
+\end{align*}
+The correlation of $U$ is:
+\[
+    \Cor^{\beta}(U)=\prod\limits_i\Cor(u^{(i-1)},u^{(i)}).
+\]
+A \textit{linear hull} of $\beta$ is composed of $r$-round linear trails with the same initial and final masks. The correlation of a linear hull $(a,b)$ is the sum of the correlations of all these linear trails:
+\[
+    \Cor^{\beta}(a,b)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}\Cor(U).
+\]
+A key-alternating cipher $\beta'$ consists of key-independent round transformations $\rho^{(i)}$ and simple key addition by means of XOR denoted as $\sigma[k]$:
+\[
+    \beta'=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}].
+\]
+For a key-alternating cipher, The amplitude of the correlation of a linear trail is independent of the round keys:
+\begin{align*}
+    \Cor^{\beta'}(U)&=(-1)^{u^{(0)}\cdot k^{(0)}}\prod\limits_i(-1)^{u^{(i)}\cdot k^{(i)}}\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)}).\\
+    &=(-1)^{U\cdot K}\cdot(-1)^{d_U}\bigg\lvert\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})\bigg\rvert\\
+    &=(-1)^{d_U\oplus U\cdot K}\Big\lvert\Cor^{\beta'}(U)\Big\rvert,
+\end{align*}
+where $K=(k^{(0)},k^{(1)},k^{(2)},\cdots,k^{(r-1)},k^{(r)})$, $d_U=1$ if $\prod\limits_i\Cor^{\rho^{(i)}}(u^{(i-1)},u^{(i)})<0$ and $d_U=0$ otherwise. The correlation of a linear hull $(a,b)$ for a key-alternating cipher is:
+\[
+    \Cor^{\beta'}(a,b)=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(-1)^{d_U\oplus U\cdot K}\lvert\Cor^{\beta'}(U)\rvert.
+\]
+We denote the square of a correlation by correlation potential. The average correlation potential between an input and an output mask is the sum of the correlation potentials of all linear trails between the input and output masks:
+\[
+    \text{Exp}_{K}[(\Cor^{\beta'}(a,b))^2]=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(\Cor^{\beta'}(U))^2.
+\]
+
+\subsection{EDP and ELP \cite{DR02}}
+The differential probabilities and linear correlations of a cipher $\calE_K$ both depend on the specific key used $K$. In the case of differential cryptanalysis, EDP (expected differential probability) is defined as:
+\[
+    \EDP(a,b)=\Exp_{K}[\Prob^{\calE_K}(a,b)].
+\]
+It is often assumed that
+\[
+    \Prob^{\calE_K}(a,b)\approx\EDP(a,b)
+\]
+for most keys. In the case of linear cryptanalysis, ELP (expected linear potential) is defined as:
+\begin{align*}
+    \ELP(a,b)&=\Exp_{K}[(\Cor^{\calE_K}(a,b))^2]\\
+    &=\sum\limits_{u^{(0)}=a,u^{(r)}=b}(\Cor^{\calE_K}(U))^2.
+\end{align*}
+    
+
+If the cipher is a key-alternating one, $\calE_K=\sigma[k^{(r)}]\circ\rho^{(r)}\circ\sigma[k^{(r-1)}]\circ\cdots\circ\sigma[k^{(1)}]\circ\rho^{(1)}\circ\sigma[k^{(0)}]$. Let $\calE$ be $\rho^{(r)}\circ\cdots\circ\rho^{(1)}$ without key addition, then we define:
+\[
+    \ELP(a,b)=\Big(\sum\limits_{u^{(0)}=a,u^{(r)}=b}\Cor^{\calE}(U)\Big)^2.
+\]
+
+%For the sponge construction and its variant, no key is involved in the inner permutations. Thus the correlation of a linear hull is directly the signed sum of the correlations of the linear trails.
