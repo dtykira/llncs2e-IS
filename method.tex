@@ -1,5 +1,28 @@
 \section{Searching for Iterative Trails and Estimation of Differentials and Linear Hulls\label{sec:method}}
 
+In this section, we present our method to find interesting iterative trails. and estimate EDP and ELP 
+
+\subsection{Definitions of Iterative Characteristics}
+
+For symmetric-key primitives of SPN structure, we state the conventional definition of iterative characteristics that is used implicitly in \cite{wang2008differential,liu2019iterative} as follows:
+\begin{definition}[Iterative Characteristic]\label{def:it}
+	A characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=\alpha_r$.
+\end{definition}
+
+In this definition, the equals sign is taken as the equivalence in numerical value by default. However, such a definition is not adequate for some primitives like RECTANGLE, KNOT, ASCON. Since all operations in them have rotational symmetry, every characteristic has rotation equivalent variants. For example, a one-round iterative differential characteristic of RECTANGLE \cite{zhang2015rectangle} is
+\[
+	\alpha_0[1]=2,\alpha_0[6]=6\rightarrow \alpha_1[0]=2,\alpha_1[5]=6.
+\]
+The one-round differential characteristic can be concatenated to itself arbitrary times, though $\alpha_0$ and $\alpha_1$ are not equal in numerical value. Thus we generalize Definition \ref{def:it} by allowing customizing the equals sign:
+\begin{definition}[Generalized Iterative Characteristic]\label{def:git}
+	Given an equivalence relation $=$, a characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=\alpha_r$.
+\end{definition}
+In the case of RECTANGLE, the equivalence relation is given as:
+
+\begin{definition}[Rotational Equivalence Relation]
+	For $\alpha=\alpha[0]||\cdots||\alpha[m-1]$ and $\beta=\beta[0]||\cdots||\beta[m-1]$, $\alpha$ and $\beta$ are cyclic equivalent if there exists a $k$ such that $\alpha[0]=\beta[k],\alpha[1]=\beta[k+1],\cdots,\alpha[m-1]=\beta[k-1]$.
+\end{definition}
+
 \subsection{Generating a Graph Modelling Difference or Mask Propagations}
 
 In a directed graph, each vertex can be associated with a difference or mask value. Each edge $u\rightarrow v$ represents a 1-round differential or linear trail. Given the round transformation $F$ of an iterative block cipher or permutation $\calE$, in the case of differential cryptanalysis, the weight of an edge is defined as:
