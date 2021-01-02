@@ -2,26 +2,65 @@
 
 In this section, we present our method to find interesting iterative trails. and estimate EDP and ELP 
 
-\subsection{Definitions of Iterative Characteristics}
+\subsection{Definitions of Iterative Characteristics}\label{sec:def-it}
 
 For symmetric-key primitives of SPN structure, we state the conventional definition of iterative characteristics that is used implicitly in \cite{wang2008differential,liu2019iterative} as follows:
 \begin{definition}[Iterative Characteristic]\label{def:it}
 	A characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=\alpha_r$.
 \end{definition}
 
-In this definition, the equals sign is taken as the equivalence in numerical value by default. However, such a definition is not adequate for some primitives like RECTANGLE, KNOT, ASCON. Since all operations in them have rotational symmetry, every characteristic has rotation equivalent variants. For example, a one-round iterative differential characteristic of RECTANGLE \cite{zhang2015rectangle} is
+In this definition, the equals sign is taken as the equivalence in numerical value by default. However, such a definition is not adequate for some primitives like RECTANGLE \cite{zhang2015rectangle}, KNOT, ASCON \cite{dobraunig2016ascon}. Since all operations in them have rotational symmetry, every characteristic has rotation equivalent variants. For example, a one-round iterative differential characteristic of RECTANGLE \cite{zhang2015rectangle} is
 \[
-	\alpha_0[1]=2,\alpha_0[6]=6\rightarrow \alpha_1[0]=2,\alpha_1[5]=6.
+	0x 0200 0060 0000 0000\xrightarrow{\bbP=2^{-5}}0x 2000 0600 0000 0000
 \]
+%\[
+%	\alpha_0[1]=2,\alpha_0[6]=6\rightarrow \alpha_1[0]=2,\alpha_1[5]=6.
+%\]
 The one-round differential characteristic can be concatenated to itself arbitrary times, though $\alpha_0$ and $\alpha_1$ are not equal in numerical value. Thus we generalize Definition \ref{def:it} by allowing customizing the equals sign:
 \begin{definition}[Generalized Iterative Characteristic]\label{def:git}
-	Given an equivalence relation $=$, a characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=\alpha_r$.
+	Given an equivalence relation $=_E$, a characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=_E\alpha_r$.
 \end{definition}
 In the case of RECTANGLE, the equivalence relation is given as:
 
-\begin{definition}[Rotational Equivalence Relation]
-	For $\alpha=\alpha[0]||\cdots||\alpha[m-1]$ and $\beta=\beta[0]||\cdots||\beta[m-1]$, $\alpha$ and $\beta$ are cyclic equivalent if there exists a $k$ such that $\alpha[0]=\beta[k],\alpha[1]=\beta[k+1],\cdots,\alpha[m-1]=\beta[k-1]$.
+\begin{definition}[Rotation Equivalence Relation]
+	For $\alpha=\alpha[0]||\cdots||\alpha[m-1]$ and $\beta=\beta[0]||\cdots||\beta[m-1]$, $\alpha$ and $\beta$ are rotation equivalent, i.e. $\alpha=_R\beta$, if there exists a $j\in[0,m-1]$ such that $\alpha=\rotl_j(\alpha)$ where $\rotl_j(\beta)=\alpha[j]||\alpha[j+1]||\cdots||\alpha[m-1]||\alpha[0]||\cdots||\alpha[j-1]$. 
 \end{definition}
+
+For two values which are equal under the equivalence relation, they belong to the same equivalence class. The rotation equivalence class of $\alpha$ is the set $[\alpha]_R=\{x|x=_R\alpha\}=\{\rotl_j(\alpha),0\leq j\leq m-1\}$. In one equivalence class, we choose one of its element as its representative. We define the representative of $[\alpha]_R$ as the largest value in $[\alpha]_R$ and we denote it by $r_R(\alpha)$. We define the distance between $\alpha$ and its representative under $=_R$ as the $j\in[0,m-1]$ such that $r_R(\alpha)=\rotl_j(\alpha)$ and denote it by $d_R(\alpha)$. 
+
+\subsection{Generating an Interesting Graph}
+
+By viewing the problem of find iterative characteristics as a graph problem, we can utilize currently available graph algorithms to solve it. For a directed graph $G$ with $V$ as its vertex set and $E$ as its edge set, we associate a difference or mask value to a vertex. For an edge $u\rightarrow v$, we associate its cost to the diffrential probability or correlation of the corresponding one-round characteristic.
+
+However, for a primitive with block size $n$, the total number of vertices in $G$ is $2^n$, which making the graph to be generated exceedingly huge. In order to limit the size of the graph, we only consider difference or mask values with no more than $A$ active S-boxes. We define the function extracting the number of active S-boxes of $\alpha$ as $\Asn(\alpha)=\#\{j|\alpha[j]\neq 0\}$. 
+
+In Section \ref{sec:def-it}, we've introduced the customization of equivalence relation to generalize the definition of iterative characteristics. To adapt to the generalized circumstance, while generating $G$, we regard a vertex as the value of the representative of an equivalence class. As a result, between two vertices, there may be multiple edges corresponding to independent costs. Thus we add an extra dimension, the distance difference between the two original values, to index the edges. 
+
+We generate $G$ as Algorithm \ref{algo:gen_G} does in the case of diffrential cryptanalysis. While in the case of linear cryptanalysis, we substitute $\calL^{T}(u)$ for $\calL^{-1}(u)$ in Line 3 and $\Cor^2(u\xrightarrow{\calL\circ\calS}v)$ for $\bbP(u\xrightarrow{\calL\circ\calS}v)$ in Line 6. 
+
+\begin{algorithm}
+	\caption{Generating $G$}
+	\label{algo:gen_G}
+	\begin{algorithmic}[1]
+		\Require Empty graph $G$, upper limit of active S-box number $A$, an equivalence relation $=_E$
+		\Procedure {}{}
+		\For{each $u\in\bbF_2^n$ satisfying $\Asn(u)\leq A$}
+		\If{$\Asn(\calL^{-1}(u))\leq A$}
+		\For{each $v\in\bbF_2^n$ compatible with $u$ satisfying $\Asn(v)\leq A$}
+		\State $u'\leftarrow r_E(u),v'\leftarrow r_E(v),d\leftarrow (d_E(v)-d_E(u))\mod m$
+		\State add edge $u'\rightarrow v'$ to $G$, $c(u'\rightarrow v',d)\leftarrow \bbP(u\xrightarrow{\calL\circ\calS}v)$
+		\EndFor
+		\EndIf
+		\EndFor
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Find the Best Iterative Characteristic}
+
+Note that one characteristic is iterative or not is irrelavant to its diffrential probability or correlation. Thus we can reduce $G$ to its variant $G'$ without costs associated to edges. Multiple edges between two vertices can thus degrade to one. 
+
+Applying Johnson's algorithm \cite{johnson1975finding}, we can enumerate all elementary circuits in $G'$, i.e. all elementary iterative characteristics described via $G'$. The next problems are how to define the optimality of iterative characteristics and whether there is a difference between the optimality of iterative characteristics and the optimality of elementary ones. 
 
 \subsection{Generating a Graph Modelling Difference or Mask Propagations}
 
