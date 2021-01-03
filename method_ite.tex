@@ -1,0 +1,133 @@
+\section{Our methods for Searching Iterative Characteristics}\label{sec:method_ite}
+
+In this section, we present our method to search interesting iterative characteristics using a graph approach. In Section \ref{sec:def-it} we generalize the definition of iterative characteristics. In Section \ref{sec:gen_G} we determine the graph we are interested with. In Section \ref{sec:find_ite_c} we define the optimality of iterative characteristic and present our method to find the best one in the generated graph. Taking a further step, we propose a method to investigate the clustering effect of iterative characteristics using the generated graph in Section \ref{sec:find_ite_h}. 
+
+\subsection{Definitions of Iterative Characteristics}\label{sec:def-it}
+
+For symmetric-key primitives of SPN structure, we state the conventional definition of iterative characteristics that is used implicitly in \cite{wang2008differential,liu2019iterative} as follows:
+\begin{definition}[Iterative Characteristic]\label{def:it}
+	A characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=\alpha_r$.
+\end{definition}
+
+In this definition, the equals sign is taken as the equivalence in numerical value by default. However, such a definition is not adequate for some primitives like RECTANGLE \cite{zhang2015rectangle}, KNOT \cite{zhang2019knot}, ASCON \cite{dobraunig2016ascon}. Since all operations in them have rotational symmetry, every characteristic has rotational equivalent variants. 
+
+\begin{example}\label{exp:ic_rect}
+    a one-round iterative differential characteristic of RECTANGLE \cite{zhang2015rectangle} is
+    \[
+        \alpha_0:0x 0200 0060 0000 0000\xrightarrow{\bbP=2^{-5}}\alpha_1:0x 2000 0600 0000 0000
+    \]
+\end{example}
+
+In Example \ref{exp:ic_rect}, the one-round differential characteristic can be concatenated to itself arbitrary times, though $\alpha_0$ and $\alpha_1$ are not equal in numerical value. Thus we generalize Definition \ref{def:it} by allowing customizing the equals sign:
+\begin{definition}[Generalized Iterative Characteristic]\label{def:git}
+	Given an equivalence relation $=_E$, a characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=_E\alpha_r$.
+\end{definition}
+
+For two values which are equal under the equivalence relation, they belong to the same equivalence class. In one equivalence class, one of its element is chosen as its representative. In the case of RECTANGLE, we define the \textit{rotational equivalence relation} as:
+
+\begin{definition}[Rotational Equivalence Relation $=_R$]
+	For $\alpha=\alpha[0]||\cdots||\alpha[m-1]$ and $\beta=\beta[0]||\cdots||\beta[m-1]$, $\alpha$ and $\beta$ are rotational equivalent, i.e. $\alpha=_R\beta$, if there exists a $j\in[0,m-1]$ such that $\beta=\rotl_j(\alpha)$ where $\rotl_j(\alpha)=\alpha[j]||\alpha[j+1]||\cdots||\alpha[m-1]||\alpha[0]||\cdots||\alpha[j-1]$. 
+\end{definition}
+The rotational equivalence class of $\alpha$ is the set $[\alpha]_R=\{x|x=_R\alpha\}=\{\rotl_j(\alpha),0\leq j\leq m-1\}$. We define the representative of $[\alpha]_R$ as the largest value in $[\alpha]_R$ and we denote it by $r_R(\alpha)$. We further define the distance between $\alpha$ and its representative under $=_R$ as the $j\in[0,m-1]$ such that $r_R(\alpha)=\rotl_j(\alpha)$ and denote it by $d_R(\alpha)$. 
+
+In Example \ref{exp:ic_rect}, under $=_R$, $\alpha_0$ and $\alpha_1$ belong to the same equivalence class. Thus the one-round characteristic is iterative according to Definition \ref{def:git}. The representative of the class is $0x 6000 0000 0002 0000$. $d_R(\alpha_0)=6$ and $d_R(\alpha_1)=5$.
+
+For completeness, we denote the numerical equivalence relation by $=_{N}$. The numerical equivalence class of $\alpha$ is the set $[\alpha]_N$ containing only $\alpha$ itself. The representative of $[\alpha]_N$ is $\alpha$ itself. The distance between $\alpha$ and its representative under $=_N$ is always 0, i.e. $d_N(\alpha)\equiv 0$. In this paper, we only consider these two equivalence relations. 
+
+\subsection{Generating an Interesting Graph}\label{sec:gen_G}
+
+By viewing the problem of find iterative characteristics as a graph problem, we can utilize currently available graph algorithms to solve it. For a directed graph $G$ with $V$ as its vertex set and $E$ as its edge set, we associate a difference or mask value to a vertex. For an edge $u\rightarrow v$, we associate its cost to the diffrential probability or correlation of the corresponding one-round characteristic.
+
+However, for a primitive with block size $n$, the total number of vertices in $G$ is $2^n$, which making the graph to be generated exceedingly huge. In order to limit the size of the graph, we only consider difference or mask values with no more than $A$ active S-boxes. We define the function extracting the number of active S-boxes of $\alpha$ as $\Asn(\alpha)=\#\{j|\alpha[j]\neq 0\}$. 
+
+In Section \ref{sec:def-it}, we've introduced the customization of equivalence relation to generalize the definition of iterative characteristics. To adapt to the generalized circumstance, while generating $G$, we regard a vertex as the value of the representative of an equivalence class. As a result, between two vertices, there may be multiple edges corresponding to independent costs. Thus we add an extra dimension, the distance difference between the two original values, to index the edges. 
+
+We generate $G$ as Algorithm \ref{algo:gen_G} does in the case of diffrential cryptanalysis. While in the case of linear cryptanalysis, we substitute $\calL^{T}(u)$ for $\calL^{-1}(u)$ in Line 3 and $\Cor^2(u\xrightarrow{\calL\circ\calS}v)$ for $\bbP(u\xrightarrow{\calL\circ\calS}v)$ in Line 6. 
+
+\begin{algorithm}
+	\caption{Generate $G$}
+	\label{algo:gen_G}
+	\begin{algorithmic}[1]
+		\Require Empty graph $G$, upper limit of active S-box number $A$, an equivalence relation $=_E$
+		\Procedure {}{}
+		\For{each $u\in\bbF_2^n$ satisfying $\Asn(u)\leq A$}
+		\If{$\Asn(\calL^{-1}(u))\leq A$}
+		\For{each $v\in\bbF_2^n$ compatible with $u$ satisfying $\Asn(v)\leq A$}
+		\State $u'\leftarrow r_E(u),v'\leftarrow r_E(v),d\leftarrow (d_E(v)-d_E(u))\mod m$
+		\State add edge $u'\rightarrow v'$ to $G$, $c(u'\rightarrow_d v')\leftarrow \bbP(u\xrightarrow{\calL\circ\calS}v)$
+		\EndFor
+		\EndIf
+		\EndFor
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Find the Best Iterative Characteristic}\label{sec:find_ite_c}
+
+Note that one characteristic is iterative or not is irrelavant to its diffrential probability or correlation. Thus we can reduce $G$ to its variant $G'$ where multiple edges between two vertices in $G$ degrade to one edge in $G'$. 
+
+Applying Johnson's algorithm \cite{johnson1975finding} to $G'$, we can enumerate all elementary circuits in $G'$, i.e. all elementary iterative characteristics described via $G'$. The next problems are how to define the optimality of iterative characteristics and whether there is a difference between the optimality of iterative characteristics and the optimality of elementary ones. 
+
+For an $r$-round iterative characteristic with differential probability or correlation square denoted by $2^{-w}$, we regard its weight per round $w/r$ as an index describing the weight growth of the iterative characteristic. We refer the best iterative characteristic to the one with the largest weight per round. According to this optimality of iterative characteristics, we assign the edge with the largest cost in $G$ to $G'$, i.e. $c'(u\rightarrow v)$ is assigned with $\max_d c(u\rightarrow_d v)$ where $c'(\cdot\rightarrow\cdot)$ denotes the cost of an edge in $G'$. 
+
+The optimality of iterative characteristics defined, we next state that
+\begin{theorem}
+    One of the best iterative characteristics must be an elementary one.
+\end{theorem}
+\begin{proof}
+    Suppose that none of the best iterative characteristics are elementary ones. Then for any of the best iterative characteristics $ic$, we divide it into two iterative characteristics $ic_1$ and $ic_2$ since it's not elementary. The weight per round of $ic_1$, $ic_2$ and $ic$ is respectively $wpr_1=-\log_2|c(ic_1)|/l(ic_1)$, $wpr_2=-\log_2|c(ic_2)|/l(ic_2)$ and $wpr=-\log_2|c(ic_1)c(ic_2)|/(l(ic_1)+l(ic_2))$. If $wpr_1< wpr_2$, then $wpr_1<wpr<wpr_2$, which contradicts to that $ic$ is a best iterative characteristic. Else if $wpr_1=wpr_2$, then $ic_1$ and $ic_2$ are both not elementary, since they are also best iterative characteristics. Thus the above steps can be continuously conducted on $ic_1$ and $ic_2$. However, the division can't be conducted infinite times. One of $ic_1$ and $ic_2$ will be elementary at some time and then we will get a contradiction.
+\end{proof}
+
+Therefore, it's enough to investigate only on elementary iterative characteristics and reasonable to apply Johnson's algorithm \cite{johnson1975finding}. Through enumerating elementary circuits, we can evaluate the weight per round for each of them and thus find the best one. The procedure in given in Algorithm \ref{algo:find_ite_c_G}. 
+
+\begin{algorithm}
+	\caption{Find the best iterative characteristic in $G$}
+	\label{algo:find_ite_c_G}
+	\begin{algorithmic}[1]
+        \Require $G$, Empty graph $G'$
+        \Ensure Weight per round $bwpr$ of the best iterative characteristic
+        \Procedure {}{}
+        \For{each two vertices $u$ and $v$ linked in $G$}
+        \State add edge $u\rightarrow v$ to $G'$, $c'(u\rightarrow v)\leftarrow \max_d c(u\rightarrow v,d)$
+        \EndFor
+        \State $bwpr\leftarrow\infty$
+        \For{each elementary circuit $p=(\alpha_0,\cdots,\alpha_r)$ in $G'$ (applying Johnson's algorithm in \cite{johnson1975finding})}
+        \State $bwpr\leftarrow\min\{-\log_2\Big|\prod\limits_{i=0}^{r-1}c'(\alpha_i,\alpha_{i+1})\Big|/r,bwpr\}$        
+        \EndFor
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Find the Best Iterative Hull}\label{sec:find_ite_h}
+
+In order to investigate the clustering effect of iterative characteristics, we define iterative hulls as the set of iterative characteristics with the same input and output value and the same number of rounds. 
+
+The procedure is given in Algorithm \ref{algo:find_ite_h_G}.
+
+\begin{algorithm}
+	\caption{Find the best $r$-round iterative hull in $G$}
+	\label{algo:find_ite_h_G}
+	\begin{algorithmic}[1]
+        \Require $G$, round number $r$
+        \Ensure Weight per round $bwpr$ of the best iterative hull
+        \Procedure {}{}
+        \State $bwpr\leftarrow\infty$
+        \For{each distinct $G$'s strong component with vertex set $V_{sc}$ applying Tarjan's algorithm in \cite{tarjan1972depth}}
+        \State Let $\calH(\cdot,\cdot,\cdot)$ be an empty hash table. $\calH(u,v,d)\leftarrow c(u\rightarrow_d v),\forall u,v\in V_{sc},\forall$ existent $d$
+        \For{$i\leftarrow 2:r$}
+        \State Create an empty hash table $\calH'(\cdot,\cdot,\cdot)$.
+        \For{each key $(u,z,d_1)$ of $\calH(\cdot,\cdot,\cdot)$ and each edge $z\rightarrow_{d_2} v$}
+        \State $d\leftarrow (d_1+d_2)\mod m$
+        \If{$\calH'(u,v,d)$ exists}
+        \State $\calH'(u,v,d)\leftarrow\calH'(u,v,d)+\calH(u,z,d_1)\cdot c(z\rightarrow_{d_2} v)$
+        \Else
+        \State $\calH'(u,v,d)\leftarrow\calH(u,z,d_1)\cdot c(z\rightarrow_{d_2} v)$
+        \EndIf
+        \EndFor
+        \State $\calH\leftarrow \calH'$
+        \EndFor
+        \State $bwpr\leftarrow \min\{-\log_2\max\limits_{u,d}|\calH(u,u,d)|/r,bwpr\}$
+        \EndFor
+        \EndProcedure
+	\end{algorithmic}
+\end{algorithm}
