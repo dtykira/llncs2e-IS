@@ -100,9 +100,18 @@ Therefore, it's enough to investigate only on elementary iterative characteristi
 
 \subsection{Find the Best Iterative Hull}\label{sec:find_ite_h}
 
-In order to investigate the clustering effect of iterative characteristics, we define iterative hulls as the set of iterative characteristics with the same input and output value and the same number of rounds. 
+In order to investigate the clustering effect of iterative characteristics, we define an iterative hull as the set of iterative characteristics with the same input and output value and the same number of rounds. 
 
-The procedure is given in Algorithm \ref{algo:find_ite_h_G}.
+A strong component $G'=(V',E')$ is a subgraph of $G$ where for all $u,v\in V'$ there exist paths $p_{u,v}$ and $p_{v,u}$. For all $u\in V'$, all circuits in $G$ containing $u$ are included within $G'$. Applying Tarjan's algorithm in \cite{tarjan1972depth} to $G$, we can obtain the vertex sets of all the distinct strong components of $G$. Then each strong component $G'$ can be induced from its vertex set $V'$. 
+
+If two elementary iterative characteristics have common values, then they can form an iterative hull with cost larger than each of the iterative characteristic. 
+\begin{example}\label{exp:ih}
+    Suppose that we find two elementary iterative characteristic $p_0=(\alpha_0,\alpha_1,\alpha_0)$ with weight per round $wpr_0$ and $p_1=(\alpha_0,\alpha_1,\alpha_2,\alpha_0)$ with weight per round $wpr_1$. Then a 6-round iterative hull $h_{\alpha_0,\alpha_0}^6$ with weight per round $wpr=-\log_2(2^{-wpr_0}+2^{-wpr_1})$ can be constructed. Such an iterative hull is better than any of the two single iterative characteristics.
+\end{example}
+
+According to Example \ref{exp:ih}, we may find better iterative distinguishers by considering the clustering effect. To calculate the largest value of $c(h_{u,u}^r),u\in V'$ given the round number $r$, we perform a breadth first traversal of the graph for each vertex in $V'$. The procedure is given in Algorithm \ref{algo:find_ite_h_G}.
+
+%With the number of rounds increasing, the clustering effect of iterative characteristics having common vertices will be stronger. Note that, iterative distinguishers are used to concatenate to itself to construct a long distinguisher. However, an iterative distinguisher is unexploitable if it's too long. 
 
 \begin{algorithm}
 	\caption{Find the best $r$-round iterative hull in $G$}
@@ -112,8 +121,9 @@ The procedure is given in Algorithm \ref{algo:find_ite_h_G}.
         \Ensure Weight per round $bwpr$ of the best iterative hull
         \Procedure {}{}
         \State $bwpr\leftarrow\infty$
-        \For{each distinct $G$'s strong component with vertex set $V_{sc}$ applying Tarjan's algorithm in \cite{tarjan1972depth}}
-        \State Let $\calH(\cdot,\cdot,\cdot)$ be an empty hash table. $\calH(u,v,d)\leftarrow c(u\rightarrow_d v),\forall u,v\in V_{sc},\forall$ existent $d$
+        \For{each distinct strong component of $G$ with vertex set $V_{sc}$ (applying Tarjan's algorithm in \cite{tarjan1972depth})}
+        \State Let $\calH(\cdot,\cdot,\cdot)$ be an empty hash table. 
+        \State $\calH(u,v,d)\leftarrow c(u\rightarrow_d v),\forall u,v\in V_{sc},\forall$ existent $d$
         \For{$i\leftarrow 2:r$}
         \State Create an empty hash table $\calH'(\cdot,\cdot,\cdot)$.
         \For{each key $(u,z,d_1)$ of $\calH(\cdot,\cdot,\cdot)$ and each edge $z\rightarrow_{d_2} v$}
