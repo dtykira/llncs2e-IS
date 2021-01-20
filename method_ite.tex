@@ -62,7 +62,7 @@ We generate $G$ as Algorithm \ref{algo:gen_G} does in the case of diffrential cr
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Find the Best Iterative Characteristic}\label{sec:find_ite_c}
+\subsection{Finding the Best Iterative Characteristic}\label{sec:find_ite_c}
 
 Note that one characteristic is iterative or not is irrelavant to its diffrential probability or correlation. Thus we can reduce $G$ to its variant $G'$ where multiple edges between two vertices in $G$ degrade to one edge in $G'$. 
 
@@ -98,7 +98,7 @@ Therefore, it's enough to investigate only on elementary iterative characteristi
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Find the Best Iterative Hull}\label{sec:find_ite_h}
+\subsection{Finding the Best Iterative Hull}\label{sec:find_ite_h}
 
 In order to investigate the clustering effect of iterative characteristics, we define an iterative hull as the set of iterative characteristics with the same input and output value and the same number of rounds. 
 
@@ -138,6 +138,41 @@ According to Example \ref{exp:ih}, we may find better iterative distinguishers b
         \EndFor
         \State $bwpr\leftarrow \min\{-\log_2\max\limits_{u,d}|\calH(u,u,d)|/r,bwpr\}$
         \EndFor
+        \EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Estimating EDPs or ELPs}\label{sec:method-edp-elp}
+
+According to the previous sections, once the interesting graph generated, we can obtain the strong components and enumerate the elementary circuits using existing graph algorithms. An circuit always locates in one strong component. When exploiting the iterative characteristics, a path linking two circuits in different strong components is also valuable to be taken into consideration. We call a subgraph $G_{IS}$ of $G$ its \textit{iterative structure} if $G_{IS}$ contains all strong components and path linking different strong components. To reduce $G$ to $G_{IS}$, we eliminate any vertex if it does not have at least one incoming and one outgoing edge until no more vertices can be eliminated. 
+
+Conventionally, an iterative characteristic is exploited in two phases. Firstly, it's concatenated to itself. Secondly, the resulting characteristic is extended both forward and backward by several rounds. Following this idea, a path is picked in $G_{IS}$ and extended to obtain an exploitable characteristic. To achieve this, for each vertex in $G_{IS}$, we extend a characteristic from it by several rounds and restore them.
+
+To estimate the EDPs and ELPs, we utilize the framework proposed in \cite{EPRINT:HalVej18} as we demonstrate in Section \ref{sec:frame-msg}. Once the interesting multistage graph is built, we can obtain the best hull within the graph. 
+
+%When exploiting the iterative characteristics, conventionally it's concatenated to itself. If there is a path linking two iterative characteristics, then
+\begin{algorithm}
+	\caption{Estimating EDPs or ELPs}
+	\label{algo:msg}
+	\begin{algorithmic}[1]
+        \Require $G$, round number $r$
+        \Ensure Weight $bw$ of the best hull
+        \Procedure {}{}
+        \State $bw\leftarrow\infty$
+        \State Create an empty multistage graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$.
+        \State Reduce $G$ to its iterative structure $G_{IS}$. 
+        \State Add each edge in $G_{IS}$ between $S_i$ and $S_{i+1}$ for any $i\in[0,r-1]$
+        \For{each characteristic $(u=u_0,u_1,\cdots,u_k)$ extended forward from $u\in G_{IS}$}
+        \State $u_j'\leftarrow r_E(u_j),\forall 0\leq j\leq k$
+        \State $d_j\leftarrow d_E(u_{j+1})-d_E(u_j),\forall 0\leq j<k$.
+        \State Add edge $u_j'\rightarrow_{d_j} u_{j+1}'$ between $S_{r-k+j}$ and $S_{r-k+j+1}$
+        \EndFor
+        \For{each characteristic $(u_0,u_1,\cdots,u_k=u)$ extended backward from $u\in G_{IS}$}
+        \State $u_j'\leftarrow r_E(u_j),\forall 0\leq j\leq k$
+        \State $d_j\leftarrow (d_E(u_{j+1})-d_E(u_j))\mod m,\forall 0\leq j<k$.
+        \State Add edge $u_j'\rightarrow_{d_j} u_{j+1}'$ between $S_{k-1+j}$ and $S_{k+j}$
+        \EndFor
+        \State $bw\leftarrow-\log_2\max\limits_{\alpha\in S_0,\beta\in S_r}c(h^r_{\alpha,\beta})$
         \EndProcedure
 	\end{algorithmic}
 \end{algorithm}
