@@ -110,7 +110,12 @@
 
 %The design and cryptanalysis are the both sides from which we look at symmetric-key primitives. If a symmetric-key primitive is broken by a kind of cryptanalysis, it's definitely insecure. If a designer claims a symmetric-key primitive to be secure, one should demonstrate that the primitive resists against all known attacks. 
 
-%%Differential and linear cryptanalysis are two of the most important kinds of cryptanalysis for symmetric-key primitives. To conduct a successful differential (linear) cryptanalysis, a differential (linear) distinguisher with significant differential probability (linear correlation) is needed. 
+Differential and linear cryptanalysis are two of the most important kinds of cryptanalysis for symmetric-key primitives. To conduct a successful differential (linear) cryptanalysis, a differential (linear) distinguisher with significant differential probability (linear correlation) is needed. 
+
+In this work, we propose a method of searching for iterative differential and linear distinguishers using a graph approach. Assume that the best distinguisher is dominated by iterative characteristics, we further propose a method of estimating EDPs and ELPs. 
+
+We apply our methods to some S-bP symmetric primitives, including RECTANGLE, PRESENT, GIFT and so on. We find that iterative characteristics can always be found for them. By considering the clustering effect, we may find better iterative distinguishers. Using the knowledge of iterative characteristics, we estimate EDPs and ELPs and illustrate that the assumption of the dominance of iterative characteristics is reasonable. 
+
 
 %%For some lightweight symmetric-key primitives, their best trails contain iterative trails. In this work, We present an algorithm searching for iterative trails by modelling it into a graph problem. We find that the clustering effect of iterative trails may enhance differential and linear propagations. If iterative trails found, we propose a method to estimate the probability (correlation) of differentials (linear hulls). 
 
