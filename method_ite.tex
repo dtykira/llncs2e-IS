@@ -148,7 +148,7 @@ According to the previous sections, once the interesting graph generated, we can
 
 Conventionally, an iterative characteristic is exploited in two phases. Firstly, it's concatenated to itself. Secondly, the resulting characteristic is extended both forward and backward by several rounds. Following this idea, a path is picked in $G_{IS}$ and extended to obtain an exploitable characteristic. To achieve this, for each vertex in $G_{IS}$, we extend a characteristic from it by several rounds and restore them.
 
-To estimate the EDPs and ELPs, we utilize the framework proposed in \cite{EPRINT:HalVej18} as we demonstrate in Section \ref{sec:frame-msg}. Once the interesting multistage graph is built, we can obtain the best hull within the graph. 
+To estimate the EDPs and ELPs, we utilize the framework proposed in \cite{EPRINT:HalVej18} as we demonstrate in Section \ref{sec:frame-msg}. Once the interesting multistage graph is built, we can obtain the best hull within the graph. We present the total procedure in Algorithm \ref{algo:msg}.
 
 %When exploiting the iterative characteristics, conventionally it's concatenated to itself. If there is a path linking two iterative characteristics, then
 \begin{algorithm}
