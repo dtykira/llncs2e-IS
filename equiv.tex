@@ -1,0 +1,128 @@
+\section{Algoriths Targetting Primitives with the Rotational Symmetry}\label{sec:equiv}
+
+In Section \ref{sec:def-it}, we've already defined rotational iterative characteristics using the rotational equivalence relation denoted by $=_E$. If two values are rotational equivalent, they belong to the same \textit{rotational equivalence class}. We define the \textit{representative} of a equivalence class as the largest value in it. We denote the function turning a value to its representative by $r_E(\cdot)$. We define The left rotation number from a value to its representative as the distance between them and denote it by $d_E(\cdot)$. For a value $u\in \bbF_2^{s\times m}$, $r_E(u)=\rotl_{d_E(u)}(u)$. 
+
+The algorithms targetting primitives having the rotational symmetry are shown in Algorithm \ref{algo:gen-g-equiv}, \ref{algo:find-ite-c-equiv}, \ref{algo:find-ite-h-equiv} and \ref{algo:msg-equiv}. 
+
+\begin{algorithm}[htbp]
+	\caption{Generate $G$ for a rotational symmetric primitive}
+	\label{algo:gen-g-equiv}
+	\begin{algorithmic}[1]
+		\Require upper limit of active S-box number $A$, the rotational equivalence relation $=_E$ and its corresponding functions $r_E$ and $d_E$
+		\Procedure {}{}
+                \State Create an empty graph $G$
+		\For{each $u\in\bbF_2^n$ satisfying $\Asn(u)\leq A$}
+		\If{$\Asn(\calL^{-1}(u))\leq A$}
+		\For{each $v\in\bbF_2^n$ satisfying $\Asn(v)\leq A$ and the 1-round characteristic $u\xrightarrow{\calL\circ\calS}v$ is valid}
+		\State $u'\leftarrow r_E(u),v'\leftarrow r_E(v)$
+                \State $d\leftarrow (d_E(v)-d_E(u))\mod m$
+		\State Add edge $u'\rightarrow v'$ to $G$
+                \State $c(u'\xrightarrow[d]{} v')\leftarrow \bbP(u\xrightarrow{\calL\circ\calS}v)$
+		\EndFor
+		\EndIf
+		\EndFor
+                \State Reduce $G$ by removing any vertex if it doesn't have at least one incoming and one outgoing edge until no more vertices can be removed. 
+                \Return{$G$}
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htbp]
+	\caption{Find the best rotational iterative characteristic in $G$}
+	\label{algo:find-ite-c-equiv}
+	\begin{algorithmic}[1]
+        \Require $G$
+        \Ensure The best average weight growth of an rotational iterative characteristic
+        \Procedure {}{}
+        \State Create an empty graph $G'$
+        \For{each two vertices $u$ and $v$ linked in $G$}
+        \State Add edge $u\rightarrow v$ to $G'$
+        \State $c'(u\rightarrow v)\leftarrow \max\limits_d c(u\xrightarrow[d]{} v)$
+        \EndFor
+        \State $bwpr\leftarrow\infty$
+        \For{each elementary circuit $p=(\alpha_0,\cdots,\alpha_r)$ in $G'$}
+        \State $bwpr\leftarrow\min\{-\log_2\Big|\prod\limits_{i=0}^{r-1}c'(\alpha_i,\alpha_{i+1})\Big|/r,bwpr\}$        
+        \EndFor
+        \Return{$bwpr$}
+	\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htbp]
+	\caption{Find the best rotatianal iterative differential or linear hull in $G$}
+	\label{algo:find-ite-h-equiv}
+	\begin{algorithmic}[1]
+        \Require $G$, upper limits of the round number $rd$
+        \Ensure the best average weight growth of an rotational iterative distinguisher considering the clustering effect with the number of rounds no more than $rd$
+        \Procedure {}{}
+        \State $bwpr\leftarrow\infty$
+        \For{$r=1:rd$}
+        \For{each distinct strong component of $G$ with vertex set $V_{sc}$}
+        \State Let $\calH(\cdot,\cdot,\cdot)$ be an empty hash table. 
+        \State $\calH(u,v,d)\leftarrow c(u\xrightarrow[d]{} v),\forall u,v\in V_{sc},\forall$ existent $d$
+        \For{$i\leftarrow 2:r$}
+        \State Create an empty hash table $\calH'(\cdot,\cdot,\cdot)$.
+        \For{each key $(u,z,d_1)$ of $\calH(\cdot,\cdot,\cdot)$ and each edge $z\xrightarrow[d_2]{} v$}
+        \State $d\leftarrow (d_1+d_2)\mod m$
+        \If{$\calH'(u,v,d)$ exists}
+        \State $\calH'(u,v,d)\leftarrow\calH'(u,v,d)+\calH(u,z,d_1)\cdot c(z\xrightarrow[d_2]{} v)$
+        \Else
+        \State $\calH'(u,v,d)\leftarrow\calH(u,z,d_1)\cdot c(z\xrightarrow[d_2]{} v)$
+        \EndIf
+        \EndFor
+        \State $\calH\leftarrow \calH'$
+        \EndFor
+        \State $bwpr\leftarrow \min\{-\log_2\max\limits_{u,d}|\calH(u,u,d)|/r,bwpr\}$
+        \EndFor
+        \EndFor
+        \Return{$bwpr$}
+        \EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htbp]
+	\caption{Find the best differential or linear hull containing rotational iterative sub-characteristics}
+	\label{algo:msg-equiv}
+	\begin{algorithmic}[1]
+        \Require $G$, round number $r$, maximum round number to be extended $rb$, maximum weight a extended characteristic can has $wb$
+        \Ensure The weight of the best differential or linear hull containing rotational iterative sub-characteristics
+        \Procedure {}{}
+        \State $bw\leftarrow\infty$
+        \State Create an empty multistage graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$.
+        \State Reduce $G$ to its iterative structure $G_{IS}$. 
+        \State Add each edge in $G$ between $S_i$ and $S_{i+1}$ for all $i\in[0,r-1]$
+        \For{each characteristic $p=(u=u_0,u_1,\cdots,u_k)$ extended forward from $u\in G$ satisfying $k\leq rb$ and $c(p)\geq 2^{-wb}$}
+        \State $u_j'\leftarrow r_E(u_j),\forall 0\leq j\leq k$
+        \State $d_j\leftarrow d_E(u_{j+1})-d_E(u_j),\forall 0\leq j<k$.
+        \State Add edge $u_j'\xrightarrow[d_j]{} u_{j+1}'$ between $S_{r-k+j}$ and $S_{r-k+j+1}$
+        \EndFor
+        \For{each characteristic $p=(u_0,u_1,\cdots,u_k=u)$ extended backward from $u\in G$ satisfying $k\leq rb$ and $c(p)\geq 2^{-wb}$}
+        \State $u_j'\leftarrow r_E(u_j),\forall 0\leq j\leq k$
+        \State $d_j\leftarrow (d_E(u_{j+1})-d_E(u_j))\mod m,\forall 0\leq j<k$.
+        \State Add edge $u_j'\xrightarrow[d_j]{} u_{j+1}'$ between $S_{k-1+j}$ and $S_{k+j}$
+        \EndFor
+
+        \State $bw\leftarrow\infty$
+        \For{each $u\in S_0$}
+        \State Let $\calH(\cdot,\cdot)$ be an empty hash table. 
+        \State $\calH(v,d)\leftarrow c(u\xrightarrow[d]{} v),\forall v\in S_1,\forall \text{ existent } d$
+        \For{$i\leftarrow 2:r$}
+        \State Create an empty hash table $\calH'(\cdot,\cdot)$.
+        \For{each key $(z,d)$ of $\calH(\cdot,\cdot)$ and each edge $z\xrightarrow[d']{} v,z\in S_{i-1},v\in S_i$}
+        \State $d''\leftarrow d+d'\mod m$
+        \If{$\calH'(v,d'')$ exists}
+        \State $\calH'(v,d'')\leftarrow\calH'(v,d'')+\calH(z,d)\cdot c(z\xrightarrow[d']{} v)$
+        \Else
+        \State $\calH'(v,d'')\leftarrow\calH(z,d)\cdot c(z\xrightarrow[d']{} v)$
+        \EndIf
+        \EndFor
+        \State $\calH\leftarrow \calH'$
+        \EndFor
+        \State $bw\leftarrow\min\{-\log_2\max\limits_{v,d}\calH(v,d),bw\}$
+        \EndFor
+
+        %\State $bw\leftarrow-\log_2\max\limits_{\alpha\in S_0,\beta\in S_r}c(h^r_{\alpha,\beta})$
+        \State \Return{$bw$}
+        \EndProcedure
+	\end{algorithmic}
+\end{algorithm}

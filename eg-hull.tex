@@ -1,0 +1,27 @@
+\begin{figure}[H]
+    \centering
+\begin{tikzpicture}
+    \tikzstyle{every node}=[transform shape];
+    \tikzstyle{every node}=[node distance=1.2cm];
+    \tikzstyle{every node}=[font=\footnotesize,scale=0.9]
+    \node (a00) [] {$\alpha_0$};
+    \node (a10) [right of=a00] {$\alpha_1$};
+    \node (a20) [right of=a10] {$\alpha_2$};
+    \node (a21) [below of=a20] {$\alpha_0$};
+    \node (a30) [right of=a20] {$\alpha_0$};
+    \node (a31) [below of=a30] {$\alpha_1$};
+    \node (a40) [right of=a30] {$\alpha_1$};
+    \node (a41) [below of=a40] {$\alpha_2$};
+    \node (a50) [right of=a40] {$\alpha_0$};
+    
+    \path[line] (a00) edge node[above] {} (a10);
+    \path[line] (a10) edge node[above] {} (a20);\path[line] (a10) edge node[above] {} (a21);
+    \path[line] (a20) edge node[above] {} (a30);
+    \path[line] (a21) edge node[above] {} (a31);
+    \path[line] (a30) edge node[above] {} (a40);
+    \path[line] (a31) edge node[above] {} (a41);\path[line] (a40) edge node[above] {} (a50);
+    \path[line] (a41) edge node[above] {} (a50);
+\end{tikzpicture}
+\caption{An iterative distinguisher constructed by two iterative characteristics}
+\label{fig:eg-hull}
+\end{figure}

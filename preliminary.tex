@@ -1,10 +1,10 @@
-\section{Preliminaries\label{sec:pre}}
+\section{Preliminaries}\label{sec:pre}
 
-A block cipher is a function $\calE:\bbF_2^k \times \bbF_2^n \rightarrow \bbF_2^n$ with $C=\calE(K,P)$ where $K$, $P$ and $C$ are the $k$-bit master key, $n$-bit plaintext and $n$-bit ciphertext. $k$ is the key size and $n$ is the block size. Embedded into an operation mode, a block cipher can be used to encrypt a message with arbitrary length. 
+A block cipher is a function $\calE:\bbF_2^k \times \bbF_2^n \rightarrow \bbF_2^n$ with $C=\calE(K,P)$ where $K$, $P$ and $C$ are the $k$-bit master key, $n$-bit plaintext and $n$-bit ciphertext. $k$ is the key size and $n$ is the block size. Embedded into an mode of operation, a block cipher can be used to encrypt a message with arbitrary length. 
 
 A permutation is a function $\calP:\bbF_2^n \rightarrow \bbF_2^n$ with $SO=\calP(SI)$ where $SI$ and $SO$ are the $n$-bit input and output state. The sponge/duplex construction where a permutation is embedded can build various primitives such as a hash function, a stream cipher, a MAC or an authenticated encryption scheme \cite{bertoni2007sponge}. Note that a block cipher with key fixed $\calE_K=\calE(K,\cdot)$ can be seen as a permutation.
 
-In this paper, we focus on symmetric-key primitives including iterated key-alternating block ciphers and permutations of SPN structures. The state of such a primitive can be seperated into $m$ words of $s$ bits and it holds that $n=s\times m$. The round function of the $i$-th round consists of three layers and is denoted by $\calR_i=\calL\circ\calS\circ\calA_{W_i}$ where the three layers are:
+In this paper, we focus on symmetric-key primitives including iterated key-alternating SPN block ciphers and primitives based on SPN permutations. The state of such a primitive can be seperated into $m$ words of $s$ bits and it holds that $n=s\times m$. The round function of the $i$-th round consists of three layers and is denoted by $\calR_i=\calL\circ\calS\circ\calA_{W_i}$ where the three layers are:
 \begin{itemize}
     \item Addition layer $\calA_{W_i}$: xor the $i$-th $n$-bit round key or constant $W_i$ to the state;
     \item Non-linear layer $\calS$: apply $m$ parallel $s$-bit S-boxes to the words, i.e.
@@ -14,59 +14,64 @@ In this paper, we focus on symmetric-key primitives including iterated key-alter
     \item Linear layer $\calL$: multiply an $n\times n$ bijective binary matrix to the state. 
 \end{itemize}
 \input{SPN.tex}
-We use $W_i$ to denote the $i$-th round key for a block cipher or round constant for a permutation. The primitive iterates the round function several times (See Fig. \ref{fig:SPN}). We denote the $i$-th round function excluding the addition layer by $\calR_i^*=\calL\circ\calS$. We denote the states before the non-linear layer, before the linear layer and after the linear layer of the $i$-th round function by $X_i$, $Y_i$ and $Z_i$. $X_i[j]$ denotes the $j$-th word of $X_i$, i.e. the input value of the $j$-th S-box. For an $X_i$ with $k$ active S-boxes whose index set is $\mathfrak{K}=\{j_0,\cdots,j_{k-1}\}$, we denote it by $X_i[j_0]=x_0,\cdots,X_i[j_{k-1}]=x_{k-1}$ where $x_t\neq 0,\forall 0\leq t<k$ and $X_i[t]=0$ if $t\notin \mathfrak{K}$.
+We use $W_i$ to denote the $i$-th round key for a block cipher or round constant for a permutation. The primitive iterates the round function $r$ times (See Fig. \ref{fig:SPN}). We denote the $i$-th round function excluding the addition layer by $\calR_i^*=\calL\circ\calS$. We denote the states before the non-linear layer, before the linear layer and after the linear layer of the $i$-th round function by $X_i$, $Y_i$ and $Z_i$. $X_i[j]$ denotes the $j$-th word of $X_i$, i.e. the input value of the $j$-th S-box. %For an $X_i$ with $k$ active S-boxes whose index set is $\mathfrak{K}=\{j_0,\cdots,j_{k-1}\}$, we denote it by $X_i[j_0]=x_0,\cdots,X_i[j_{k-1}]=x_{k-1}$ where $x_t\neq 0,\forall 0\leq t<k$ and $X_i[t]=0$ if $t\notin \mathfrak{K}$.
 
 \subsection{Differential Cryptanalysis}
 
-In differential cryptanalysis, the attacker tries to find an exploitable \textit{differential} which is a difference pair $(\Delta P=P\oplus P',\Delta C=C\oplus C')$ with high probability to distinguish the target block cipher or permutation from a random permutation. 
+In differential cryptanalysis, the attacker tries to find an exploitable \textit{differential propagation}, which is a difference pair, with high probability to distinguish the target symmetric-key primitive from a random permutation. 
+%That is, considering a couple of $n$-bit $a$ and $a'$ with $\alpha=a\oplus a'$, we let $\beta=h(a)\oplus h(a')$.
 
-\begin{definition}[Differential Probability of $\calP$]
-    For a permutation $\calP$, given $\alpha,\beta\in \bbF_2^n$, the differential probability of the differential $(\alpha,\beta)$ is
+\begin{definition}[Differential Probability for $\calP$]
+    For a permutation $\calP:\bbF_2^n\rightarrow \bbF_2^n$, the probability of a difference propagation is defined as:
     \begin{align*}
         \bbP(\alpha\xrightarrow{\calP}\beta)=2^{-n}\cdot\Big|\{x\in\bbF_2^n|\calP(x)\oplus\calP(x\oplus\alpha)=\beta\}\Big|.
     \end{align*}
 \end{definition}
 
-Since the fixed-key block cipher $\calE_K$ is a permutation, its differential probability is also defined as above. However, the key $K$ of $\calE_K$ is unknown for the attacker. Thus the \textit{expected differential probability} (EDP) over all keys is defined.
+For a pair chosen uniformly from the set of all pairs $(a,a')$ where $a\oplus a'=\alpha$,
+$\bbP(\alpha\xrightarrow{\calP}\beta)$ is the probability that $\calP(a)\oplus \calP(a')=\beta$, ranging from 0 to 1.
 
-\begin{definition}[EDP of $\calE$]
-    For a block cipher $\calE$, given $\alpha,\beta\in \bbF_2^n$, the EDP of the differential $(\alpha,\beta)$ over a uniformly distributed random key $K\in \bbF_2^k$ is 
+Since the fixed-key block cipher $\calE_K$ is a permutation, a differential propagation probability for $\calE_K$ is also defined as above. However, the key $K$ of $\calE_K$ is unknown for the attacker. Thus the \textit{Expected Differential Probability} (EDP) over all keys for $\calE$ is defined as follows:
+
+\begin{definition}[EDP for $\calE$]
+    For a block cipher $\calE:\bbF_2^n\rightarrow \bbF_2^k\times\bbF_2^n$, given $\alpha,\beta\in \bbF_2^n$, the EDP of the difference propagation $(\alpha,\beta)$ over a uniformly distributed random key $K\in \bbF_2^k$ is defined as:
     \begin{align*}
-        \EDP(\alpha\xrightarrow{\calE}\beta):=2^{-k}\cdot\sum\limits_{K\in \bbF_2^k}\bbP(\alpha\xrightarrow{\calE_K}\beta)
+        \EDP(\alpha\xrightarrow{\calE}\beta)=2^{-k}\cdot\sum\limits_{K\in \bbF_2^k}\bbP(\alpha\xrightarrow{\calE_K}\beta)
     \end{align*}
 \end{definition}
 
-\begin{definition}[Differential Characteristics]
+\begin{definition}[Differential Characteristic]
     An $r$-round differential characteristic is a sequence of $r+1$ differences $(\alpha_0,\cdots,\alpha_r)\in(\bbF_2^n)^{r+1}$. Its probability is
     \begin{align*}
         &\bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
         =&2^{-n}\cdot\Big|\{x\in\bbF_2^n|\forall i, \calR_i\circ\cdots\circ\calR_0(x)\oplus\calR_i\circ\cdots\circ\calR_0(x\oplus\alpha_0)=\alpha_{i+1}\}\Big|\\
+        \approx&\prod\limits_{i=0}^{r-1}\bbP(\alpha_i\xrightarrow{\calR_i^*}\alpha_{i+1})
+        =\prod\limits_{i=0}^{r-1}\prod\limits_{j=0}^{m-1}\bbP(\alpha_i[j]\xrightarrow{\calS_i}\beta_i[j])
     \end{align*}
+    where $\alpha_{i+1}=\calL(\beta_i),0\leq i<r$. 
 \end{definition}
 
-Under the assumption of independent random round keys and the hypothesis of stochastic equivalence \cite{lai1991markov}, the probability of a differential characteristic is calculated round by round and S-box by S-box:
-\begin{align*}
-    \bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)
-    =&\prod\limits_{i=0}^{r-1}\bbP(\alpha_i\xrightarrow{\calR_i^*}\alpha_{i+1})\\
-    =&\prod\limits_{i=0}^{r-1}\prod\limits_{j=0}^{m-1}\bbP(\alpha_i[j]\xrightarrow{\calS_i}\beta_i[j])
-\end{align*}
-where $\alpha_{i+1}=\calL(\beta_i),0\leq i<r$. 
+Under the assumption of independent random round keys and the hypothesis of stochastic equivalence \cite{lai1991markov}, the probability of a differential characteristic is calculated round by round and S-box by S-box.
 
-The probability of a differential is calculated by summing the probabilities of all differential characteristics sharing the same input and output differences:
+\begin{definition}[Differential]
+    An $r$-round differential $(\alpha,\beta)$ is a set of differential characteristics sharing the same input difference $\alpha$ and output difference $\beta$. 
+\end{definition}
+
+The probability of a difference propagation is estimated by summing the probabilities of all differential characteristics sharing the same input and output differences, i.e. the probability of the differential:
 \begin{align*}
-    \bbP(\alpha\xrightarrow{\calP}\beta) \text{ or } \EDP(\alpha\xrightarrow{\calE}\beta)=&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
-    =&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\prod\limits_{i=0}^{r-1}\prod\limits_{j=0}^{m-1}\bbP(\alpha_i[j]\xrightarrow{\calS_i}\beta_i[j])
+    \bbP(\alpha\xrightarrow{\calP}\beta) \text{ or } \EDP(\alpha\xrightarrow{\calE}\beta)=&\sum\limits_{\substack{\alpha_0=\alpha,\alpha_r=\beta\\\alpha_1,\cdots,\alpha_{r-1}}}\bbP(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
+    \approx&\sum\limits_{\substack{\alpha_0=\alpha,\alpha_r=\beta\\\alpha_1,\cdots,\alpha_{r-1}}}\prod\limits_{i=0}^{r-1}\prod\limits_{j=0}^{m-1}\bbP(\alpha_i[j]\xrightarrow{\calS_i}\beta_i[j])
 \end{align*}
 
-\subsubsection{Truncated Differential}
-Let $\lambda$ be a linear function corresponding to an $n\times l$ binary matrix $M$. The probability of a \textit{truncated} differential of $\lambda\circ\calP$ is given by \cite{daemen2002design}:
+\subsubsection{Truncated Differential \cite{daemen2002design}}
+Let $\lambda$ be a linear function corresponding to an $n\times l$ binary matrix $M$. The probability of a \textit{truncated} differential of $\lambda\circ\calP$ is given by:
 \[
     \bbP(\alpha\xrightarrow{\lambda\circ\calP}\beta)=\sum\limits_{\omega|\beta=M\omega}\bbP(\alpha\xrightarrow{\calP}\omega).
 \]
 
 \subsection{Linear Cryptanalysis}
 
-In linear cryptanalysis, the attacker tries to find an exploitable \textit{linear approximation}  $\Gamma P\cdot P\oplus \Gamma C\cdot C$ determined by a mask pair $(\Gamma P,\Gamma C)$ revealing an approximate linear relation between $P$ and $C$ and thus distinguishing the target block cipher or permutation from a random permutation. 
+In linear cryptanalysis, the attacker tries to find an exploitable \textit{linear propagation}, which is a mask pair, revealing an approximate linear relation between the input value and the output value of the target symmetric-key primitive, and thus we can distinguish the target primitive from a random permutation. 
 
 \begin{definition}[Correlation]
     The correlation of a Boolean function $f:\bbF_2^n\rightarrow\bbF_2$ is
@@ -75,11 +80,24 @@ In linear cryptanalysis, the attacker tries to find an exploitable \textit{linea
     \end{align*}
 \end{definition}
 
-\begin{definition}[Linear Approximation]
-    For a permutation $\calP$, given $\alpha,\beta\in \bbF_2^n$, $\alpha\cdot x\oplus \beta\cdot\calP(x)$ is a linear approximation of $\calP$ and we denote $c_{\alpha\cdot x\oplus \beta\cdot\calP(x)}$ by $\Cor(\alpha\xrightarrow{\calP}\beta)$.
+\begin{definition}[Correlation for $\calP$]
+    For a permutation $\calP:\bbF_2^n\rightarrow \bbF_2^n$, the correlation of a linear propagation is defined as:
+    \begin{align*}
+        \Cor(\alpha\xrightarrow{\calP}\beta)=c_{\alpha\cdot x\oplus \beta\cdot\calP(x)}
+    \end{align*}
+    %$\alpha\cdot x\oplus \beta\cdot\calP(x)$ is a linear approximation of $\calP$ and we denote $c_{\alpha\cdot x\oplus \beta\cdot\calP(x)}$ by $\Cor(\alpha\xrightarrow{\calP}\beta)$.
 \end{definition}
 
-\begin{definition}[Linear Characteristics]
+The fixed-key block cipher $\calE_K$ is a permutation. However, the key $K$ of $\calE_K$ is unknown for the attacker. Thus the \textit{Expected Linear Potential} (ELP) over all keys for $\calE$ is defined as follows:
+
+\begin{definition}[ELP for $\calE$]
+    For a block cipher $\calE:\bbF_2^n\rightarrow \bbF_2^k\times\bbF_2^n$, given $\alpha,\beta\in \bbF_2^n$, the ELP of the linear propagation $(\alpha,\beta)$ over a uniformly distributed random key $K\in \bbF_2^k$ is defined as:
+    \begin{align*}
+        \ELP(\alpha\xrightarrow{\calE}\beta)=2^{-k}\cdot\sum\limits_{K\in \bbF_2^k}\Cor^2(\alpha\xrightarrow{\calE_K}\beta)
+    \end{align*}
+\end{definition}
+
+\begin{definition}[Linear Characteristic]
     An $r$-round linear characteristic is a sequence of $r+1$ masks $(\alpha_0,\cdots,\alpha_r)\in(\bbF_2^n)^{r+1}$. Its correlation is calculated by
     \begin{align*}
         \Cor(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)
@@ -87,7 +105,17 @@ In linear cryptanalysis, the attacker tries to find an exploitable \textit{linea
     \end{align*}
 \end{definition}
 
-In the case of key-alternating block ciphers, the \textit{expected linear potential} (ELP) of a linear approximation is calculated by summing the correlation squares of all linear characteristics sharing the same input and output masks according to Theorem 7.9.1 in \cite{daemen2002design}:
+\begin{definition}[Linear Hull]
+    An $r$-round linear hull $(\alpha,\beta)$ is a set of linear characteristics sharing the same input mask $\alpha$ and output mask $\beta$. 
+\end{definition}
+
+For a permutation, the correlation of a linear propagation is calculated by the signed sum of correlations all linear characteristics sharing the same input and output masks:
+\begin{align*}
+    \Cor(\alpha\xrightarrow{\calP}\beta)=&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\Cor(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
+    =&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\prod\limits_{i=0}^{r-1} (-1)^{\oplus_{i=0}^r \alpha_i\cdot W_i} \prod\limits_{j=0}^{m-1}\Cor(\alpha_i[j]\xrightarrow{\calS_i}\beta_i[j]).
+\end{align*}
+
+For a key-alternating block cipher, the ELP of a linear propagation is calculated by summing the correlation squares of all linear characteristics sharing the same input and output masks according to Theorem 7.9.1 in \cite{daemen2002design}:
 \begin{align*}
     \ELP(\alpha\xrightarrow{\calE}\beta)=&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\Cor^2(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
     =&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\Cor^2(\alpha_0\xrightarrow{\calR_0^*}\cdots\xrightarrow{\calR_{r-1}^*}\alpha_r)\\
@@ -95,15 +123,11 @@ In the case of key-alternating block ciphers, the \textit{expected linear potent
 \end{align*}
 where $\beta_i=\calL^T(\alpha_{i+1}),0\leq i<r$.
 
-In the case of permutations, the correlation of a linear approximation is calculated by the signed sum of correlations all linear characteristics sharing the same input and output masks:
-\begin{align*}
-    \Cor(\alpha\xrightarrow{\calP}\beta)=&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\Cor(\alpha_0\xrightarrow{\calR_0}\cdots\xrightarrow{\calR_{r-1}}\alpha_r)\\
-    =&\sum\limits_{\alpha_1,\cdots,\alpha_{r-1}}\prod\limits_{i=0}^{r-1} (-1)^{\oplus_{i=0}^r \alpha_i\cdot W_i} \prod\limits_{j=0}^{m-1}\Cor(\alpha_i[j]\xrightarrow{\calS_i}\beta_i[j]).
-\end{align*}
 
-\subsection{Concepts in Graph Theory}
 
-A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. $u$ is called the head of the edge and $v$ is called the tail of it. Each edge $u\rightarrow v$ can be associated with a \textit{cost} and it's denoted by $c(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_0,v_1,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E, 0\leq i<k$. The \textit{length} of the path is
+\subsection{Concepts in Graph Theory} \label{sec:graph-concept}
+
+A \textit{directed graph} $G(V, E)$ consists of a nonempty and finite set of \textit{vertices} $V$ and a set $E$ of ordered pairs of distinct vertices called \textit{edges}. We denote a directed edge from a vertex $u\in V$ to a vertex $v\in V$ by $u\rightarrow v$. $u$ is called the head of the edge and $v$ is called the tail of the edge. Each edge $u\rightarrow v$ can be associated with a \textit{cost} and we denote it by $c(u\rightarrow v)$. A \textit{path} $p_{u,v}$ is a sequence of vertices $(u=v_0,v_1,\cdots,v_{k-1},v=v_k)$ such that $v_i\rightarrow v_{i+1}\in E, 0\leq i<k$. The \textit{length} of the path is
 \[
     l(p_{u,v})=k,
 \]
@@ -111,42 +135,18 @@ the \textit{cost} of the path is
 \[
     c(p_{u,v})=\prod\limits_{i=1}^{k}c(v_{i-1}\rightarrow v_i).
 \]
-The \textit{hull} of $(u,v)$ is defined as the set of all paths $p_{u,v}$ leading from $u$ to $v$. More specifically, we define the $k$-length hull of $(u,v)$, denoted by $h^k(u,v)$, as the set of all paths $p_{u,v}$ satisfying $l(p_{u,v})=k$. The cost of $h^k_{u,v}$ is
+A \textit{hull} of $(u,v)$ is defined as the set of all paths $p_{u,v}$ leading from $u$ to $v$. More specifically, we define a $k$-length hull of $(u,v)$, denoted by $h^k_{u,v}$, as the set of all paths $p_{u,v}$ satisfying $l(p_{u,v})=k$. The cost of $h^k_{u,v}$ is
 \[
     c(h^k_{u,v})=\sum\limits_{l(p_{u,v})=k} c(p_{u,v}).
 \]
 
-A path $p_{u,u}$ is called a \textit{circuit}. A circuit is \textit{elementary} if no vertex but the first and last appears twice. Two circuits are distinct if one is not a cyclic permutation of the other. An induced subgraph $G'=(V',E')$ is a (maximal) \textit{strong component} of $G$ if for all $u, v\in V'$ there exist paths $p_{uv}$ and $p_{vu}$ and this property holds for no subgraph of $G$ induced by a vertex set $\overline{V'}$ such that $V' \subset \overline{V'} \subseteq V$.
+A path $p_{u,u}$ whose head is equal to its tail is called a \textit{circuit}. A circuit is \textit{elementary} if no vertex but the first and last appears twice. Two circuits are distinct if one is not a cyclic permutation of the other. An induced subgraph $G'=(V',E')$ is a (maximal) \textit{strong component} of $G$ if for all $u, v\in V'$ there exist paths $p_{uv}$ and $p_{vu}$ and this property holds for no subgraph of $G$ induced by a vertex set $\overline{V'}$ such that $V' \subset \overline{V'} \subseteq V$. A vertex in a strong component must belong to a circuit. And a vertex in a circuit must belong to a strong component. 
 
 Let $G$ be a directed graph with vertices $V$ and edges $E$. If the vertices in $V$ are partitioned into $l$ subsets $S_0,\cdots,S_{l-1}$, called \textit{stages}, such that any edge in $E$ has the form $u\rightarrow v$ with $u\in S_i$ and $v\in S_{i+1}$, $0\leq i<l$. We call the graph a \textit{multistage graph}.
 
+\subsubsection{Associating Characteristics with a Directed Graph}
+
+For a directed graph $G$ with $V$ as its vertex set and $E$ as its edge set, we associate every vertex to a difference or mask. An edge $u\rightarrow v$ exists if the corresponding 1-round characteristic is valid. The cost of the edge can be associated with the differential probability, correlation or correlation square of the 1-round characteristic. A path with length $k$ is a $k$-round characteristic. A circuit is an iterative characteristic. A $k$-length hull is a $k$-round differential or linear hull. 
+
 %\subsubsection{Notation} In this paper, we will not distinguish a vertex from a difference or mask value, an edge from a 1-round trail, a path from a trail, a weight from a differential probability or linear correlation. Note that the term "weight" has several meanings in other literatures, like the hamming weight of a difference or mask value, the negative logarithm of a differential probability or linear correlation. 
 
-\subsection{Estimating EDP and ELP using a Graph Approach}\label{sec:frame-msg}
-
-In \cite{EPRINT:HalVej18}, an algorithm for differential or linear characteristic search is proposed using a multistage graph approach. To summarize, once the onr-round characteristics to be considered are determined, the best differential or linear approximation within the search space can be found. We present its main framework in three steps as follows.
-
-\subsubsection{Generating a multistage graph}
-An edge is equivalent to a one-round characteristic. The cost of the edge is determined by the differential probability or correlation of the one-round characteristic. By selecting the interesting one-round characteristics, the multistage graph $G$ is generated by adding corresponding edges between stages $S_i$ and $S_{i+1}, \forall i\in[0,r-1]$. 
-
-\subsubsection{Graph Pruning}
-\begin{enumerate}
-    \item Remove any vertex in $S_0$ with no outgoing edges.
-    \item Remove any vertex in $S_1$ to $S_{r-1}$, if it does not have at least one incoming and one outgong edge, remove it.
-    \item Remove any vertex in $S_r$ with no incoming edges.
-\end{enumerate}
-Repeat the above procedure until no more vertices can be removed. 
-
-\subsubsection{Finding the best differential or linear approximation}
-\begin{enumerate}
-    \item Let $\calH$ be an empty hash table. Choose an $\alpha\in S_0$ and let $\calH(\alpha)=1$.
-    \item For each stage $S_0$ to $S_{r-1}$ of $G$, do:
-    \begin{enumerate}
-        \item Create an empty hash table $\calH'$.
-        \item For each key of $\calH$, let $u$ be the corresponding vertex in $G$. Let $t=\calH(u)$. Then, for each edge $u\rightarrow v$. if $\calH'(v)$ doesn't exists, let $\calH'(v)=t\cdot c(u\rightarrow v)$. Otherwise, let $\calH'(v)=\calH'(v)+t\cdot c(u\rightarrow v)$.
-        \item Let $\calH=\calH'$.
-    \end{enumerate}
-    \item $\calH(\beta)$ now contains $c(h^r_{\alpha,\beta})$.
-    \item Repeat for a new value of $\alpha$.
-\end{enumerate}
-The EDP or ELP for the best differential or linear approximation is estimated by $\max\limits_{\alpha,\beta}c(h^r_{\alpha,\beta})$.

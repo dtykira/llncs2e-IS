@@ -1,5 +1,8 @@
 \section{Conclusion\label{sec:conclusion}}
 
-In this work, we propose a new automatic tool searching for iterative characteristics for SPN symmetric-key primitives. We visualize iterative characteristics as a directed graph hoping to provide insignts on cipher designing. Based on the iterative characteristics, we can efficiently estimate the probabilities of differentials and correlations of linear approximations. It's shown that the best differentials and linear approximations are dominated by iterative characteristics. 
+In this work, we propose a new automatic tool searching for iterative distinguishers for SPN symmetric-key primitives. We visualize iterative characteristics as a directed graph hoping to provide insignts on cipher designing. Based on the iterative characteristics, we efficiently find exploitable differentials and linear hulls. 
+%It's shown that the best differentials and linear approximations are dominated by iterative characteristics. 
 
-We have conducted an initial study on ASCON permutation. For its comparatively strong diffusion layer, we can't find any iterative characteristic. A question raised for designers is that, whether a cipher with bit permutation as its linear layer can have no iterative characteristics.
+We have conducted an initial study on ASCON's inner permutation and GIFT-128. A question raised for designers is that, how to in purpose design a cipher with bit permutation as its linear layer can have no low-weight iterative characteristics. 
+
+Our method is not only suitable for SPN primitives, but also suitable for primitives of Feistel structure with SPN round functions. We leave it in future work. 

@@ -1,76 +1,129 @@
-\section{Our Methods of Finding Iterative Distinguishers}\label{sec:method_ite}
+\section{Our Method of Finding Iterative Distinguishers}\label{sec:method_ite}
 
-In this section, we present our method to search interesting iterative characteristics using a graph approach. In Section \ref{sec:def-it} we generalize the definition of iterative characteristics. In Section \ref{sec:gen_G} we determine the graph we are interested with. In Section \ref{sec:find_ite_c} we define the optimality of iterative characteristic and present our method to find the best one in the generated graph. Taking a further step, we propose a method to investigate the clustering effect of iterative characteristics using the generated graph in Section \ref{sec:find_ite_h}. 
+In this section, we present our method of searching for iterative distinguishers using a graph approach and further finding the best differential or linear hull containing iterative sub-characteristics. 
+
+In Section \ref{sec:def-it}, we give the definition of iterative characteristics and further define \textit{rotational iterative characteristics} for primitives having the rotational symmetry. 
+
+In Section \ref{sec:gen_G}, we present how we generate an interesting graph given the maximum number of active S-boxes to be considered of each round. 
+
+In Section \ref{sec:find_ite_c}, we define its \textit{average weight growth} as the index quantizing the optimality of an iterative characteristic. Then we present our method of finding the best iterative characteristic in the generated graph. 
+
+In Section \ref{sec:find_ite_h}, we propose our method of finding the best iterative differential or linear hull in the generated graph in order to investigate the clustering effect of iterative characteristics. 
+
+In Section \ref{sec:method-edp-elp}, we propose our method of finding the best differential or linear hull containing iterative sub-characteristics. 
 
 \subsection{Definitions of Iterative Characteristics}\label{sec:def-it}
 
-For symmetric-key primitives of SPN structure, we state the conventional definition of iterative characteristics that is used implicitly in \cite{wang2008differential,liu2019iterative} as follows:
+For an SPN symmetric-key primitive, we first state the definition of an iterative characteristic. 
+%that is used implicitly in \cite{wang2008differential,liu2019iterative} as follows:
 \begin{definition}[Iterative Characteristic]\label{def:it}
-	A characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=\alpha_r$.
+	A differential (linear) characteristic with difference (mask) sequence $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=\alpha_r$.
 \end{definition}
 
-In this definition, the equals sign is taken as the equivalence in numerical value by default. However, such a definition is not adequate for some primitives like RECTANGLE \cite{zhang2015rectangle}, KNOT \cite{zhang2019knot}, ASCON \cite{dobraunig2016ascon}. Since all operations in them have rotational symmetry, every characteristic has rotational equivalent variants. 
+%In this definition, the equals sign is taken as the equivalence in numerical value by default. 
+However, such a definition cannot be applied to primitives like RECTANGLE \cite{zhang2015rectangle}, KNOT \cite{zhang2019knot} and ASCON \cite{dobraunig2016ascon} directly. For the substitution and linear operations in them have the rotational symmetry. In Example \ref{exp:ic_rect}, we give a 1-round differential characteristic of RECTANGLE. It's not an iterative characteristic according to Definition \ref{def:it}, but it can be concatenated to itself arbitrary times. 
 
 \begin{example}\label{exp:ic_rect}
-    a one-round iterative differential characteristic of RECTANGLE \cite{zhang2015rectangle} is
+    a 1-round differential characteristic of RECTANGLE \cite{zhang2015rectangle} is
     \[
-        \alpha_0:0x 0200 0060 0000 0000\xrightarrow{\bbP=2^{-5}}\alpha_1:0x 2000 0600 0000 0000
+        \alpha_0:0x 0200 0060 0000 0000\xrightarrow{\bbP=2^{-5}}\alpha_1:0x 2000 0600 0000 0000.
+    \]
+    We can construct a differential characteristic as:
+    \[
+        0x 0002 0000 6000 0000 \rightarrow 0x 0020 0006 0000 0000 \rightarrow 0x 0200 0060 0000 0000 \cdots
     \]
 \end{example}
 
-In Example \ref{exp:ic_rect}, the one-round differential characteristic can be concatenated to itself arbitrary times, though $\alpha_0$ and $\alpha_1$ are not equal in numerical value. Thus we generalize Definition \ref{def:it} by allowing customizing the equals sign:
-\begin{definition}[Generalized Iterative Characteristic]\label{def:git}
-	Given an equivalence relation $=_E$, a characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=_E\alpha_r$.
+Thus we generalize Definition \ref{def:it} by considering the equal sign as a equivalance relation. To adapt Example \ref{exp:ic_rect} to Definition \ref{def:it}, we define the rotationl equivalance relation as follows:
+
+%is not adequate for some primitives like RECTANGLE \cite{zhang2015rectangle}, KNOT \cite{zhang2019knot}, ASCON \cite{dobraunig2016ascon}. Since all operations in them have rotational symmetry, every characteristic has rotational equivalent variants. 
+
+%In Example \ref{exp:ic_rect}, the 1-round differential rotational iterative characteristic can be concatenated to itself arbitrary times, though $\alpha_0$ and $\alpha_1$ are not equal in numerical value. Thus we generalize Definition \ref{def:it} by considering the equal sign as a equivalance relation. We define the rotationl equivalance relation as follows:
+
+\begin{definition}[Rotational Equivalence Relation]
+	For $\alpha=\alpha[0]||\cdots||\alpha[m-1]$ and $\beta=\beta[0]||\cdots||\beta[m-1]$, $\alpha$ and $\beta$ are rotational equivalent, if there exists a $j\in[0,m-1]$ such that $\beta=\rotl_j(\alpha)$, where $\rotl_j(\alpha)=\alpha[j]||\alpha[j+1]||\cdots||\alpha[m-1]||\alpha[0]||\cdots||\alpha[j-1]$. 
 \end{definition}
 
-For two values which are equal under the equivalence relation, they belong to the same equivalence class. In one equivalence class, one of its element is chosen as its representative. In the case of RECTANGLE, we define the \textit{rotational equivalence relation} as:
+%\begin{definition}[Generalized Iterative %Characteristic]\label{def:git}
+%	Given an equivalence relation $=_E$, a characteristic $(\alpha_0,\cdots,\alpha_r)$ is iterative if $\alpha_0=_E\alpha_r$.
+%\end{definition}
 
-\begin{definition}[Rotational Equivalence Relation $=_R$]
-	For $\alpha=\alpha[0]||\cdots||\alpha[m-1]$ and $\beta=\beta[0]||\cdots||\beta[m-1]$, $\alpha$ and $\beta$ are rotational equivalent, i.e. $\alpha=_R\beta$, if there exists a $j\in[0,m-1]$ such that $\beta=\rotl_j(\alpha)$ where $\rotl_j(\alpha)=\alpha[j]||\alpha[j+1]||\cdots||\alpha[m-1]||\alpha[0]||\cdots||\alpha[j-1]$. 
+%For two values which are equal under the equivalence relation, they belong to the same equivalence class. In one equivalence class, one of its element is chosen as its representative. In the case of RECTANGLE, we define the \textit{rotational equivalence relation} as:
+
+We define a rotational iterative characteristic based on the rotational equivalance relation. In \cite{cui2019tangram}, the authors also defined the rotational iterative characteristic, but not using an equivalance relation. Note that for any other symmetry, the equivalence relation can also be customized. For example, it's mentioned in \cite{bertoni2013keccak} that all steps of the Keccak-f round function are translation invariant in the direction of the z axis, indicating a symmetry along the z axis. Thus our definition is general. However, in this papar, we only consider primitives having no symmetry and the rotatianal symmetry. 
+
+\begin{definition}[Rotational Iterative Characteristic]\label{def:rit}
+    A differential (linear) characteristic with difference (mask) sequence $(\alpha_0,\cdots,\alpha_r)$ is rotational iterative if $\alpha_0$ and $\alpha_r$ are rotational equivalent.
 \end{definition}
-The rotational equivalence class of $\alpha$ is the set $[\alpha]_R=\{x|x=_R\alpha\}=\{\rotl_j(\alpha),0\leq j\leq m-1\}$. We define the representative of $[\alpha]_R$ as the largest value in $[\alpha]_R$ and we denote it by $r_R(\alpha)$. We further define the distance between $\alpha$ and its representative under $=_R$ as the $j\in[0,m-1]$ such that $r_R(\alpha)=\rotl_j(\alpha)$ and denote it by $d_R(\alpha)$. 
 
-In Example \ref{exp:ic_rect}, under $=_R$, $\alpha_0$ and $\alpha_1$ belong to the same equivalence class. Thus the one-round characteristic is iterative according to Definition \ref{def:git}. The representative of the class is $0x 6000 0000 0002 0000$. $d_R(\alpha_0)=6$ and $d_R(\alpha_1)=5$.
+In Example \ref{exp:ic_rect}, under the rotational equivalence relation, $\alpha_0$ and $\alpha_1$ are equivalent. Thus the 1-round characteristic is a rotational iterative characteristic. 
 
-For completeness, we denote the numerical equivalence relation by $=_{N}$. The numerical equivalence class of $\alpha$ is the set $[\alpha]_N$ containing only $\alpha$ itself. The representative of $[\alpha]_N$ is $\alpha$ itself. The distance between $\alpha$ and its representative under $=_N$ is always 0, i.e. $d_N(\alpha)\equiv 0$. In this paper, we only consider these two equivalence relations. 
+%Thus the one-round characteristic is iterative according to Definition \ref{def:git}. The representative of the class is $0x 6000 0000 0002 0000$. $d_R(\alpha_0)=6$ and $d_R(\alpha_1)=5$.
+
+In the following parts in this section, we present our algorithms targetting primitives having no symmetry. The algorithms targeting primitives having the rotational symmetry are presented in Appendix \ref{sec:equiv}. 
+
+
+
+%The rotational equivalence class of $\alpha$ is the set $[\alpha]_R=\{x|x=_R\alpha\}=\{\rotl_j(\alpha),0\leq j\leq m-1\}$. We define the representative of $[\alpha]_R$ as the largest value in $[\alpha]_R$ and we denote it by $r_R(\alpha)$. We further define the distance between $\alpha$ and its representative under $=_R$ as the $j\in[0,m-1]$ such that $r_R(\alpha)=\rotl_j(\alpha)$ and denote it by $d_R(\alpha)$. 
+
+
+
+%For completeness, we denote the numerical equivalence relation by $=_{N}$. The numerical equivalence class of $\alpha$ is the set $[\alpha]_N$ containing only $\alpha$ itself. The representative of $[\alpha]_N$ is $\alpha$ itself. The distance between $\alpha$ and its representative under $=_N$ is always 0, i.e. $d_N(\alpha)\equiv 0$. In this paper, we only consider these two equivalence relations. 
 
 \subsection{Generating an Interesting Graph}\label{sec:gen_G}
 
-By viewing the problem of find iterative characteristics as a graph problem, we can utilize currently available graph algorithms to solve it. For a directed graph $G$ with $V$ as its vertex set and $E$ as its edge set, we associate a difference or mask value to a vertex. For an edge $u\rightarrow v$, we associate its cost to the diffrential probability or correlation of the corresponding one-round characteristic.
+By viewing the problem of finding iterative characteristics as finding circuits in a graph, we can utilize currently available graph algorithms to solve it. The first step is to generate an interesting graph, since the graph will be exceedingly huge if we consider all $2^n$ differences or masks given the block size $n$. Thus we only consider differences or masks with no more than $A$ active S-boxes. We generate the interesting graph $G$ given $A$ as shown in Algorithm \ref{algo:gen-g}. We explain the algorithm as follows: 
+\begin{itemize}
+    \item In Line 2, we traverse every possible input difference (mask) $u$ of a 1-round characteristic. We keep $u$ with no more than $A$ active S-boxes. 
+    \item In Line 3, we filter out the input difference (mask) $u$ not satisfying $\Asn(\calL^{-1}(u))\le A$. A 1-round characteristic $u\xrightarrow{\calL\circ\calS}v$ satisfying $\Asn(\calL^{-1}(u))>A$ won't occur in any circuit because in the traversal of output differences (masks), we keep the output differences (masks) with no more than $A$ active S-boxes. When generating $G$ to find linear distinguishers, we modify $\Asn(\calL^{-1}(u))\le A$ to $\Asn(\calL^{T}(u))\le A$.
+    \item In Line 4, we traverse every possible difference (mask) $v$ satisfying $Asn(v)\le A$ and the 1-round characteristic $u\xrightarrow{\calL\circ\calS}v$ with input difference (mask) $u$ and output difference (mask) $v$ is valid. 
+    \item In Line 5-6, we add edge $u\leftarrow v$ to graph $G$. The cost of the edge is the differential probability or correlation square of the 1-round characteristic. When generating $G$ to find linear distinguishers, we modify $\bbP(u\xrightarrow{\calL\circ\calS}v)$ to $\Cor^2(u\xrightarrow{\calL\circ\calS}v)$. 
+    \item In Line 10, we reduce $G$ such that $G$ only contains circuits and paths linking two different vertices belonging to two different strong components. 
+\end{itemize}
+%for a primitive with block size $n$, the total number of vertices in $G$ is $2^n$, making the graph to be generated exceedingly huge. 
 
-However, for a primitive with block size $n$, the total number of vertices in $G$ is $2^n$, which making the graph to be generated exceedingly huge. In order to limit the size of the graph, we only consider difference or mask values with no more than $A$ active S-boxes. We define the function extracting the number of active S-boxes of $\alpha$ as $\Asn(\alpha)=\#\{j|\alpha[j]\neq 0\}$. 
+%In order to limit the size of the graph, we only consider difference or mask values with no more than $A$ active S-boxes. We define the function extracting the number of active S-boxes of $\alpha$ as $\Asn(\alpha)=\#\{j|\alpha[j]\neq 0\}$. 
 
-In Section \ref{sec:def-it}, we've introduced the customization of equivalence relation to generalize the definition of iterative characteristics. To adapt to the generalized circumstance, while generating $G$, we regard a vertex as the value of the representative of an equivalence class. As a result, between two vertices, there may be multiple edges corresponding to independent costs. Thus we add an extra dimension, the distance difference between the two original values, to index the edges. 
+%In Section \ref{sec:def-it}, we've introduced the customization of equivalence relation to generalize the definition of iterative characteristics. To adapt to the generalized circumstance, while generating $G$, we regard a vertex as the value of the representative of an equivalence class. As a result, between two vertices, there may be multiple edges corresponding to independent costs. Thus we add an extra dimension, the distance difference between the two original values, to index the edges. 
 
-We generate $G$ as Algorithm \ref{algo:gen_G} does in the case of diffrential cryptanalysis. While in the case of linear cryptanalysis, we substitute $\calL^{T}(u)$ for $\calL^{-1}(u)$ in Line 3 and $\Cor^2(u\xrightarrow{\calL\circ\calS}v)$ for $\bbP(u\xrightarrow{\calL\circ\calS}v)$ in Line 6. 
+%We generate $G$ as Algorithm \ref{algo:gen_G} does in the case of diffrential cryptanalysis. While in the case of linear cryptanalysis, we substitute $\calL^{T}(u)$ for $\calL^{-1}(u)$ in Line 3 and $\Cor^2(u\xrightarrow{\calL\circ\calS}v)$ for $\bbP(u\xrightarrow{\calL\circ\calS}v)$ in Line 6. 
 
 \begin{algorithm}
 	\caption{Generate $G$}
-	\label{algo:gen_G}
+	\label{algo:gen-g}
 	\begin{algorithmic}[1]
-		\Require Empty graph $G$, upper limit of active S-box number $A$, an equivalence relation $=_E$
+		\Require upper limit of active S-box number $A$
+        \Ensure graph $G$
 		\Procedure {}{}
+        \State Create an empty graph $G$
 		\For{each $u\in\bbF_2^n$ satisfying $\Asn(u)\leq A$}
 		\If{$\Asn(\calL^{-1}(u))\leq A$}
-		\For{each $v\in\bbF_2^n$ compatible with $u$ satisfying $\Asn(v)\leq A$}
-		\State $u'\leftarrow r_E(u),v'\leftarrow r_E(v),d\leftarrow (d_E(v)-d_E(u))\mod m$
-		\State add edge $u'\rightarrow v'$ to $G$, $c(u'\rightarrow_d v')\leftarrow \bbP(u\xrightarrow{\calL\circ\calS}v)$
+		\For{each $v\in\bbF_2^n$ satisfying $\Asn(v)\leq A$ and the 1-round characteristic $u\xrightarrow{\calL\circ\calS} v$ is valid}
+		\State Add edge $u\rightarrow v$ to $G$
+        \State $c(u\rightarrow v)\leftarrow \bbP(u\xrightarrow{\calL\circ\calS}v)$
 		\EndFor
 		\EndIf
 		\EndFor
+        \State Reduce $G$ by removing any vertex if it doesn't have at least one incoming and one outgoing edge until no more vertices can be removed. 
+        \State \Return{$G$}
 		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Finding the Best Iterative Characteristic}\label{sec:find_ite_c}
 
-Note that one characteristic is iterative or not is irrelavant to its diffrential probability or correlation. Thus we can reduce $G$ to its variant $G'$ where multiple edges between two vertices in $G$ degrade to one edge in $G'$. 
 
-Applying Johnson's algorithm \cite{johnson1975finding} to $G'$, we can enumerate all elementary circuits in $G'$, i.e. all elementary iterative characteristics described via $G'$. The next problems are how to define the optimality of iterative characteristics and whether there is a difference between the optimality of iterative characteristics and the optimality of elementary ones. 
+\subsection{Finding Iterative Characteristics}\label{sec:find_ite_c}
 
-For an $r$-round iterative characteristic with differential probability or correlation square denoted by $2^{-w}$, we regard its weight per round $w/r$ as an index describing the weight growth of the iterative characteristic. We refer the best iterative characteristic to the one with the largest weight per round. According to this optimality of iterative characteristics, we assign the edge with the largest cost in $G$ to $G'$, i.e. $c'(u\rightarrow v)$ is assigned with $\max_d c(u\rightarrow_d v)$ where $c'(\cdot\rightarrow\cdot)$ denotes the cost of an edge in $G'$. 
+%Note that one characteristic is iterative or not is irrelavant to its diffrential probability or correlation. Thus 
+%We can reduce $G$ to its variant $G'$ where multiple edges between two vertices in $G$ degrade to one edge in $G'$. 
+%Applying Johnson's algorithm \cite{johnson1975finding} to $G'$, we can enumerate all elementary circuits in $G'$, i.e. all elementary iterative characteristics described via $G'$. The next problem is how to define the optimality of iterative characteristics and whether there is a difference between the optimality of iterative characteristics and the optimality of elementary ones. 
 
-The optimality of iterative characteristics defined, we next state that
+Applying Johnson's algorithm \cite{johnson1975finding} to $G$, we can enumerate all elementary circuits in $G$. The next two problems are (1) how to define the optimality of iterative characteristics and (2) whether there is a difference between the optimality of iterative characteristics and the optimality of elementary iterative characteristics. 
+
+For a characteristic with differential probability or correlation square $2^{-w}$, we call $w$ the weight of the characteristic. For an $r$-round iterative characteristic with weight $w$, we regard its weight per round $w/r$ as an index describing the \textit{average weight growth} for each round of the iterative characteristic. We refer the best iterative characteristic to the one with the smallest average weight growth. 
+%According to this optimality of iterative characteristics, we assign the edge with the largest cost in $G$ to $G'$, i.e. $c'(u\rightarrow v)$ is assigned with $\max_d c(u\rightarrow_d v)$ where $c'(\cdot\rightarrow\cdot)$ denotes the cost of an edge in $G'$. 
+
+To obtain the best average weight growth of a circuit in $G$, we obtain the best average weight growth of an elementary circuit in $G$ instead. We state that
 \begin{theorem}
     One of the best iterative characteristics must be an elementary one.
 \end{theorem}
@@ -78,101 +131,149 @@ The optimality of iterative characteristics defined, we next state that
     Suppose that none of the best iterative characteristics are elementary ones. Then for any of the best iterative characteristics $ic$, we divide it into two iterative characteristics $ic_1$ and $ic_2$ since it's not elementary. The weight per round of $ic_1$, $ic_2$ and $ic$ is respectively $wpr_1=-\log_2|c(ic_1)|/l(ic_1)$, $wpr_2=-\log_2|c(ic_2)|/l(ic_2)$ and $wpr=-\log_2|c(ic_1)c(ic_2)|/(l(ic_1)+l(ic_2))$. If $wpr_1< wpr_2$, then $wpr_1<wpr<wpr_2$, which contradicts to that $ic$ is a best iterative characteristic. Else if $wpr_1=wpr_2$, then $ic_1$ and $ic_2$ are both not elementary, since they are also best iterative characteristics. Thus the above steps can be continuously conducted on $ic_1$ and $ic_2$. However, the division can't be conducted infinite times. One of $ic_1$ and $ic_2$ will be elementary at some time and then we will get a contradiction.
 \end{proof}
 
-Therefore, it's enough to investigate only on elementary iterative characteristics and reasonable to apply Johnson's algorithm \cite{johnson1975finding}. Through enumerating elementary circuits, we can evaluate the weight per round for each of them and thus find the best one. The procedure in given in Algorithm \ref{algo:find_ite_c_G}. 
+Therefore, it's enough to investigate only on elementary iterative characteristics and reasonable to apply Johnson's algorithm \cite{johnson1975finding}. Through enumerating elementary circuits, we can evaluate the average weight growth for each of them and thus find the best one. The procedure is given as shown in Algorithm \ref{algo:find-ite-c}. We explain the algorithm as follows: 
+
+\begin{itemize}
+    \item In Line 2, we set $bwpr$, which means the best weight per round, to infinity. 
+    \item In Line 3, we enumerate all elementary circuits in $G$ applying Johnson's algorithm \cite{johnson1975finding}. In practice, we can limit the length of the circuits within 10 when the size of the generated graph is very large. Otherwise the algorithm will stick with enumerating elementary iterative characteristics with too many rounds. 
+    \item In Line 4, $bwpr$ restores the smallest average weight growth of an elementary circuit. 
+\end{itemize}
 
 \begin{algorithm}
 	\caption{Find the best iterative characteristic in $G$}
-	\label{algo:find_ite_c_G}
+	\label{algo:find-ite-c}
 	\begin{algorithmic}[1]
-        \Require $G$, Empty graph $G'$
-        \Ensure Weight per round $bwpr$ of the best iterative characteristic
+        \Require $G$
+        \Ensure The best average weight growth of an iterative characteristic
         \Procedure {}{}
-        \For{each two vertices $u$ and $v$ linked in $G$}
-        \State add edge $u\rightarrow v$ to $G'$, $c'(u\rightarrow v)\leftarrow \max_d c(u\rightarrow v,d)$
-        \EndFor
         \State $bwpr\leftarrow\infty$
-        \For{each elementary circuit $p=(\alpha_0,\cdots,\alpha_r)$ in $G'$ (applying Johnson's algorithm in \cite{johnson1975finding})}
-        \State $bwpr\leftarrow\min\{-\log_2\Big|\prod\limits_{i=0}^{r-1}c'(\alpha_i,\alpha_{i+1})\Big|/r,bwpr\}$        
+        \For{each elementary circuit $p=(\alpha_0,\cdots,\alpha_r)$ in $G$}
+        \State $bwpr\leftarrow\min\{(-\log_2\Big|\prod\limits_{i=0}^{r-1}c'(\alpha_i,\alpha_{i+1})\Big|)/r,bwpr\}$        
         \EndFor
+        \State \Return{$bwpr$}
 		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Finding the Best Iterative Hull}\label{sec:find_ite_h}
+\subsection{Finding the Best Iterative Differential or Linear Hull}\label{sec:find_ite_h}
 
-In order to investigate the clustering effect of iterative characteristics, we define an iterative hull as the set of iterative characteristics with the same input and output value and the same number of rounds. 
+In order to investigate the clustering effect, we try to find the best iterative differential or linear hull in $G$, that is, to compute $\min\limits_{\substack{r\\u\in G}}(-\log_2c(h^r_{u,u}))/r$. 
 
-A strong component $G'=(V',E')$ is a subgraph of $G$ where for all $u,v\in V'$ there exist paths $p_{u,v}$ and $p_{v,u}$. For all $u\in V'$, all circuits in $G$ containing $u$ are included within $G'$. Applying Tarjan's algorithm in \cite{tarjan1972depth} to $G$, we can obtain the vertex sets of all the distinct strong components of $G$. Then each strong component $G'$ can be induced from its vertex set $V'$. 
+%A strong component $G'=(V',E')$ is a subgraph of $G$ where for all $u,v\in V'$ there exist paths $p_{u,v}$ and $p_{v,u}$. For all $u\in V'$, all circuits in $G$ containing $u$ are included within $G'$. Applying Tarjan's algorithm in \cite{tarjan1972depth} to $G$, we can obtain the vertex sets of all the distinct strong components of $G$. Then each strong component $G'$ can be induced from its vertex set $V'$. 
 
-If two elementary iterative characteristics have common values, then they can form an iterative hull with cost larger than each of the iterative characteristic. 
+If two elementary circuits have any common vertex, then a better iterative distinguisher can be found. We use Example \ref{exp:ih} to illustrate. 
+
 \begin{example}\label{exp:ih}
-    Suppose that we find two elementary iterative characteristic $p_0=(\alpha_0,\alpha_1,\alpha_0)$ with weight per round $wpr_0$ and $p_1=(\alpha_0,\alpha_1,\alpha_2,\alpha_0)$ with weight per round $wpr_1$. Then a 6-round iterative hull $h_{\alpha_0,\alpha_0}^6$ with weight per round $wpr=-\log_2(2^{-wpr_0}+2^{-wpr_1})$ can be constructed. Such an iterative hull is better than any of the two single iterative characteristics.
+    Suppose that we find two elementary iterative characteristic $p_0=(\alpha_0,\alpha_1,\alpha_0)$ with weight per round $wpr_0$ and $p_1=(\alpha_0,\alpha_1,\alpha_2,\alpha_0)$ with weight per round $wpr_1$. See Figure \ref{fig:eg-hull}. Then a 6-length hull $h_{\alpha_0,\alpha_0}^6$ with weight per round $-\log_2(2^{-wpr_0}+2^{-wpr_1})$ can be constructed. Such an iterative hull is better than any of the two single iterative characteristics. 
 \end{example}
 
-According to Example \ref{exp:ih}, we may find better iterative distinguishers by considering the clustering effect. To calculate the largest value of $c(h_{u,u}^r),u\in V'$ given the round number $r$, we perform a breadth first traversal of the graph for each vertex in $V'$. The procedure is given in Algorithm \ref{algo:find_ite_h_G}.
+\input{eg-hull.tex}
+
+Given the interesting graph $G$, we find the best iterative differential or linear hull with rounds no more than $rd$ as shown in Algorithm \ref{algo:find-ite-h}. We explain the algorithm as follows: 
+
+
+%Given $r$, to find 
+
+%According to Example \ref{exp:ih}, we may find better iterative distinguishers by considering the clustering effect. To calculate the largest value of $c(h_{u,u}^r),u\in V'$ given the round number $r$, we perform a breadth first traversal of the graph for each vertex in $V'$. The procedure is given in Algorithm \ref{algo:find_ite_h_G}.
 
 %With the number of rounds increasing, the clustering effect of iterative characteristics having common vertices will be stronger. Note that, iterative distinguishers are used to concatenate to itself to construct a long distinguisher. However, an iterative distinguisher is unexploitable if it's too long. 
 
+\begin{itemize}
+    \item In Line 2, $bwpr$, restoring the best average weight growth, is set to infinity. 
+    \item In Line 3, we traverse $r$ from $1$ to $rd$. Given the fixed $r$, to find the minimun $(-\log_2c(h^r_{u,u}))/r$ is to find the maximum $c(h^r_{u,u})$.
+    \item In Line 4, we traverse the strong components in $G$ applying Tarjan's algorithm in \cite{tarjan1972depth}. all the vertices of one circuit must belong to the same strong component. 
+    \item In Line 5-18, we compute $c(h^r_{u,v})$ for all $u,v\in V_{sc}$ throung a round-by-round way implemented by hash tables, where $V_{sc}$ is the vertex set of a strong component. Then we find the maximum $c(h^r_{u,u})$ in the hash table. $bwpr$ restores the best average weight growth.
+\end{itemize}
+
 \begin{algorithm}
-	\caption{Find the best $r$-round iterative hull in $G$}
-	\label{algo:find_ite_h_G}
+	\caption{Find the best iterative differential or linear hull in $G$}
+	\label{algo:find-ite-h}
 	\begin{algorithmic}[1]
-        \Require $G$, round number $r$
-        \Ensure Weight per round $bwpr$ of the best iterative hull
+        \Require $G$, upper limit of the round number $rd$
+        \Ensure the best average weight growth of an iterative distinguisher considering the clustering effect with the number of rounds no more than $rd$
         \Procedure {}{}
         \State $bwpr\leftarrow\infty$
-        \For{each distinct strong component of $G$ with vertex set $V_{sc}$ (applying Tarjan's algorithm in \cite{tarjan1972depth})}
-        \State Let $\calH(\cdot,\cdot,\cdot)$ be an empty hash table. 
-        \State $\calH(u,v,d)\leftarrow c(u\rightarrow_d v),\forall u,v\in V_{sc},\forall$ existent $d$
+        \For{$r=1:rd$}
+        \For{each distinct strong component of $G$ with vertex set $V_{sc}$}
+        \State Let $\calH(\cdot,\cdot)$ be an empty hash table. 
+        \State $\calH(u,v)\leftarrow c(u\rightarrow v),\forall u,v\in V_{sc}$
         \For{$i\leftarrow 2:r$}
-        \State Create an empty hash table $\calH'(\cdot,\cdot,\cdot)$.
-        \For{each key $(u,z,d_1)$ of $\calH(\cdot,\cdot,\cdot)$ and each edge $z\rightarrow_{d_2} v$}
-        \State $d\leftarrow (d_1+d_2)\mod m$
-        \If{$\calH'(u,v,d)$ exists}
-        \State $\calH'(u,v,d)\leftarrow\calH'(u,v,d)+\calH(u,z,d_1)\cdot c(z\rightarrow_{d_2} v)$
+        \State Create an empty hash table $\calH'(\cdot,\cdot)$.
+        \For{each key $(u,z)$ of $\calH(\cdot,\cdot)$ and each edge $z\rightarrow v$}
+        \If{$\calH'(u,v)$ exists}
+        \State $\calH'(u,v)\leftarrow\calH'(u,v)+\calH(u,z)\cdot c(z\rightarrow v)$
         \Else
-        \State $\calH'(u,v,d)\leftarrow\calH(u,z,d_1)\cdot c(z\rightarrow_{d_2} v)$
+        \State $\calH'(u,v)\leftarrow\calH(u,z)\cdot c(z\rightarrow v)$
         \EndIf
         \EndFor
         \State $\calH\leftarrow \calH'$
         \EndFor
-        \State $bwpr\leftarrow \min\{-\log_2\max\limits_{u,d}|\calH(u,u,d)|/r,bwpr\}$
+        \State $bwpr\leftarrow \min\{-\log_2\max\limits_{u}|\calH(u,u)|/r,bwpr\}$
         \EndFor
+        \EndFor
+        \State \Return{$bwpr$}
         \EndProcedure
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Estimating EDPs or ELPs}\label{sec:method-edp-elp}
+\subsection{Finding the Best Differential or Linear Hull containing iterative sub-characteristics}\label{sec:method-edp-elp}
 
-According to the previous sections, once the interesting graph generated, we can obtain the strong components and enumerate the elementary circuits using existing graph algorithms. An circuit always locates in one strong component. When exploiting the iterative characteristics, a path linking two circuits in different strong components is also valuable to be taken into consideration. We call a subgraph $G_{IS}$ of $G$ its \textit{iterative structure} if $G_{IS}$ contains all strong components and path linking different strong components. To reduce $G$ to $G_{IS}$, we eliminate any vertex if it does not have at least one incoming and one outgoing edge until no more vertices can be eliminated. 
+An iterative characteristic is exploited in two phases. Firstly, it's concatenated to itself several times, forming a longer characteristic. Secondly, the resulting characteristic is extended both forward and backward by several rounds. Following this idea, in our method, we pick a path in $G$ and it's extended backward from the first vertex and forward from the last vertex, forming an exploitable characteristic. To consider as many such characteristics as we can, for each vertex in $G$, we extend characteristics from it by several rounds and restore them. given the round number $r$, We create a multistage graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$. Then we add vertices and edges to $MSG$ according to $G$ and those extended characteristics. Once $MSG$ determined, we compute $-\log_2\max\limits_{u\in S_0,v\in S_r}c(h^r_{u,v})$. 
 
-Conventionally, an iterative characteristic is exploited in two phases. Firstly, it's concatenated to itself. Secondly, the resulting characteristic is extended both forward and backward by several rounds. Following this idea, a path is picked in $G_{IS}$ and extended to obtain an exploitable characteristic. To achieve this, for each vertex in $G_{IS}$, we extend a characteristic from it by several rounds and restore them.
+%According to the previous sections, once the interesting graph generated, we can obtain the strong components and enumerate the elementary circuits using existing graph algorithms. 
 
-To estimate the EDPs and ELPs, we utilize the framework proposed in \cite{EPRINT:HalVej18} as we demonstrate in Section \ref{sec:frame-msg}. Once the interesting multistage graph is built, we can obtain the best hull within the graph. We present the total procedure in Algorithm \ref{algo:msg}.
+%When exploiting the iterative characteristics, a path linking two circuits in different strong components is also valuable to be taken into consideration. We call a subgraph $G_{IS}$ of $G$ its \textit{iterative structure} if $G_{IS}$ contains all strong components and path linking different strong components. To reduce $G$ to $G_{IS}$, we eliminate any vertex if it does not have at least one incoming and one outgoing edge until no more vertices can be eliminated. 
+
+%Conventionally, an iterative characteristic is exploited in two phases. Firstly, it's concatenated to itself. Secondly, the resulting characteristic is extended both forward and backward by several rounds. Following this idea, a path is picked in $G_{IS}$ and extended to obtain an exploitable characteristic. To achieve this, for each vertex in $G_{IS}$, we extend a characteristic from it by several rounds and restore them.
+
+%To estimate the EDPs and ELPs, we utilize the framework proposed in \cite{EPRINT:HalVej18} as we demonstrate in Section \ref{sec:frame-msg}. Once the interesting multistage graph is built, we can obtain the best hull within the graph. We present the total procedure in Algorithm \ref{algo:msg}.
+
+Given the interesting graph $G$, the number of rounds $r$ and $(rb,wb)$ limiting the scope of characteristics to be considered, we find the best differential or linear hull containing iterative sub-characteristics as shown in Algorithm \ref{algo:msg}. We explain the algorithm as follows: 
 
 %When exploiting the iterative characteristics, conventionally it's concatenated to itself. If there is a path linking two iterative characteristics, then
+
+\begin{itemize}
+    \item In Line 2, we create an emtpy multistage graph $MSG$. 
+    \item In Line 3, we add edges to $MSG$ according to $G$. 
+    \item In Line 4-9, we add edges to $MSG$ according to characteristics extended backward or forward from vertices in $G$. We keep that the number of rounds of an extended characteristic doesn't exceed $rb$ and the differential probability or correlation square of an extended characteristic is at least $2^{-wb}$. 
+    \item In Line 10-26, once $MSG$ determined, we compute $\max\limits_{u\in S_0,v\in S_r} c(h^r_{u,v})$ round by round. $bw$ restores the candidate best weight of a differential or linear hull. In Line 25, after the round-by-round computation, $\calH(v)$ restores the probability of the differential $(u,v)$ or the correlation square of the linear hull $(u,v)$. The time complexity can be reduced if we consider $u\in S_0$ simultaneously. However this will increase the memory complexity from $\calO(|S_r|)$ to $\calO(|S_0|\cdot|S_r|)$ \cite{EPRINT:HalVej18}. In our method, $S_0$ and $S_r$ contains the most vertices. 
+\end{itemize}
+
 \begin{algorithm}
-	\caption{Estimating EDPs or ELPs}
+	\caption{Find the best differential or linear hull containing iterative sub-characteristics}
 	\label{algo:msg}
 	\begin{algorithmic}[1]
-        \Require $G$, round number $r$
-        \Ensure Weight $bw$ of the best hull
+        \Require $G$, round number $r$, maximum round number to be extended $rb$, maximum weight a extended characteristic can has $wb$
+        \Ensure The weight of the best differential or linear hull containing iterative sub-characteristics
         \Procedure {}{}
-        \State $bw\leftarrow\infty$
+        
         \State Create an empty multistage graph $MSG$ with $r+1$ stages $S_0,\cdots,S_r$.
-        \State Reduce $G$ to its iterative structure $G_{IS}$. 
-        \State Add each edge in $G_{IS}$ between $S_i$ and $S_{i+1}$ for any $i\in[0,r-1]$
-        \For{each characteristic $(u=u_0,u_1,\cdots,u_k)$ extended forward from $u\in G_{IS}$}
-        \State $u_j'\leftarrow r_E(u_j),\forall 0\leq j\leq k$
-        \State $d_j\leftarrow d_E(u_{j+1})-d_E(u_j),\forall 0\leq j<k$.
-        \State Add edge $u_j'\rightarrow_{d_j} u_{j+1}'$ between $S_{r-k+j}$ and $S_{r-k+j+1}$
+        \State Add each edge in $G$ between $S_i$ and $S_{i+1}$ for all $i\in[0,r-1]$
+        \For{each characteristic $p=(u=u_0,u_1,\cdots,u_k)$ extended forward from $u\in G$ satisfying $k\leq rb$ and $c(p)\geq 2^{-wb}$} 
+        \State Add edge $u_j\rightarrow u_{j+1}$ between $S_{r-k+j}$ and $S_{r-k+j+1}$
         \EndFor
-        \For{each characteristic $(u_0,u_1,\cdots,u_k=u)$ extended backward from $u\in G_{IS}$}
-        \State $u_j'\leftarrow r_E(u_j),\forall 0\leq j\leq k$
-        \State $d_j\leftarrow (d_E(u_{j+1})-d_E(u_j))\mod m,\forall 0\leq j<k$.
-        \State Add edge $u_j'\rightarrow_{d_j} u_{j+1}'$ between $S_{k-1+j}$ and $S_{k+j}$
+        \For{each characteristic $(u_0,u_1,\cdots,u_k=u)$ extended backward from $u\in G$ satisfying $k\leq rb$ and $c(p)\geq 2^{-wb}$}
+        \State Add edge $u_j\rightarrow u_{j+1}$ between $S_{k-1+j}$ and $S_{k+j}$
         \EndFor
-        \State $bw\leftarrow-\log_2\max\limits_{\alpha\in S_0,\beta\in S_r}c(h^r_{\alpha,\beta})$
+
+        \State $bw\leftarrow\infty$
+        \For{each $u\in S_0$}
+        \State Let $\calH(\cdot)$ be an empty hash table. 
+        \State $\calH(v)\leftarrow c(u\rightarrow v),\forall v\in S_1$
+        \For{$i\leftarrow 2:r$}
+        \State Create an empty hash table $\calH'(\cdot)$.
+        \For{each key $z$ of $\calH(\cdot)$ and each edge $z\rightarrow v,z\in S_{i-1},v\in S_i$}
+        \If{$\calH'(v)$ exists}
+        \State $\calH'(v)\leftarrow\calH'(v)+\calH(z)\cdot c(z\rightarrow v)$
+        \Else
+        \State $\calH'(v)\leftarrow\calH(z)\cdot c(z\rightarrow v)$
+        \EndIf
+        \EndFor
+        \State $\calH\leftarrow \calH'$
+        \EndFor
+        \State $bw\leftarrow\min\{-\log_2\max\limits_{v}\calH(v),bw\}$
+        \EndFor
+        \State \Return{$bw$}
         \EndProcedure
 	\end{algorithmic}
 \end{algorithm}
